@@ -6,7 +6,6 @@ export const metadata: Metadata = {
   description: "Artykuły naukowe, rozdziały w monografiach i teksty popularnonaukowe.",
 };
 
-// TODO: uzupełnij listę publikacji — dodaj prawdziwe wpisy poniżej
 const publications: {
   title: string;
   venue: string;
@@ -14,14 +13,47 @@ const publications: {
   type: string;
   href?: string;
 }[] = [
-  // Przykład struktury:
-  // {
-  //   title: "Tytuł artykułu",
-  //   venue: "Nazwa czasopisma lub monografii",
-  //   year: 2024,
-  //   type: "Artykuł naukowy",
-  //   href: "https://doi.org/...",
-  // },
+  {
+    title:
+      "Bezpieczeństwo separatyzmu – implikacje separatyzmu na bezpieczeństwo w regionie na przykładzie wybranych państw azjatyckich",
+    venue: "Bliski Wschód – tożsamość i polityka",
+    year: 2021,
+    type: "Rozdział w monografii",
+  },
+  {
+    title: "Separatyzm cypryjski – wielowymiarowość problemu",
+    venue: "Współczesny regionalizm Bliskiego i Dalekiego Wschodu",
+    year: 2019,
+    type: "Rozdział w monografii",
+  },
+  {
+    title:
+      "Recenzja: Tomasz Grzegorz Grosse, Pokryzysowa Europa. Dylematy Unii Europejskiej",
+    venue: "Wydawnictwo Adam Marszałek",
+    year: 2018,
+    type: "Recenzja",
+  },
+  {
+    title:
+      "Recenzja: Szymon Sochacki, Bośnia i Hercegovina 1995–2012. Studium politologiczne",
+    venue: "Wydawnictwo Adam Marszałek",
+    year: 2016,
+    type: "Recenzja",
+  },
+  {
+    title:
+      "Languages – a Tool in the Hands of Nationalists and Globalists. The Current Situation in Europe.",
+    venue: "Wydawnictwo Adam Marszałek",
+    year: 2016,
+    type: "Artykuł naukowy",
+  },
+  {
+    title:
+      "Recenzja: Edward Olszewski, Bogusław Zieliński (eds.), Spotkania polsko-chorwackie",
+    venue: "Wydawnictwo Adam Marszałek",
+    year: 2015,
+    type: "Recenzja",
+  },
 ];
 
 export default function PublikacjePage() {
