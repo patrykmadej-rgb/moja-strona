@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
-@theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-body {
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+@theme {
+  --color-pm-purple: #5C2D91;
+  --color-pm-purple-mid: #7B4DB8;
+  --color-pm-purple-light: #9B70D0;
+  --color-pm-purple-pale: #EDE6F8;
+  --color-pm-cream: #F5F1EC;
+  --color-pm-dark: #1C1028;
 }

@@ -1,121 +1,215 @@
 import Link from "next/link";
 import { siteConfig } from "@/lib/site-config";
 
-// TODO: podmień poniższe dane na swoje publikacje i tematy badawcze.
-const articles = [
+const pillars = [
   {
-    title: "Tytuł artykułu naukowego",
-    venue: "Nazwa czasopisma / konferencji, 2025",
+    href: "/badania",
+    label: "Badania",
     description:
-      "Krótkie streszczenie artykułu — o czym jest, jaki problem porusza i jakie wnioski przynosi.",
-    href: "#",
+      "Projekty badawcze, modele i analizy naukowe z obszaru psychologii, kryminologii i wiktymologii.",
   },
   {
-    title: "Tytuł drugiego artykułu",
-    venue: "Nazwa czasopisma, 2024",
-    description: "Krótki opis drugiej publikacji naukowej.",
-    href: "#",
+    href: "/publikacje",
+    label: "Publikacje",
+    description:
+      "Artykuły naukowe, rozdziały w monografiach i teksty popularnonaukowe.",
+  },
+  {
+    href: "/projekty",
+    label: "Projekty i modele",
+    description:
+      "Autorskie koncepcje i modele analityczne dotyczące ofiar, sprawców i systemu.",
+  },
+  {
+    href: "/psychoterapia",
+    label: "Psychoterapia",
+    description:
+      "Szkolenie, podejście, obszary zainteresowań i przyszła praktyka terapeutyczna.",
+  },
+  {
+    href: "/wiedza",
+    label: "Wiedza",
+    description:
+      "Artykuły, komentarze i analizy o człowieku, traumie, przestępczości i bezpieczeństwie.",
   },
 ];
 
-const research = [
-  {
-    title: "Temat badawczy 1",
-    description:
-      "Opis prowadzonego projektu badawczego — cel, metodologia i aktualny etap prac.",
-  },
-  {
-    title: "Temat badawczy 2",
-    description: "Opis kolejnego obszaru zainteresowań badawczych.",
-  },
+const areas = [
+  "Psychologia zachowań",
+  "Kryminologia",
+  "Wiktymologia",
+  "Trauma",
+  "Bezpieczeństwo",
+  "Prawo",
+  "Neuroróżnorodność",
+  "Psychoterapia",
+  "AI i analiza danych",
 ];
 
 export default function Home() {
   return (
     <div>
-      <section className="mx-auto max-w-5xl px-6 pt-20 pb-16 sm:pt-28">
-        <p className="text-sm font-medium tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
+      {/* HERO */}
+      <section className="mx-auto max-w-6xl px-6 pt-24 pb-20 sm:pt-32">
+        <p className="mb-5 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
           {siteConfig.title}
         </p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-          {siteConfig.name}
+        <h1 className="text-5xl font-semibold tracking-tight text-[#1C1028] sm:text-6xl lg:text-7xl dark:text-white">
+          Badania.<br />
+          Zrozumienie.<br />
+          <span className="text-[#5C2D91] dark:text-purple-400">Realna zmiana.</span>
         </h1>
-        <p className="mt-6 max-w-2xl text-lg text-neutral-600 dark:text-neutral-300">
+        <p className="mt-8 max-w-2xl text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
           {siteConfig.description}
         </p>
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div className="mt-10 flex flex-wrap gap-4">
           <Link
-            href="#artykuly"
-            className="rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+            href="/badania"
+            className="rounded-full bg-[#5C2D91] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
           >
-            Zobacz artykuły
+            Zobacz moje badania →
           </Link>
           <Link
-            href="/psychoterapia"
-            className="rounded-full border border-neutral-300 px-5 py-2.5 text-sm font-medium text-neutral-900 transition-colors hover:border-neutral-400 dark:border-neutral-700 dark:text-white dark:hover:border-neutral-500"
+            href="/#o-mnie"
+            className="rounded-full border border-[#5C2D91]/30 px-7 py-3 text-sm font-semibold text-[#5C2D91] transition-colors hover:border-[#5C2D91] dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
           >
-            Psychoterapia
+            Dowiedz się więcej o mnie
           </Link>
         </div>
       </section>
 
-      <section id="o-mnie" className="border-t border-black/10 py-16 dark:border-white/10">
-        <div className="mx-auto max-w-5xl px-6">
-          <h2 className="text-2xl font-semibold tracking-tight">O mnie</h2>
-          <div className="mt-6 max-w-3xl space-y-4 text-neutral-600 dark:text-neutral-300">
-            <p>
-              Jestem doktorantem oraz przyszłym psychoterapeutą. Tutaj znajdziesz kilka zdań
-              o moim wykształceniu, doświadczeniu badawczym i klinicznym oraz o tym, czym się
-              obecnie zajmuję.
-            </p>
-            {/* TODO: zastąp poniższy akapit właściwym opisem swojej drogi zawodowej i naukowej. */}
-            <p>
-              Uzupełnij tę sekcję o informacje o studiach, afiliacji (uczelnia, instytut),
-              szkoleniu psychoterapeutycznym oraz obszarach, którymi się zajmujesz.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section id="artykuly" className="border-t border-black/10 py-16 dark:border-white/10">
-        <div className="mx-auto max-w-5xl px-6">
-          <h2 className="text-2xl font-semibold tracking-tight">Artykuły naukowe</h2>
-          <div className="mt-6 grid gap-6 sm:grid-cols-2">
-            {articles.map((article) => (
-              <a
-                key={article.title}
-                href={article.href}
-                className="rounded-xl border border-black/10 p-5 transition-colors hover:border-neutral-400 dark:border-white/10 dark:hover:border-neutral-500"
+      {/* PIĘĆ FILARÓW */}
+      <section className="border-t border-[#5C2D91]/10 py-16 dark:border-white/10">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {pillars.map((pillar) => (
+              <Link
+                key={pillar.href}
+                href={pillar.href}
+                className="group rounded-2xl border border-[#5C2D91]/15 bg-white p-6 transition-all hover:border-[#5C2D91]/40 hover:shadow-md dark:bg-neutral-900 dark:border-white/10 dark:hover:border-purple-400/30"
               >
-                <h3 className="font-medium">{article.title}</h3>
-                <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-                  {article.venue}
+                <p className="text-xs font-semibold tracking-widest uppercase text-[#5C2D91] dark:text-purple-400">
+                  {pillar.label}
                 </p>
-                <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
-                  {article.description}
+                <p className="mt-3 text-sm leading-relaxed text-[#4A3360] dark:text-neutral-300">
+                  {pillar.description}
                 </p>
-              </a>
+                <p className="mt-4 text-xs font-medium text-[#5C2D91] opacity-0 transition-opacity group-hover:opacity-100 dark:text-purple-400">
+                  →
+                </p>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="badania" className="border-t border-black/10 py-16 dark:border-white/10">
-        <div className="mx-auto max-w-5xl px-6">
-          <h2 className="text-2xl font-semibold tracking-tight">Badania</h2>
-          <div className="mt-6 grid gap-6 sm:grid-cols-2">
-            {research.map((item) => (
-              <div
-                key={item.title}
-                className="rounded-xl border border-black/10 p-5 dark:border-white/10"
+      {/* CYTAT */}
+      <section className="border-t border-[#5C2D91]/10 py-20 dark:border-white/10">
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <p className="text-2xl font-light italic leading-relaxed text-[#1C1028] sm:text-3xl dark:text-white">
+            „Zrozumieć człowieka w jego historii, kontekście i relacjach
+            — to pierwszy krok do realnej zmiany."
+          </p>
+          <p className="mt-6 text-sm font-semibold tracking-widest uppercase text-[#5C2D91] dark:text-purple-400">
+            — Patryk Madej
+          </p>
+        </div>
+      </section>
+
+      {/* OBSZARY DZIAŁALNOŚCI */}
+      <section className="border-t border-[#5C2D91]/10 py-16 dark:border-white/10">
+        <div className="mx-auto max-w-6xl px-6">
+          <p className="mb-6 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
+            Obszary działalności
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {areas.map((area) => (
+              <span
+                key={area}
+                className="rounded-full border border-[#5C2D91]/20 bg-white px-5 py-2.5 text-sm font-medium text-[#4A3360] dark:bg-neutral-900 dark:border-white/10 dark:text-neutral-300"
               >
-                <h3 className="font-medium">{item.title}</h3>
-                <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
-                  {item.description}
+                {area}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* O MNIE */}
+      <section id="o-mnie" className="border-t border-[#5C2D91]/10 py-20 dark:border-white/10">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
+            <div>
+              <p className="mb-4 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
+                O mnie
+              </p>
+              <h2 className="text-3xl font-semibold tracking-tight text-[#1C1028] dark:text-white">
+                Połączenie perspektyw.<br />Zrozumienie człowieka.
+              </h2>
+              <div className="mt-6 space-y-4 text-[#4A3360] leading-relaxed dark:text-neutral-300">
+                <p>
+                  Jestem doktorantem Uniwersytetu Szczecińskiego oraz studentem psychologii.
+                  Przez lata łączyłem zainteresowania prawnicze, politologiczne i psychologiczne —
+                  badając Bałkany Zachodnie, separatyzm, bezpieczeństwo i wielokulturowość.
+                </p>
+                <p>
+                  Dziś moje zainteresowania naukowe skupiają się na kryminologii, wiktymologii
+                  i psychologii bezpieczeństwa. Równolegle szkolę się w psychoterapii
+                  w nurcie integracyjno-psychodynamicznym, w tym metodą EMDR w pracy z traumą.
+                </p>
+                <p>
+                  Łączę różne dziedziny wiedzy i doświadczenia, aby lepiej rozumieć człowieka,
+                  jego decyzje, zachowania oraz konteksty, w których funkcjonuje.
                 </p>
               </div>
-            ))}
+              <Link
+                href="/#o-mnie"
+                className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[#5C2D91] hover:underline dark:text-purple-400"
+              >
+                Więcej o mnie →
+              </Link>
+            </div>
+
+            <div className="space-y-4">
+              {[
+                { label: "Wykształcenie", value: "Prawo (mgr), Bezpieczeństwo wewnętrzne (lic.), Psychologia (w toku) — Uniwersytet Szczeciński" },
+                { label: "Doktorat", value: "Instytut Politologii i Europeistyki, Uniwersytet Szczeciński" },
+                { label: "Specjalizacja badawcza", value: "Bałkany Zachodnie, separatyzm, bezpieczeństwo, wiktymologia, kryminologia" },
+                { label: "Języki", value: "Polski (ojczysty) · Angielski (biegle) · Włoski (płynnie)" },
+                { label: "Psychoterapia", value: "Szkolenie w nurcie integracyjno-psychodynamicznym z metodą EMDR (od września 2026)" },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-xl border border-[#5C2D91]/15 bg-white p-5 dark:bg-neutral-900 dark:border-white/10"
+                >
+                  <p className="text-xs font-semibold tracking-widest uppercase text-[#5C2D91] dark:text-purple-400">
+                    {item.label}
+                  </p>
+                  <p className="mt-2 text-sm text-[#4A3360] dark:text-neutral-300">{item.value}</p>
+                </div>
+              ))}
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* OSTATNIE PUBLIKACJE — placeholder */}
+      <section className="border-t border-[#5C2D91]/10 py-16 dark:border-white/10">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="flex items-baseline justify-between">
+            <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
+              Ostatnie publikacje
+            </p>
+            <Link
+              href="/publikacje"
+              className="text-xs font-semibold text-[#5C2D91] hover:underline dark:text-purple-400"
+            >
+              Zobacz wszystkie →
+            </Link>
+          </div>
+          <p className="mt-6 text-sm text-[#4A3360] dark:text-neutral-400">
+            Lista publikacji pojawi się wkrótce.
+          </p>
         </div>
       </section>
     </div>
