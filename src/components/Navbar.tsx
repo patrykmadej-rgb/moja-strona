@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/actions";
 import { siteConfig } from "@/lib/site-config";
@@ -26,7 +27,14 @@ export default async function Navbar() {
           href="/"
           className="text-lg font-semibold tracking-tight text-[#1C1028] dark:text-white"
         >
-          {siteConfig.name}
+          <Image
+            src="/podpis.png"
+            alt="Patryk Madej"
+            width={160}
+            height={40}
+            className="h-10 w-auto object-contain"
+            priority
+          />
         </Link>
 
         {/* Główna nawigacja */}
