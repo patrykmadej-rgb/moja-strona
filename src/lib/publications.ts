@@ -4,7 +4,8 @@ export type Publication = {
   venue: string;
   year: number;
   type: string;
-  abstract: string;
+  abstractPl: string;
+  abstractEn?: string;
   tags: string[];
   href?: string;
   pdfUrl?: string;
@@ -18,7 +19,7 @@ export const publications: Publication[] = [
     venue: "Bliski Wschód – tożsamość i polityka",
     year: 2021,
     type: "Rozdział w monografii",
-    abstract:
+    abstractPl:
       "Artykuł analizuje wpływ separatyzmu na bezpieczeństwo państw i regionów, koncentrując się na przykładach z Azji. Punktem wyjścia jest napięcie między dążeniem państwa do zachowania integralności terytorialnej a potrzebą ochrony tożsamości, praw i bezpieczeństwa społeczności separatystycznych. Na podstawie konfliktów w Palestynie, Górskim Karabachu i na Cyprze oraz innych ruchów obecnych na kontynencie azjatyckim pokazuję, że separatyzm rzadko pozostaje wyłącznie problemem wewnętrznym. Prowadzi często do zaangażowania państw trzecich, zmienia relacje międzynarodowe i może destabilizować całe regiony. Jednocześnie nie sposób ocenić go wyłącznie jako zagrożenia: dla części mniejszości narodowych i etnicznych autonomia lub secesja stanowią próbę ochrony ich praw, tożsamości i możliwości rozwoju. Artykuł wskazuje zatem, że wpływ separatyzmu na bezpieczeństwo zależy od perspektywy uczestników konfliktu, jego uwarunkowań oraz metod wykorzystywanych do realizacji celów politycznych.",
     tags: ["Separatyzm", "Bezpieczeństwo międzynarodowe", "Azja", "Konflikty etniczne", "Górski Karabach", "Palestyna", "Cypr"],
   },
@@ -28,7 +29,7 @@ export const publications: Publication[] = [
     venue: "Współczesny regionalizm Bliskiego i Dalekiego Wschodu",
     year: 2019,
     type: "Rozdział w monografii",
-    abstract: "",
+    abstractPl: "",
     tags: ["separatyzm", "Cypr", "regionalizm"],
   },
   {
@@ -37,7 +38,7 @@ export const publications: Publication[] = [
     venue: "Wydawnictwo Adam Marszałek",
     year: 2018,
     type: "Recenzja",
-    abstract: "",
+    abstractPl: "",
     tags: ["Unia Europejska", "kryzys", "politologia"],
   },
   {
@@ -46,7 +47,7 @@ export const publications: Publication[] = [
     venue: "Wydawnictwo Adam Marszałek",
     year: 2016,
     type: "Recenzja",
-    abstract: "",
+    abstractPl: "",
     tags: ["Bośnia", "Bałkany", "politologia"],
   },
   {
@@ -55,7 +56,10 @@ export const publications: Publication[] = [
     venue: "Wydawnictwo Adam Marszałek",
     year: 2016,
     type: "Artykuł naukowy",
-    abstract: "",
+    abstractPl:
+      "Artykuł analizuje polityczne znaczenie języka we współczesnej Europie oraz napięcie między tendencjami narodowymi a integracyjną polityką Unii Europejskiej. Na przykładzie wymogów językowych stosowanych w procedurach uzyskiwania obywatelstwa pokazuję, że język może pełnić funkcję narzędzia integracji społecznej, ale również bariery ograniczającej dostęp do pełni praw obywatelskich. Drugim obszarem analizy jest wielojęzyczność Unii Europejskiej, oparta na zasadzie równego traktowania języków urzędowych państw członkowskich. Artykuł omawia praktyczne konsekwencje tego modelu, w tym problemy wynikające z rozbieżności między poszczególnymi wersjami językowymi prawa unijnego. Zestawienie polityk krajowych z podejściem instytucji europejskich ukazuje język jako istotny element sporów o tożsamość, suwerenność, równość i przyszły kształt integracji europejskiej.",
+    abstractEn:
+      "The article examines the political significance of language in contemporary Europe and the tension between national tendencies and the integration-oriented policy of the European Union. Using language requirements in citizenship procedures as an example, it demonstrates that language may serve both as an instrument of social integration and as a barrier restricting access to full citizenship rights. The second area of analysis concerns the European Union's multilingualism, founded on the principle of equal treatment of the official languages of its Member States. The article discusses the practical consequences of this model, including problems caused by discrepancies between different language versions of EU law. By comparing national language policies with the approach adopted by European institutions, the article presents language as an important dimension of disputes concerning identity, sovereignty, equality and the future shape of European integration.",
     tags: ["język", "nacjonalizm", "globalizacja", "Europa"],
   },
   {
@@ -64,7 +68,7 @@ export const publications: Publication[] = [
     venue: "Wydawnictwo Adam Marszałek",
     year: 2015,
     type: "Recenzja",
-    abstract: "",
+    abstractPl: "",
     tags: ["Chorwacja", "Polska", "relacje kulturowe"],
   },
 ];

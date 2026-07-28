@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getPublicationBySlug, publications } from "@/lib/publications";
 import { tagToSlug } from "@/lib/tags";
 import { siteConfig } from "@/lib/site-config";
+import AbstractToggle from "@/components/AbstractToggle";
 
 export function generateStaticParams() {
   return publications.map((p) => ({ slug: p.slug }));
@@ -19,7 +20,7 @@ export async function generateMetadata({
   if (!pub) return {};
   return {
     title: `${pub.title} — ${siteConfig.name}`,
-    description: pub.abstract || pub.title,
+    description: pub.abstractPl || pub.title,
   };
 }
 
@@ -67,7 +68,6 @@ export default async function PublikacjaPage({
         </div>
       )}
 
-      {/* Przyciski akcji */}
       {(pub.pdfUrl || (pub.externalLinks && pub.externalLinks.length > 0)) && (
         <div className="mt-8 flex flex-wrap gap-3">
           {pub.pdfUrl && (
@@ -94,21 +94,7 @@ export default async function PublikacjaPage({
         </div>
       )}
 
-      {/* Streszczenie */}
-      <div className="mt-12 rounded-2xl border border-[#5C2D91]/15 bg-white p-8 dark:bg-neutral-900 dark:border-white/10">
-        <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#5C2D91] dark:text-purple-400 mb-3">
-          Streszczenie
-        </p>
-        {pub.abstract ? (
-          <p className="text-[#4A3360] leading-relaxed dark:text-neutral-300">
-            {pub.abstract}
-          </p>
-        ) : (
-          <p className="text-sm text-[#4A3360]/60 italic dark:text-neutral-500">
-            Streszczenie zostanie dodane wkrótce.
-          </p>
-        )}
-      </div>
+      <AbstractToggle abstractPl={pub.abstractPl} abstractEn={pub.abstractEn} />
     </div>
   );
 }
