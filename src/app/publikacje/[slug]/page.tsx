@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPublicationBySlug, publications } from "@/lib/publications";
+import { tagToSlug } from "@/lib/tags";
 import { siteConfig } from "@/lib/site-config";
 
 export function generateStaticParams() {
@@ -55,12 +56,13 @@ export default async function PublikacjaPage({
       {pub.tags.length > 0 && (
         <div className="mt-6 flex flex-wrap gap-2">
           {pub.tags.map((tag) => (
-            <span
+            <Link
               key={tag}
-              className="rounded-full border border-[#5C2D91]/20 px-3 py-0.5 text-xs text-[#5C2D91] dark:border-purple-400/20 dark:text-purple-300"
+              href={`/tagi/${tagToSlug(tag)}`}
+              className="rounded-full border border-[#5C2D91]/20 px-3 py-0.5 text-xs text-[#5C2D91] hover:bg-[#EDE6F8] hover:border-[#5C2D91]/50 transition-colors dark:border-purple-400/20 dark:text-purple-300 dark:hover:bg-purple-900/20"
             >
               {tag}
-            </span>
+            </Link>
           ))}
         </div>
       )}
