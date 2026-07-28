@@ -7,6 +7,8 @@ export type Publication = {
   abstract: string;
   tags: string[];
   href?: string;
+  pdfUrl?: string;
+  externalLinks?: { label: string; href: string }[];
 };
 
 export const publications: Publication[] = [

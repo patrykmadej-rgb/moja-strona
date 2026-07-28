@@ -65,6 +65,34 @@ export default async function PublikacjaPage({
         </div>
       )}
 
+      {/* Przyciski akcji */}
+      {(pub.pdfUrl || (pub.externalLinks && pub.externalLinks.length > 0)) && (
+        <div className="mt-8 flex flex-wrap gap-3">
+          {pub.pdfUrl && (
+            <a
+              href={pub.pdfUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-[#5C2D91] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#7B4DB8] transition-colors"
+            >
+              ↓ Pobierz PDF
+            </a>
+          )}
+          {pub.externalLinks?.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-[#5C2D91]/30 px-5 py-2.5 text-sm font-medium text-[#5C2D91] hover:border-[#5C2D91] hover:bg-[#EDE6F8] transition-colors dark:border-purple-400/30 dark:text-purple-300 dark:hover:bg-purple-900/20"
+            >
+              {link.label} →
+            </a>
+          ))}
+        </div>
+      )}
+
+      {/* Streszczenie */}
       <div className="mt-12 rounded-2xl border border-[#5C2D91]/15 bg-white p-8 dark:bg-neutral-900 dark:border-white/10">
         <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#5C2D91] dark:text-purple-400 mb-3">
           Streszczenie
@@ -79,17 +107,6 @@ export default async function PublikacjaPage({
           </p>
         )}
       </div>
-
-      {pub.href && (
-        <a
-          href={pub.href}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#5C2D91] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#7B4DB8] transition-colors"
-        >
-          Zobacz publikację →
-        </a>
-      )}
     </div>
   );
 }
