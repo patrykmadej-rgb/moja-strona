@@ -10,3 +10,7 @@
   --color-pm-cream: #F5F1EC;
   --color-pm-dark: #1C1028;
 }
+
+html {
+  scroll-padding-top: 5rem;
+}
