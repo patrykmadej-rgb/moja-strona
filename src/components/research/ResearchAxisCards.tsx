@@ -175,7 +175,7 @@ export default function ResearchAxisCards({
   }, [activeAxis]);
 
   return (
-    <section id="osie-badawcze" className="mx-auto hidden max-w-6xl px-6 py-20 min-[720px]:block">
+    <section id="osie-badawcze" className="mx-auto hidden max-w-6xl px-6 pt-10 pb-20 min-[720px]:block">
       <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
         {labels.axesEyebrow}
       </p>

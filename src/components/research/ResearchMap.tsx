@@ -120,7 +120,7 @@ export default function ResearchMap({
               fill
               priority
               loading="eager"
-              sizes="(min-width: 720px) 45vw, 100vw"
+              sizes="(min-width: 720px) calc(100vw - 400px), 100vw"
               aria-hidden="true"
               className="object-cover"
             />
@@ -233,8 +233,8 @@ export default function ResearchMap({
               <span
                 className="flex items-center justify-center rounded-full bg-[var(--research-paper)]"
                 style={{
-                  width: "clamp(30px, 8cqw, 52px)",
-                  height: "clamp(30px, 8cqw, 52px)",
+                  width: "clamp(30px, 8cqw, 90px)",
+                  height: "clamp(30px, 8cqw, 90px)",
                   border: "1.5px solid",
                   borderColor: isFocused ? "var(--research-gold)" : "var(--research-amethyst)",
                   boxShadow: isFocused ? "0 0 0 5px rgba(195,154,59,.12)" : undefined,
@@ -242,11 +242,11 @@ export default function ResearchMap({
                   transition: "border-color 250ms var(--research-ease), box-shadow 250ms var(--research-ease), color 250ms var(--research-ease)",
                 }}
               >
-                <Icon style={{ width: "clamp(15px, 4cqw, 26px)", height: "clamp(15px, 4cqw, 26px)" }} />
+                <Icon style={{ width: "clamp(15px, 4cqw, 46px)", height: "clamp(15px, 4cqw, 46px)" }} />
               </span>
               <span
-                className="max-w-[9rem] leading-tight font-semibold text-[var(--research-plum-800)] dark:text-white"
-                style={{ fontSize: "clamp(10px, 2.2cqw, 13px)" }}
+                className="max-w-[10rem] leading-tight font-semibold text-[var(--research-plum-800)] dark:text-white"
+                style={{ fontSize: "clamp(10px, 2.2cqw, 16px)" }}
               >
                 {axis.shortTitle}
               </span>

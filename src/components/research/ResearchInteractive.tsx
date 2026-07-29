@@ -82,19 +82,26 @@ export default function ResearchInteractive({ heroLeft, axes, currentWork, hasBa
 
   return (
     <>
-      <section className="mx-auto flex max-w-6xl flex-col items-center gap-10 px-6 pt-14 pb-8 min-[720px]:flex-row min-[720px]:items-center min-[720px]:gap-8 min-[720px]:pt-20">
-        <div className="w-full shrink-0 min-[720px]:max-w-[360px]">{heroLeft}</div>
-        <div className="w-full min-[720px]:flex-1">
-          <ResearchMap
-            axes={axes}
-            activeAxis={activeAxis}
-            hoveredAxis={hoveredAxis}
-            onSelect={selectAxis}
-            onHover={setHoveredAxis}
-            onSeeRelated={seeRelated}
-            labels={labels}
-            hasBackgroundImage={hasBackgroundImage}
-          />
+      {/* Hero "wyłamuje się" z max-w-6xl na szeroki viewport (tak jak hero strony
+          głównej), żeby mapa dostała dużo więcej miejsca niż połowa zwykłego
+          kontenera. items-start (nie items-center), żeby krótsza kolumna tekstu
+          nie była wyśrodkowana w wysokości wyznaczanej przez mapę — to właśnie
+          tworzyło pusty pas pod przyciskiem CTA. */}
+      <section className="relative left-0 w-full min-[720px]:left-[calc(-50vw+50%)] min-[720px]:w-screen">
+        <div className="mx-auto flex max-w-6xl flex-col gap-10 px-6 pt-14 pb-8 min-[720px]:max-w-none min-[720px]:flex-row min-[720px]:items-start min-[720px]:gap-10 min-[720px]:px-10 min-[720px]:pt-16 min-[720px]:pb-10 lg:px-16">
+          <div className="w-full shrink-0 min-[720px]:max-w-[320px]">{heroLeft}</div>
+          <div className="w-full min-[720px]:flex-1">
+            <ResearchMap
+              axes={axes}
+              activeAxis={activeAxis}
+              hoveredAxis={hoveredAxis}
+              onSelect={selectAxis}
+              onHover={setHoveredAxis}
+              onSeeRelated={seeRelated}
+              labels={labels}
+              hasBackgroundImage={hasBackgroundImage}
+            />
+          </div>
         </div>
       </section>
 
