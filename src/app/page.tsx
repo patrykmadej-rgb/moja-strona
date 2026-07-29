@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { siteConfig } from "@/lib/site-config";
 
 const pillars = [
@@ -50,31 +51,46 @@ export default function Home() {
   return (
     <div>
       {/* HERO */}
-      <section className="mx-auto max-w-6xl px-6 pt-24 pb-20 sm:pt-32">
-        <p className="mb-5 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
-          {siteConfig.title}
-        </p>
-        <h1 className="text-5xl font-semibold tracking-tight text-[#1C1028] sm:text-6xl lg:text-7xl dark:text-white">
-          Badania.<br />
-          Zrozumienie.<br />
-          <span className="text-[#5C2D91] dark:text-purple-400">Realna zmiana.</span>
-        </h1>
-        <p className="mt-8 max-w-2xl text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
-          {siteConfig.description}
-        </p>
-        <div className="mt-10 flex flex-wrap gap-4">
-          <Link
-            href="/badania"
-            className="rounded-full bg-[#5C2D91] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
-          >
-            Zobacz moje badania →
-          </Link>
-          <Link
-            href="/#o-mnie"
-            className="rounded-full border border-[#5C2D91]/30 px-7 py-3 text-sm font-semibold text-[#5C2D91] transition-colors hover:border-[#5C2D91] dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
-          >
-            Dowiedz się więcej o mnie
-          </Link>
+      <section className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+        <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2">
+          <div>
+            <p className="mb-5 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
+              {siteConfig.title}
+            </p>
+            <h1 className="text-5xl leading-tight font-bold tracking-tight text-[#1C1028] lg:text-6xl dark:text-white">
+              Badania.<br />
+              Zrozumienie.<br />
+              <span className="text-[#5C2D91] dark:text-purple-400">Realna zmiana.</span>
+            </h1>
+            <p className="mt-8 max-w-xl text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
+              {siteConfig.description}
+            </p>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <Link
+                href="/badania"
+                className="rounded-full bg-[#5C2D91] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
+              >
+                Zobacz moje badania →
+              </Link>
+              <Link
+                href="/#o-mnie"
+                className="rounded-full border border-[#5C2D91] px-7 py-3 text-sm font-semibold text-[#5C2D91] transition-colors hover:bg-[#5C2D91] hover:text-white dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
+              >
+                Dowiedz się więcej o mnie
+              </Link>
+            </div>
+          </div>
+
+          <div>
+            <Image
+              src="/hero-ilustracja.png"
+              alt="Ilustracja przedstawiająca tematykę badań psychologicznych i kryminologicznych"
+              width={1693}
+              height={929}
+              priority
+              className="h-auto w-full rounded-2xl"
+            />
+          </div>
         </div>
       </section>
 
