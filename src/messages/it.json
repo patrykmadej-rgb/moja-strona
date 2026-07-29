@@ -143,5 +143,10 @@
   },
   "PublicationDetail": {
     "backToAll": "← Tutte le pubblicazioni"
+  },
+  "PublicationStatus": {
+    "inProgress": "In corso di pubblicazione",
+    "inPreparation": "In preparazione",
+    "expectedDate": "Pubblicazione prevista: {date}"
   }
 }

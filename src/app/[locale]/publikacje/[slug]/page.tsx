@@ -7,6 +7,7 @@ import { getPublicationBySlug, publications } from "@/lib/publications";
 import { tagToSlug } from "@/lib/tags";
 import { siteConfig } from "@/lib/site-config";
 import AbstractToggle from "@/components/AbstractToggle";
+import PublicationStatusBadge from "@/components/PublicationStatusBadge";
 
 export function generateStaticParams() {
   return publications.map((p) => ({ slug: p.slug }));
@@ -38,6 +39,8 @@ export default async function PublikacjaPage({
   const locale = await getLocale();
   const tDetail = await getTranslations("PublicationDetail");
   const tNote = await getTranslations("PublicationNote");
+  const tStatus = await getTranslations("PublicationStatus");
+  const isInProgress = pub.status === "w-trakcie";
   const titleLang = pub.titleLang ?? "pl";
   const showLanguageNote = locale !== "pl" && titleLang !== locale;
   const languageNote = titleLang === "en" ? tNote("english") : tNote("polish");
@@ -63,9 +66,18 @@ export default async function PublikacjaPage({
                 {tDetail("backToAll")}
               </Link>
 
-              <span className="inline-block w-fit rounded-full bg-white/20 px-3 py-0.5 text-xs font-medium text-white">
-                {pub.type}
-              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-block w-fit rounded-full bg-white/20 px-3 py-0.5 text-xs font-medium text-white">
+                  {pub.type}
+                </span>
+                {isInProgress && <PublicationStatusBadge />}
+              </div>
+
+              {pub.expectedPublicationDate && (
+                <p className="mt-2 text-sm text-white/80">
+                  {tStatus("expectedDate", { date: pub.expectedPublicationDate })}
+                </p>
+              )}
 
               <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white leading-snug">
                 {pub.title}
@@ -76,7 +88,7 @@ export default async function PublikacjaPage({
               )}
 
               <p className="mt-3 text-white/80">
-                {pub.venue} · {pub.year}
+                {pub.venue} · {pub.year ?? (isInProgress ? tStatus("inPreparation") : "")}
               </p>
 
               {pub.tags.length > 0 && (
@@ -104,9 +116,18 @@ export default async function PublikacjaPage({
             {tDetail("backToAll")}
           </Link>
 
-          <span className="inline-block rounded-full bg-[#EDE6F8] px-3 py-0.5 text-xs font-medium text-[#4A1D6E] dark:bg-purple-900/30 dark:text-purple-300">
-            {pub.type}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-block rounded-full bg-[#EDE6F8] px-3 py-0.5 text-xs font-medium text-[#4A1D6E] dark:bg-purple-900/30 dark:text-purple-300">
+              {pub.type}
+            </span>
+            {isInProgress && <PublicationStatusBadge />}
+          </div>
+
+          {pub.expectedPublicationDate && (
+            <p className="mt-2 text-sm text-[#4A3360] dark:text-neutral-400">
+              {tStatus("expectedDate", { date: pub.expectedPublicationDate })}
+            </p>
+          )}
 
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[#1C1028] leading-snug dark:text-white">
             {pub.title}
@@ -119,7 +140,7 @@ export default async function PublikacjaPage({
           )}
 
           <p className="mt-3 text-[#4A3360] dark:text-neutral-400">
-            {pub.venue} · {pub.year}
+            {pub.venue} · {pub.year ?? (isInProgress ? tStatus("inPreparation") : "")}
           </p>
 
           {pub.tags.length > 0 && (

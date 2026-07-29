@@ -3,7 +3,8 @@ import type { LucideIcon } from "lucide-react";
 import { Search, FileText, Share2, Brain, PenTool, Shield, Globe, Landmark } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { publications } from "@/lib/publications";
+import { publications, getPublicationSortYear } from "@/lib/publications";
+import PublicationStatusBadge from "@/components/PublicationStatusBadge";
 
 const pillars: { key: string; href: string; Icon: LucideIcon }[] = [
   { key: "badania", href: "/badania", Icon: Search },
@@ -20,7 +21,7 @@ const publicationIcons: Record<string, LucideIcon> = {
 };
 
 const recentPublications = [...publications]
-  .sort((a, b) => b.year - a.year)
+  .sort((a, b) => getPublicationSortYear(b) - getPublicationSortYear(a))
   .slice(0, 3);
 
 const areas = [
@@ -49,6 +50,7 @@ export default async function Home() {
   const tPillars = await getTranslations("Pillars");
   const tQuote = await getTranslations("QuotePublications");
   const tAbout = await getTranslations("AboutMe");
+  const tStatus = await getTranslations("PublicationStatus");
 
   return (
     <div>
@@ -220,20 +222,25 @@ export default async function Home() {
                       href={`/publikacje/${pub.slug}`}
                       className="group"
                     >
-                      {thumb ? (
-                        <div className="relative aspect-square overflow-hidden rounded-xl">
-                          <Image
-                            src={thumb}
-                            alt={pub.title}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex aspect-square items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#4A1D6E]">
-                          <Icon className="h-16 w-16 text-white" />
-                        </div>
-                      )}
+                      <div className="relative">
+                        {thumb ? (
+                          <div className="relative aspect-square overflow-hidden rounded-xl">
+                            <Image
+                              src={thumb}
+                              alt={pub.title}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex aspect-square items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#4A1D6E]">
+                            <Icon className="h-16 w-16 text-white" />
+                          </div>
+                        )}
+                        {pub.status === "w-trakcie" && (
+                          <PublicationStatusBadge className="absolute top-2 right-2 shadow-sm" />
+                        )}
+                      </div>
                       <p className="mt-2 line-clamp-2 text-base font-bold text-[#1C1028] dark:text-white">
                         {pub.title}
                       </p>
@@ -241,7 +248,7 @@ export default async function Home() {
                         {pub.type}
                       </p>
                       <p className="text-sm text-[#4A3360] dark:text-neutral-400">
-                        {pub.year}
+                        {pub.year ?? (pub.status === "w-trakcie" ? tStatus("inPreparation") : "")}
                       </p>
                       <p className="mt-2 text-sm font-semibold uppercase text-[#4A1D6E] transition-transform group-hover:translate-x-1 dark:text-purple-400">
                         {tQuote("readMore")}

@@ -2,13 +2,17 @@ export type Publication = {
   slug: string;
   title: string;
   venue: string;
-  year: number;
+  /** Opcjonalne, gdy status to "w-trakcie" i rok publikacji nie jest jeszcze znany. */
+  year?: number;
   type: string;
   abstractPl: string;
   abstractEn?: string;
   abstractIt?: string;
   /** Język, w jakim napisany jest tytuł/treść publikacji — domyślnie "pl", gdy pole nie jest ustawione. */
   titleLang?: "pl" | "en";
+  /** Domyślnie "opublikowana", gdy pole nie jest ustawione. */
+  status?: "opublikowana" | "w-trakcie";
+  expectedPublicationDate?: string;
   tags: string[];
   href?: string;
   pdfUrl?: string;
@@ -16,6 +20,12 @@ export type Publication = {
   coverImage?: string;
   coverImageThumb?: string;
 };
+
+/** Klucz sortowania malejąco: publikacje "w-trakcie" bez roku traktowane jako najnowsze. */
+export function getPublicationSortYear(pub: Publication): number {
+  if (pub.year !== undefined) return pub.year;
+  return pub.status === "w-trakcie" ? Infinity : -Infinity;
+}
 
 export const publications: Publication[] = [
   {
