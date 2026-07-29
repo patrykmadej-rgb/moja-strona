@@ -23,22 +23,26 @@ const NETWORK_PURPLE_DEEP = "#6B3AA0";
 const NETWORK_WARM_DEEP = "#D4C08A";
 
 // Sieć na całą sekcję "O mnie" (desktop/lg) — viewBox 0 0 400 200 obejmuje cały
-// dwukolumnowy układ (zdjęcie ~0-190, przerwa ~190-215, tekst+kafelki ~215-400),
-// żeby węzły i linie subtelnie łączyły zdjęcie, tekst i kafelki w jedną dekorację.
-// Współrzędne i promienie celowo nieregularne — organiczna konstelacja, nie lustrzany wzór.
+// dwukolumnowy układ (zdjęcie ~0-190, przerwa ~190-215, tekst+kafelki ~215-400).
+// Środek ciężkości układu celowo przesunięty w prawo, w stronę tekstu i kafelków:
+// przy zdjęciu zostaje tylko kilka rzadkich węzłów, gęstość i główne linie
+// koncentrują się po prawej. Współrzędne i promienie nieregularne — organiczna
+// konstelacja, nie lustrzany wzór.
 const ABOUT_SECTION_NETWORK_POINTS: { x: number; y: number; r: number; color: string; glow?: boolean }[] = [
-  { x: 25, y: 15, r: 1.6, color: NETWORK_PURPLE },
-  { x: 175, y: 12, r: 1.3, color: "#E8D9B5" },
-  { x: 15, y: 100, r: 1.8, color: NETWORK_PURPLE_DEEP, glow: true },
-  { x: 180, y: 95, r: 1.5, color: "#E8D9B5" },
-  { x: 30, y: 180, r: 1.4, color: "#E8D9B5" },
-  { x: 170, y: 185, r: 1.7, color: NETWORK_PURPLE },
-  { x: 240, y: 25, r: 1.5, color: NETWORK_PURPLE },
-  { x: 250, y: 95, r: 1.6, color: NETWORK_PURPLE_DEEP, glow: true },
-  { x: 325, y: 130, r: 1.8, color: NETWORK_PURPLE },
-  { x: 390, y: 125, r: 1.4, color: "#E8D9B5" },
-  { x: 320, y: 175, r: 2, color: NETWORK_PURPLE_DEEP, glow: true },
-  { x: 392, y: 180, r: 1.6, color: "#E8D9B5", glow: true },
+  { x: 20, y: 18, r: 1.3, color: NETWORK_PURPLE },
+  { x: 12, y: 105, r: 1.4, color: NETWORK_PURPLE_DEEP, glow: true },
+  { x: 25, y: 185, r: 1.2, color: "#E8D9B5" },
+  { x: 218, y: 12, r: 1.3, color: "#E8D9B5" },
+  { x: 222, y: 92, r: 1.6, color: NETWORK_PURPLE_DEEP, glow: true },
+  { x: 212, y: 190, r: 1.4, color: "#E8D9B5" },
+  { x: 245, y: 28, r: 1.5, color: NETWORK_PURPLE },
+  { x: 255, y: 98, r: 1.6, color: NETWORK_PURPLE_DEEP, glow: true },
+  { x: 285, y: 58, r: 1.3, color: NETWORK_PURPLE },
+  { x: 328, y: 130, r: 1.8, color: NETWORK_PURPLE, glow: true },
+  { x: 358, y: 42, r: 1.2, color: "#E8D9B5" },
+  { x: 392, y: 124, r: 1.4, color: "#E8D9B5" },
+  { x: 322, y: 178, r: 2, color: NETWORK_PURPLE_DEEP, glow: true },
+  { x: 394, y: 182, r: 1.6, color: "#E8D9B5", glow: true },
 ];
 
 const ABOUT_NETWORK_POINTS_SM: { x: number; y: number; r: number; color: string; glow?: boolean }[] = [
@@ -48,23 +52,34 @@ const ABOUT_NETWORK_POINTS_SM: { x: number; y: number; r: number; color: string;
   { x: 47, y: 96, r: 1.5, color: "#E8D9B5" },
 ];
 
-// Krzywe łączące klastry węzłów w jedną spójną, nieregularną sieć na całą szerokość sekcji.
+// Krzywe łączące klastry węzłów. Cienkie, przygaszone linie od zdjęcia sięgają
+// delikatnie w prawo; gęstsze, wyraźniejsze linie budują główną sieć po prawej
+// stronie sekcji (przy tekście i kafelkach).
 const ABOUT_SECTION_NETWORK_PATHS: { d: string; color: string; opacity: number }[] = [
-  { d: "M25,15 Q110,8 175,12", color: NETWORK_PURPLE, opacity: 0.45 },
-  { d: "M175,12 Q210,18 240,25 Q300,55 325,130", color: NETWORK_WARM_DEEP, opacity: 0.4 },
-  { d: "M15,100 Q90,115 180,95", color: NETWORK_PURPLE_DEEP, opacity: 0.45 },
-  { d: "M180,95 Q210,90 250,95 Q290,110 320,175", color: NETWORK_PURPLE, opacity: 0.4 },
-  { d: "M30,180 Q100,190 170,185", color: "#E8D9B5", opacity: 0.45 },
-  { d: "M170,185 Q250,195 320,175", color: NETWORK_PURPLE_DEEP, opacity: 0.4 },
-  { d: "M325,130 Q360,150 390,125", color: NETWORK_PURPLE, opacity: 0.5 },
-  { d: "M320,175 Q355,178 392,180", color: "#E8D9B5", opacity: 0.5 },
+  { d: "M20,18 Q120,4 218,12", color: NETWORK_WARM_DEEP, opacity: 0.22 },
+  { d: "M12,105 Q110,100 222,92", color: NETWORK_PURPLE_DEEP, opacity: 0.22 },
+  { d: "M25,185 Q115,197 212,190", color: "#E8D9B5", opacity: 0.2 },
+  { d: "M218,12 Q232,20 245,28", color: NETWORK_PURPLE, opacity: 0.45 },
+  { d: "M245,28 Q265,45 285,58", color: NETWORK_WARM_DEEP, opacity: 0.45 },
+  { d: "M285,58 Q305,90 328,130", color: NETWORK_PURPLE_DEEP, opacity: 0.5 },
+  { d: "M222,92 Q238,95 255,98", color: NETWORK_PURPLE, opacity: 0.45 },
+  { d: "M255,98 Q305,115 328,130", color: NETWORK_PURPLE_DEEP, opacity: 0.45 },
+  { d: "M328,130 Q360,135 392,124", color: NETWORK_PURPLE, opacity: 0.5 },
+  { d: "M358,42 Q378,80 392,124", color: "#E8D9B5", opacity: 0.4 },
+  { d: "M212,190 Q265,198 322,178", color: NETWORK_PURPLE_DEEP, opacity: 0.45 },
+  { d: "M322,178 Q360,182 394,182", color: "#E8D9B5", opacity: 0.5 },
+  { d: "M328,130 Q325,155 322,178", color: NETWORK_PURPLE, opacity: 0.4 },
 ];
 
 // Krótkie "odgałęzienia" poza głównymi liniami — łamią symetrię, jak przypadkowe
-// dodatkowe połączenia w prawdziwej konstelacji.
+// dodatkowe połączenia w prawdziwej konstelacji. Większość po prawej stronie,
+// żeby wzmacniać gęstość sieci przy kafelkach.
 const ABOUT_SECTION_NETWORK_BRANCHES: { x1: number; y1: number; x2: number; y2: number; r: number; color: string }[] = [
-  { x1: 240, y1: 25, x2: 265, y2: 12, r: 1, color: NETWORK_PURPLE },
-  { x1: 390, y1: 125, x2: 398, y2: 150, r: 0.9, color: "#E8D9B5" },
+  { x1: 12, y1: 105, x2: -5, y2: 118, r: 0.8, color: "#E8D9B5" },
+  { x1: 245, y1: 28, x2: 268, y2: 14, r: 1, color: NETWORK_PURPLE },
+  { x1: 285, y1: 58, x2: 302, y2: 34, r: 0.9, color: NETWORK_WARM_DEEP },
+  { x1: 358, y1: 42, x2: 376, y2: 18, r: 0.8, color: NETWORK_PURPLE },
+  { x1: 392, y1: 124, x2: 399, y2: 148, r: 0.9, color: "#E8D9B5" },
 ];
 
 const ABOUT_NETWORK_BRANCHES_SM: { x1: number; y1: number; x2: number; y2: number; r: number; color: string }[] = [
@@ -314,10 +329,10 @@ export default async function Home() {
                     <Link
                       key={pub.slug}
                       href={`/publikacje/${pub.slug}`}
-                      className="group flex items-stretch gap-4"
+                      className="group flex items-start gap-4"
                     >
                       {thumb ? (
-                        <div className="relative aspect-[3/4] h-full shrink-0 overflow-hidden rounded-xl">
+                        <div className="relative aspect-[3/4] w-[104px] shrink-0 overflow-hidden rounded-xl">
                           <Image
                             src={thumb}
                             alt={pub.title}
@@ -326,7 +341,7 @@ export default async function Home() {
                           />
                         </div>
                       ) : (
-                        <div className="flex aspect-[3/4] h-full shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#4A1D6E]">
+                        <div className="flex aspect-[3/4] w-[104px] shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#4A1D6E]">
                           <Icon className="h-6 w-6 text-white" />
                         </div>
                       )}
@@ -334,13 +349,13 @@ export default async function Home() {
                         {pub.status === "w-trakcie" && (
                           <PublicationStatusBadge className="mb-1.5" />
                         )}
-                        <p className="line-clamp-3 text-base font-bold text-[#1C1028] dark:text-white">
+                        <p className="line-clamp-3 text-sm font-bold text-[#1C1028] dark:text-white">
                           {pub.title}
                         </p>
-                        <p className="mt-1.5 text-xs text-[#4A3360] dark:text-neutral-400">
+                        <p className="mt-1.5 text-[11px] text-[#4A3360] dark:text-neutral-400">
                           {pub.type}
                         </p>
-                        <p className="text-xs text-[#4A3360] dark:text-neutral-400">
+                        <p className="text-[11px] text-[#4A3360] dark:text-neutral-400">
                           {yearLabel}
                         </p>
                         {pub.coAuthors && pub.coAuthors.length > 0 && (
@@ -348,7 +363,7 @@ export default async function Home() {
                             {tDetail("coAuthors")}: {pub.coAuthors.join(", ")}
                           </p>
                         )}
-                        <p className="mt-2 text-sm font-normal uppercase text-[#4A1D6E] transition-transform group-hover:translate-x-1 dark:text-purple-400">
+                        <p className="mt-2 text-xs font-normal uppercase text-[#4A1D6E] transition-transform group-hover:translate-x-1 dark:text-purple-400">
                           {tQuote("readMore")}
                         </p>
                       </div>
