@@ -1,6 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { LucideIcon } from "lucide-react";
+import { Search, FileText, Share2, Brain, PenTool, Shield, Globe, Landmark } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
+import { publications } from "@/lib/publications";
 
 const pillars = [
   {
@@ -8,32 +11,47 @@ const pillars = [
     label: "Badania",
     description:
       "Projekty badawcze, modele i analizy naukowe z obszaru psychologii, kryminologii i wiktymologii.",
+    Icon: Search,
   },
   {
     href: "/publikacje",
     label: "Publikacje",
     description:
       "Artykuły naukowe, rozdziały w monografiach i teksty popularnonaukowe.",
+    Icon: FileText,
   },
   {
     href: "/projekty",
     label: "Projekty i modele",
     description:
       "Autorskie koncepcje i modele analityczne dotyczące ofiar, sprawców i systemu.",
+    Icon: Share2,
   },
   {
     href: "/psychoterapia",
     label: "Psychoterapia",
     description:
       "Szkolenie, podejście, obszary zainteresowań i przyszła praktyka terapeutyczna.",
+    Icon: Brain,
   },
   {
     href: "/wiedza",
     label: "Wiedza",
     description:
       "Artykuły, komentarze i analizy o człowieku, traumie, przestępczości i bezpieczeństwie.",
+    Icon: PenTool,
   },
 ];
+
+const publicationIcons: Record<string, LucideIcon> = {
+  "bezpieczenstwo-separatyzmu-2021": Shield,
+  "separatyzm-cypryjski-2019": Globe,
+  "recenzja-grosse-pokryzysowa-europa-2018": Landmark,
+};
+
+const recentPublications = [...publications]
+  .sort((a, b) => b.year - a.year)
+  .slice(0, 3);
 
 const areas = [
   "Psychologia zachowań",
@@ -53,16 +71,16 @@ export default function Home() {
       {/* HERO */}
       <section className="relative">
         {/* Desktop / tablet: pełne tło na całą szerokość ekranu, tekst nałożony */}
-        <div className="relative left-[calc(-50vw+50%)] hidden w-screen min-h-[700px] lg:block">
+        <div className="relative left-[calc(-50vw+50%)] hidden w-screen lg:block lg:min-h-[600px]">
           <Image
             src="/hero-ilustracja.png"
             alt="Ilustracja przedstawiająca tematykę badań psychologicznych i kryminologicznych"
             fill
             priority
-            className="object-cover"
+            className="z-0 object-cover object-top"
           />
-          <div className="relative z-10 flex min-h-[700px] items-center">
-            <div className="max-w-xl pl-16">
+          <div className="relative z-10 flex lg:min-h-[600px] items-center">
+            <div className="max-w-xl pl-16 pb-12">
               <p className="mb-5 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
                 {siteConfig.title}
               </p>
@@ -132,40 +150,34 @@ export default function Home() {
       </section>
 
       {/* PIĘĆ FILARÓW */}
-      <section className="border-t border-[#5C2D91]/10 py-16 dark:border-white/10">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {pillars.map((pillar) => (
+      <section className="relative">
+        <div className="relative left-[calc(-50vw+50%)] w-screen bg-[#EAE5DE] py-12 dark:bg-neutral-900">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+            {pillars.map((pillar, i) => (
               <Link
                 key={pillar.href}
                 href={pillar.href}
-                className="group rounded-2xl border border-[#5C2D91]/15 bg-white p-6 transition-all hover:border-[#5C2D91]/40 hover:shadow-md dark:bg-neutral-900 dark:border-white/10 dark:hover:border-purple-400/30"
+                className={`group px-6 transition-opacity hover:opacity-80 md:px-8 ${
+                  i < pillars.length - 1
+                    ? "lg:border-r lg:border-black/10 dark:lg:border-white/10"
+                    : ""
+                }`}
               >
-                <p className="text-xs font-semibold tracking-widest uppercase text-[#5C2D91] dark:text-purple-400">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#2E1A42]">
+                  <pillar.Icon className="h-6 w-6 text-white" />
+                </div>
+                <p className="mt-4 text-sm font-bold tracking-wide uppercase text-[#1C1028] dark:text-white">
                   {pillar.label}
                 </p>
-                <p className="mt-3 text-sm leading-relaxed text-[#4A3360] dark:text-neutral-300">
+                <p className="mt-2 text-sm leading-relaxed text-[#4A3360] dark:text-neutral-300">
                   {pillar.description}
                 </p>
-                <p className="mt-4 text-xs font-medium text-[#5C2D91] opacity-0 transition-opacity group-hover:opacity-100 dark:text-purple-400">
+                <p className="mt-4 text-[#5C2D91] transition-transform group-hover:translate-x-1 dark:text-purple-400">
                   →
                 </p>
               </Link>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* CYTAT */}
-      <section className="border-t border-[#5C2D91]/10 py-20 dark:border-white/10">
-        <div className="mx-auto max-w-3xl px-6 text-center">
-          <p className="text-2xl font-light italic leading-relaxed text-[#1C1028] sm:text-3xl dark:text-white">
-            „Zrozumieć człowieka w jego historii, kontekście i relacjach
-            — to pierwszy krok do realnej zmiany."
-          </p>
-          <p className="mt-6 text-sm font-semibold tracking-widest uppercase text-[#5C2D91] dark:text-purple-400">
-            — Patryk Madej
-          </p>
         </div>
       </section>
 
@@ -246,23 +258,79 @@ export default function Home() {
         </div>
       </section>
 
-      {/* OSTATNIE PUBLIKACJE — placeholder */}
-      <section className="border-t border-[#5C2D91]/10 py-16 dark:border-white/10">
+      {/* CYTAT + OSTATNIE PUBLIKACJE */}
+      <section className="border-t border-[#5C2D91]/10 bg-[#F5F1EC] py-16 dark:border-white/10 dark:bg-neutral-950">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="flex items-baseline justify-between">
-            <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
-              Ostatnie publikacje
-            </p>
-            <Link
-              href="/publikacje"
-              className="text-xs font-semibold text-[#5C2D91] hover:underline dark:text-purple-400"
-            >
-              Zobacz wszystkie →
-            </Link>
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_2fr]">
+            {/* CYTAT */}
+            <div>
+              <p className="text-6xl leading-none text-[#5C2D91] dark:text-purple-400">
+                &ldquo;
+              </p>
+              <p className="mt-2 text-xl leading-relaxed italic text-[#1C1028] lg:text-2xl dark:text-white">
+                Zrozumieć człowieka w jego historii, kontekście i relacjach – to pierwszy krok do realnej zmiany.
+              </p>
+              <div className="mt-6">
+                <Image
+                  src="/podpis.png"
+                  alt="Patryk Madej"
+                  width={160}
+                  height={40}
+                  className="h-8 w-auto object-contain"
+                />
+                <p className="mt-2 text-sm tracking-widest uppercase text-[#4A3360] dark:text-neutral-400">
+                  Patryk Madej
+                </p>
+              </div>
+            </div>
+
+            {/* OSTATNIE PUBLIKACJE */}
+            <div>
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-lg font-bold uppercase text-[#1C1028] dark:text-white">
+                    Ostatnie publikacje
+                  </p>
+                  <div className="mt-2 h-1 w-12 bg-[#5C2D91]" />
+                </div>
+                <Link
+                  href="/publikacje"
+                  className="text-sm font-semibold uppercase text-[#5C2D91] hover:underline dark:text-purple-400"
+                >
+                  Zobacz wszystkie →
+                </Link>
+              </div>
+
+              <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+                {recentPublications.map((pub) => {
+                  const Icon = publicationIcons[pub.slug] ?? FileText;
+                  return (
+                    <Link
+                      key={pub.slug}
+                      href={`/publikacje/${pub.slug}`}
+                      className="group"
+                    >
+                      <div className="flex aspect-square items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#5C2D91]">
+                        <Icon className="h-16 w-16 text-white" />
+                      </div>
+                      <p className="mt-3 line-clamp-2 text-base font-bold text-[#1C1028] dark:text-white">
+                        {pub.title}
+                      </p>
+                      <p className="mt-1 text-sm text-[#4A3360] dark:text-neutral-400">
+                        {pub.type}
+                      </p>
+                      <p className="text-sm text-[#4A3360] dark:text-neutral-400">
+                        {pub.year}
+                      </p>
+                      <p className="mt-3 text-sm font-semibold uppercase text-[#5C2D91] transition-transform group-hover:translate-x-1 dark:text-purple-400">
+                        Czytaj więcej →
+                      </p>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-          <p className="mt-6 text-sm text-[#4A3360] dark:text-neutral-400">
-            Lista publikacji pojawi się wkrótce.
-          </p>
         </div>
       </section>
     </div>
