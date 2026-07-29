@@ -53,16 +53,25 @@ export type CurrentWorkItem = {
   href?: string;
 };
 
-/** Pozycje węzłów na mapie badań (desktop), w procentach kontenera 900×520. */
-// Węzły bliżej centrum (450,260 w viewBox 900x520 = 50/50), dopasowane do
-// proporcji z public/_reference/research-page-mockup.png. Musi zostać spójne
-// z krzywymi w ResearchMap.tsx (CONNECTIONS/SECONDARY_CONNECTIONS/CONNECTION_DOTS).
+/**
+ * Pozycje węzłów na mapie badań (desktop), w procentach kontenera 900×520.
+ * Wyprowadzone geometrycznie z viewBox-owych współrzędnych (patrz niżej) tak,
+ * żeby żadne dwa węzły (razem z ich dwuliniowymi etykietami, ok. 0.156 szerokości
+ * kontenera wysokości każdy) nie nachodziły na siebie — sprawdzone regułą
+ * nienachodzenia prostokątów (|dx| ≥ szerokość LUB |dy| ≥ wysokość, z zapasem
+ * ~15%). Musi zostać spójne z krzywymi w ResearchMap.tsx
+ * (CONNECTIONS/SECONDARY_CONNECTIONS/CONNECTION_DOTS), które są liczone z tych
+ * samych współrzędnych viewBox:
+ *   balkans: (250,130)  security: (650,130)
+ *   profiling: (160,345) clinical: (740,345)
+ *   victimology: (450,390)
+ */
 export const RESEARCH_MAP_NODE_POSITIONS: Record<ResearchAxisId, { x: number; y: number }> = {
-  balkans: { x: 32.3, y: 37.3 },
-  security: { x: 68.2, y: 35.6 },
-  profiling: { x: 30.9, y: 57.3 },
-  victimology: { x: 56.1, y: 69.4 },
-  clinical: { x: 69, y: 57.1 },
+  balkans: { x: 27.78, y: 25 },
+  security: { x: 72.22, y: 25 },
+  profiling: { x: 17.78, y: 66.35 },
+  victimology: { x: 50, y: 75 },
+  clinical: { x: 82.22, y: 66.35 },
 };
 
 export const researchAxes: ResearchAxis[] = [

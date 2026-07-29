@@ -10,31 +10,32 @@ import { useRevealOnce } from "./useRevealOnce";
 
 const NODE_ORDER: ResearchAxisId[] = ["balkans", "security", "profiling", "victimology", "clinical"];
 
-// Współrzędne węzłów i linii przeskalowane ok. 0.56x bliżej środka (450,260)
-// względem oryginalnych, żeby dopasować proporcje mapy do wzorca wizualnego
-// (public/_reference/research-page-mockup.png) i zostawić margines: węzły nie
-// mają wychodzić blisko krawędzi kontenera, etykiety mają mieć oddech od dołu.
+// Współrzędne (viewBox 900x520) wyznaczone geometrycznie tak, żeby żadne dwa
+// węzły — razem z ich dwuliniowymi etykietami — nie nachodziły na siebie
+// (sprawdzone regułą nienachodzenia prostokątów, patrz komentarz przy
+// RESEARCH_MAP_NODE_POSITIONS w research.ts). Węzły: balkans(250,130),
+// security(650,130), profiling(160,345), clinical(740,345), victimology(450,390).
 // Musi zostać spójne z RESEARCH_MAP_NODE_POSITIONS w research.ts.
 const CONNECTIONS: { axis: ResearchAxisId; d: string }[] = [
-  { axis: "balkans", d: "M450 260C402 224 358 201 291 194" },
-  { axis: "security", d: "M450 260C500 221 547 194 614 185" },
-  { axis: "profiling", d: "M450 260C391 267 344 281 278 298" },
-  { axis: "victimology", d: "M450 260C454 304 470 332 505 361" },
-  { axis: "clinical", d: "M450 260C512 268 561 282 621 297" },
+  { axis: "balkans", d: "M450 260C400 193 324 165 250 130" },
+  { axis: "security", d: "M450 260C532 241 588 184 650 130" },
+  { axis: "profiling", d: "M450 260C344 253 255 302 160 345" },
+  { axis: "victimology", d: "M450 260C434 303 444 346 450 390" },
+  { axis: "clinical", d: "M450 260C536 323 637 330 740 345" },
 ];
 
 const SECONDARY_CONNECTIONS = [
-  "M291 194C367 154 523 148 614 185",
-  "M278 298C360 369 423 384 505 361",
-  "M505 361C562 350 599 330 621 297",
+  "M250 130C350 50 550 50 650 130",
+  "M160 345C220 450 320 460 450 390",
+  "M450 390C580 460 680 450 740 345",
 ];
 
 const CONNECTION_DOTS = [
-  { cx: 384, cy: 229, duration: 3.8 },
-  { cx: 516, cy: 221, duration: 4.2 },
-  { cx: 394, cy: 275, duration: 4.6 },
-  { cx: 478, cy: 310, duration: 5 },
-  { cx: 545, cy: 301, duration: 5.2 },
+  { cx: 350, cy: 195, duration: 3.8 },
+  { cx: 550, cy: 195, duration: 4.2 },
+  { cx: 305, cy: 302, duration: 4.6 },
+  { cx: 450, cy: 325, duration: 5 },
+  { cx: 595, cy: 302, duration: 5.2 },
 ];
 
 type Labels = {
@@ -228,8 +229,11 @@ export default function ResearchMap({
                 opacity: isDimmed ? 0.38 : 1,
                 transform: isFocused ? "translate(-50%, calc(-50% - 3px)) scale(1.04)" : "translate(-50%, -50%) scale(1)",
                 transition: "opacity 250ms var(--research-ease), transform 250ms var(--research-ease)",
+                // Odstęp ikona→etykieta min. 0.4x rozmiaru węzła (ten sam clamp co
+                // szerokość/wysokość ikony niżej, tylko przemnożony przez 0.4).
+                gap: "clamp(12px, 3.2cqw, 36px)",
               }}
-              className="group absolute flex flex-col items-center gap-1 rounded-research-md p-1.5 text-center outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2 focus-visible:ring-[var(--research-gold)]"
+              className="group absolute flex flex-col items-center rounded-research-md p-1.5 text-center outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2 focus-visible:ring-[var(--research-gold)]"
             >
               <span
                 className="flex items-center justify-center rounded-full bg-[var(--research-paper)]"
