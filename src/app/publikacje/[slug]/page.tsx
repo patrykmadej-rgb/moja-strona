@@ -37,48 +37,50 @@ export default async function PublikacjaPage({
   return (
     <div className="mx-auto max-w-3xl px-6 py-20">
       {pub.coverImage ? (
-        <div className="relative mb-10 min-h-[560px] w-full overflow-hidden rounded-2xl">
-          <Image
-            src={pub.coverImage}
-            alt={pub.title}
-            fill
-            priority
-            className="z-0 object-cover"
-          />
-          <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
-          <div className="relative z-10 flex min-h-[560px] flex-col justify-end p-8 md:p-10">
-            <Link
-              href="/publikacje"
-              className="mb-6 inline-flex w-fit items-center gap-2 text-sm text-white/90 hover:underline"
-            >
-              ← Wszystkie publikacje
-            </Link>
+        <div className="relative left-[calc(-50vw+50%)] mb-10 w-screen">
+          <div className="relative min-h-[480px] w-full overflow-hidden rounded-none">
+            <Image
+              src={pub.coverImage}
+              alt={pub.title}
+              fill
+              priority
+              className="z-0 object-cover object-center"
+            />
+            <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
+            <div className="relative z-10 flex min-h-[480px] flex-col justify-end px-8 py-8 lg:px-16 lg:py-10">
+              <Link
+                href="/publikacje"
+                className="mb-6 inline-flex w-fit items-center gap-2 text-sm text-white/90 hover:underline"
+              >
+                ← Wszystkie publikacje
+              </Link>
 
-            <span className="inline-block w-fit rounded-full bg-white/20 px-3 py-0.5 text-xs font-medium text-white">
-              {pub.type}
-            </span>
+              <span className="inline-block w-fit rounded-full bg-white/20 px-3 py-0.5 text-xs font-medium text-white">
+                {pub.type}
+              </span>
 
-            <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white leading-snug">
-              {pub.title}
-            </h1>
+              <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white leading-snug">
+                {pub.title}
+              </h1>
 
-            <p className="mt-3 text-white/80">
-              {pub.venue} · {pub.year}
-            </p>
+              <p className="mt-3 text-white/80">
+                {pub.venue} · {pub.year}
+              </p>
 
-            {pub.tags.length > 0 && (
-              <div className="mt-6 flex flex-wrap gap-2">
-                {pub.tags.map((tag) => (
-                  <Link
-                    key={tag}
-                    href={`/tagi/${tagToSlug(tag)}`}
-                    className="rounded-full border border-white/40 bg-white/10 px-3 py-0.5 text-xs text-white hover:bg-white/20 transition-colors"
-                  >
-                    {tag}
-                  </Link>
-                ))}
-              </div>
-            )}
+              {pub.tags.length > 0 && (
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {pub.tags.map((tag) => (
+                    <Link
+                      key={tag}
+                      href={`/tagi/${tagToSlug(tag)}`}
+                      className="rounded-full border border-white/40 bg-white/10 px-3 py-0.5 text-xs text-white hover:bg-white/20 transition-colors"
+                    >
+                      {tag}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       ) : (
