@@ -11,7 +11,7 @@ export default function PsychoterapiaPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-20">
       {/* Nagłówek */}
-      <p className="mb-4 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
+      <p className="mb-4 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
         Psychoterapia
       </p>
       <h1 className="text-4xl font-semibold tracking-tight text-[#1C1028] dark:text-white">
@@ -38,7 +38,7 @@ export default function PsychoterapiaPage() {
 
         {/* Szkolenie */}
         <section>
-          <p className="mb-3 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
+          <p className="mb-3 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
             Szkolenie
           </p>
           <h2 className="text-2xl font-semibold text-[#1C1028] dark:text-white">
@@ -60,7 +60,7 @@ export default function PsychoterapiaPage() {
 
         {/* Podejście */}
         <section>
-          <p className="mb-3 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
+          <p className="mb-3 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
             Podejście
           </p>
           <h2 className="text-2xl font-semibold text-[#1C1028] dark:text-white">
@@ -72,7 +72,7 @@ export default function PsychoterapiaPage() {
               fundamenty teorii psychoanalitycznej z nowoczesnymi podejściami klinicznymi.
               Program obejmuje m.in.:
             </p>
-            <ul className="ml-4 space-y-2 list-disc marker:text-[#5C2D91]">
+            <ul className="ml-4 space-y-2 list-disc marker:text-[#4A1D6E]">
               <li>Teorię relacji z obiektem i teorię przywiązania</li>
               <li>Psychologię self i teorię ego</li>
               <li>Terapię opartą na mentalizacji (MBT)</li>
@@ -92,7 +92,7 @@ export default function PsychoterapiaPage() {
 
         {/* Dla kogo */}
         <section>
-          <p className="mb-3 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
+          <p className="mb-3 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
             Dla kogo
           </p>
           <h2 className="text-2xl font-semibold text-[#1C1028] dark:text-white">
@@ -111,7 +111,7 @@ export default function PsychoterapiaPage() {
 
         {/* Wykształcenie */}
         <section>
-          <p className="mb-3 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
+          <p className="mb-3 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
             Wykształcenie i doświadczenie
           </p>
           <h2 className="text-2xl font-semibold text-[#1C1028] dark:text-white">

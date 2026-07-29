@@ -87,12 +87,12 @@ export default async function PublikacjaPage({
         <>
           <Link
             href="/publikacje"
-            className="inline-flex items-center gap-2 text-sm text-[#5C2D91] hover:underline dark:text-purple-400 mb-10"
+            className="inline-flex items-center gap-2 text-sm text-[#4A1D6E] hover:underline dark:text-purple-400 mb-10"
           >
             ← Wszystkie publikacje
           </Link>
 
-          <span className="inline-block rounded-full bg-[#EDE6F8] px-3 py-0.5 text-xs font-medium text-[#5C2D91] dark:bg-purple-900/30 dark:text-purple-300">
+          <span className="inline-block rounded-full bg-[#EDE6F8] px-3 py-0.5 text-xs font-medium text-[#4A1D6E] dark:bg-purple-900/30 dark:text-purple-300">
             {pub.type}
           </span>
 
@@ -110,7 +110,7 @@ export default async function PublikacjaPage({
                 <Link
                   key={tag}
                   href={`/tagi/${tagToSlug(tag)}`}
-                  className="rounded-full border border-[#5C2D91]/20 px-3 py-0.5 text-xs text-[#5C2D91] hover:bg-[#EDE6F8] hover:border-[#5C2D91]/50 transition-colors dark:border-purple-400/20 dark:text-purple-300 dark:hover:bg-purple-900/20"
+                  className="rounded-full border border-[#4A1D6E]/20 px-3 py-0.5 text-xs text-[#4A1D6E] hover:bg-[#EDE6F8] hover:border-[#4A1D6E]/50 transition-colors dark:border-purple-400/20 dark:text-purple-300 dark:hover:bg-purple-900/20"
                 >
                   {tag}
                 </Link>
@@ -127,7 +127,7 @@ export default async function PublikacjaPage({
               href={pub.pdfUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-[#5C2D91] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#7B4DB8] transition-colors"
+              className="inline-flex items-center gap-2 rounded-full bg-[#4A1D6E] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#7B4DB8] transition-colors"
             >
               ↓ Pobierz PDF
             </a>
@@ -138,7 +138,7 @@ export default async function PublikacjaPage({
               href={link.href}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-[#5C2D91]/30 px-5 py-2.5 text-sm font-medium text-[#5C2D91] hover:border-[#5C2D91] hover:bg-[#EDE6F8] transition-colors dark:border-purple-400/30 dark:text-purple-300 dark:hover:bg-purple-900/20"
+              className="inline-flex items-center gap-2 rounded-full border border-[#4A1D6E]/30 px-5 py-2.5 text-sm font-medium text-[#4A1D6E] hover:border-[#4A1D6E] hover:bg-[#EDE6F8] transition-colors dark:border-purple-400/30 dark:text-purple-300 dark:hover:bg-purple-900/20"
             >
               {link.label} →
             </a>
