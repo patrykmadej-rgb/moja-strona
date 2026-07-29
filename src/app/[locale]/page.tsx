@@ -22,37 +22,52 @@ const NETWORK_PURPLE = "#8B5CB8";
 const NETWORK_PURPLE_DEEP = "#6B3AA0";
 const NETWORK_WARM_DEEP = "#D4C08A";
 
-const ABOUT_NETWORK_POINTS_LG: { x: number; y: number; color: string; glow?: boolean }[] = [
-  { x: 70, y: 8, color: NETWORK_PURPLE },
-  { x: 140, y: 8, color: "#E8D9B5" },
-  { x: 70, y: 50, color: NETWORK_PURPLE_DEEP, glow: true },
-  { x: 140, y: 50, color: "#E8D9B5", glow: true },
-  { x: 70, y: 92, color: "#E8D9B5" },
-  { x: 140, y: 92, color: NETWORK_PURPLE },
+// Współrzędne celowo nieregularne (jitter wokół styków kart, różne kąty/promienie) —
+// żeby sieć wyglądała jak organiczna konstelacja, a nie lustrzany, geometryczny wzór.
+const ABOUT_NETWORK_POINTS_LG: { x: number; y: number; r: number; color: string; glow?: boolean }[] = [
+  { x: 68, y: 9, r: 1.8, color: NETWORK_PURPLE },
+  { x: 143, y: 5, r: 1.4, color: "#E8D9B5" },
+  { x: 65, y: 49, r: 2.9, color: NETWORK_PURPLE_DEEP, glow: true },
+  { x: 146, y: 54, r: 2.4, color: "#E8D9B5", glow: true },
+  { x: 73, y: 89, r: 1.6, color: "#E8D9B5" },
+  { x: 136, y: 95, r: 2, color: NETWORK_PURPLE },
 ];
 
-const ABOUT_NETWORK_POINTS_SM: { x: number; y: number; color: string; glow?: boolean }[] = [
-  { x: 45, y: 6, color: NETWORK_PURPLE },
-  { x: 45, y: 33.3, color: NETWORK_PURPLE_DEEP, glow: true },
-  { x: 45, y: 66.6, color: "#E8D9B5", glow: true },
-  { x: 45, y: 94, color: "#E8D9B5" },
+const ABOUT_NETWORK_POINTS_SM: { x: number; y: number; r: number; color: string; glow?: boolean }[] = [
+  { x: 42, y: 5, r: 1.3, color: NETWORK_PURPLE },
+  { x: 49, y: 32, r: 2.4, color: NETWORK_PURPLE_DEEP, glow: true },
+  { x: 40, y: 68, r: 2, color: "#E8D9B5", glow: true },
+  { x: 47, y: 96, r: 1.5, color: "#E8D9B5" },
+];
+
+// Krótkie "odgałęzienia" wewnątrz siatki, poza główną linią — łamią symetrię, jak
+// przypadkowe dodatkowe połączenia w prawdziwej konstelacji.
+const ABOUT_NETWORK_BRANCHES_LG: { x1: number; y1: number; x2: number; y2: number; r: number; color: string }[] = [
+  { x1: 68, y1: 9, x2: 98, y2: 20, r: 1.1, color: NETWORK_PURPLE },
+  { x1: 146, y1: 54, x2: 158, y2: 74, r: 1, color: "#E8D9B5" },
+];
+
+const ABOUT_NETWORK_BRANCHES_SM: { x1: number; y1: number; x2: number; y2: number; r: number; color: string }[] = [
+  { x1: 49, y1: 32, x2: 71, y2: 26, r: 0.9, color: NETWORK_PURPLE },
 ];
 
 // "Czułki" wychodzące poza obszar siatki kart, z rogów/krawędzi węzłów granicznych —
 // żeby sieć wizualnie wykraczała poza kafelki. Wymaga overflow-visible na <svg>,
-// bo współrzędne celowo wychodzą poza viewBox.
+// bo współrzędne celowo wychodzą poza viewBox. Długości i kąty celowo różne
+// (nie lustrzane), żeby uniknąć sztywnej symetrii.
 const ABOUT_NETWORK_TENDRILS_LG: { x1: number; y1: number; x2: number; y2: number; color: string }[] = [
-  { x1: 70, y1: 8, x2: 24, y2: -24, color: NETWORK_PURPLE },
-  { x1: 140, y1: 8, x2: 186, y2: -24, color: "#E8D9B5" },
-  { x1: 70, y1: 92, x2: 24, y2: 124, color: "#E8D9B5" },
-  { x1: 140, y1: 92, x2: 186, y2: 124, color: NETWORK_PURPLE },
+  { x1: 68, y1: 9, x2: 18, y2: -27, color: NETWORK_PURPLE },
+  { x1: 143, y1: 5, x2: 193, y2: -13, color: "#E8D9B5" },
+  { x1: 73, y1: 89, x2: 15, y2: 114, color: "#E8D9B5" },
+  { x1: 136, y1: 95, x2: 188, y2: 128, color: NETWORK_PURPLE },
+  { x1: 158, y1: 74, x2: 204, y2: 92, color: NETWORK_PURPLE_DEEP },
 ];
 
 const ABOUT_NETWORK_TENDRILS_SM: { x1: number; y1: number; x2: number; y2: number; color: string }[] = [
-  { x1: 45, y1: 6, x2: 14, y2: -20, color: NETWORK_PURPLE },
-  { x1: 45, y1: 6, x2: 76, y2: -20, color: "#E8D9B5" },
-  { x1: 45, y1: 94, x2: 14, y2: 120, color: "#E8D9B5" },
-  { x1: 45, y1: 94, x2: 76, y2: 120, color: NETWORK_PURPLE },
+  { x1: 42, y1: 5, x2: 11, y2: -21, color: NETWORK_PURPLE },
+  { x1: 42, y1: 5, x2: 80, y2: -12, color: "#E8D9B5" },
+  { x1: 47, y1: 96, x2: 9, y2: 118, color: "#E8D9B5" },
+  { x1: 47, y1: 96, x2: 82, y2: 111, color: NETWORK_PURPLE },
 ];
 
 const pillars: { key: string; href: string; Icon: LucideIcon }[] = [
@@ -86,10 +101,10 @@ const areas = [
 const aboutCards: {
   key: string;
   Icon: LucideIcon;
-  variant: "default" | "dark" | "light";
+  variant: "default" | "light";
 }[] = [
   { key: "wyksztalcenie", Icon: GraduationCap, variant: "default" },
-  { key: "doktorat", Icon: Shield, variant: "dark" },
+  { key: "doktorat", Icon: Shield, variant: "light" },
   { key: "badania", Icon: BarChart3, variant: "default" },
   { key: "psychoterapiaCard", Icon: Brain, variant: "default" },
   { key: "jezyki", Icon: Globe, variant: "default" },
@@ -97,7 +112,7 @@ const aboutCards: {
 ];
 
 const ABOUT_CARD_VARIANT_CLASSES: Record<
-  "default" | "dark" | "light",
+  "default" | "light",
   { card: string; iconWrap: string; icon: string; label: string; value: string }
 > = {
   default: {
@@ -106,13 +121,6 @@ const ABOUT_CARD_VARIANT_CLASSES: Record<
     icon: "text-[#5C2D91] dark:text-purple-300",
     label: "text-[#1C1028] dark:text-white",
     value: "text-[#4A3360] dark:text-neutral-400",
-  },
-  dark: {
-    card: "bg-[#4A1D6E]",
-    iconWrap: "bg-white/15",
-    icon: "text-white",
-    label: "text-white",
-    value: "text-white/80",
   },
   light: {
     card: "bg-[#EDE6F8] dark:bg-purple-900/20",
@@ -145,12 +153,22 @@ export default async function Home() {
             priority
             className="z-0 object-cover object-top"
           />
+          {/* Podkładka pod tekstem — jasny (kremowy) gradient od lewej, żeby ciemny tekst
+              zachował kontrast niezależnie od jasności grafiki w tym miejscu. Zanika do
+              przezroczystości ok. 2/3 szerokości, więc grafika po prawej zostaje odsłonięta. */}
+          <div className="absolute inset-0 z-[5] bg-gradient-to-r from-[#F5F1EC] from-5% via-[#F5F1EC]/75 via-40% to-transparent to-70% dark:from-neutral-950 dark:via-neutral-950/75" />
           <div className="relative z-10 flex lg:min-h-[600px] items-center">
             <div className="max-w-xl pl-16 pb-12">
-              <p className="mb-5 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
+              <p
+                className="mb-5 text-xs font-semibold tracking-[0.15em] uppercase text-[#4A1D6E] dark:text-purple-400"
+                style={{ textShadow: "0 1px 12px rgba(245,241,236,0.9)" }}
+              >
                 {tNav("tagline")}
               </p>
-              <h1 className="text-5xl leading-tight font-bold tracking-tight text-[#1C1028] lg:text-6xl dark:text-white">
+              <h1
+                className="text-5xl leading-tight font-bold tracking-tight text-[#1C1028] lg:text-6xl dark:text-white"
+                style={{ textShadow: "0 2px 20px rgba(245,241,236,0.85)" }}
+              >
                 {tHero("line1")}<br />
                 {tHero("line2")}<br />
                 <span className="text-[#4A1D6E] dark:text-purple-400">{tHero("line3")}</span>
@@ -178,7 +196,7 @@ export default async function Home() {
 
         {/* Mobile: prosty układ pionowy, bez nakładki */}
         <div className="px-6 py-16 lg:hidden">
-          <p className="mb-5 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
+          <p className="mb-5 text-xs font-semibold tracking-[0.15em] uppercase text-[#4A1D6E] dark:text-purple-400">
             {tNav("tagline")}
           </p>
           <h1 className="text-5xl leading-tight font-bold tracking-tight text-[#1C1028] dark:text-white">
@@ -347,25 +365,6 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* OBSZARY DZIAŁALNOŚCI */}
-      <section className="border-t border-[#4A1D6E]/10 py-16 dark:border-white/10">
-        <div className="mx-auto max-w-6xl px-6">
-          <p className="mb-6 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
-            Obszary działalności
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {areas.map((area) => (
-              <span
-                key={area}
-                className="rounded-full border border-[#4A1D6E]/20 bg-white px-5 py-2.5 text-sm font-medium text-[#4A3360] dark:bg-neutral-900 dark:border-white/10 dark:text-neutral-300"
-              >
-                {area}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* O MNIE */}
       <section id="o-mnie" className="overflow-x-hidden border-t border-[#4A1D6E]/10 py-20 dark:border-white/10">
         <div className="mx-auto max-w-6xl px-6">
@@ -424,26 +423,41 @@ export default async function Home() {
                     </filter>
                   </defs>
                   <path
-                    d="M70,8 Q74,29 70,50 Q66,71 70,92"
+                    d="M68,9 Q79,26 65,49 Q56,66 73,89"
                     stroke={NETWORK_PURPLE}
                     strokeOpacity="0.55"
                     strokeWidth="1"
                     strokeLinecap="round"
                   />
                   <path
-                    d="M140,8 Q136,29 140,50 Q144,71 140,92"
+                    d="M143,5 Q133,31 146,54 Q156,73 136,95"
                     stroke={NETWORK_WARM_DEEP}
                     strokeOpacity="0.55"
                     strokeWidth="1"
                     strokeLinecap="round"
                   />
                   <path
-                    d="M70,50 Q105,42 140,50"
+                    d="M65,49 Q100,36 146,54"
                     stroke={NETWORK_PURPLE_DEEP}
                     strokeOpacity="0.5"
                     strokeWidth="1"
                     strokeLinecap="round"
                   />
+                  {ABOUT_NETWORK_BRANCHES_LG.map((b, i) => (
+                    <g key={i}>
+                      <line
+                        x1={b.x1}
+                        y1={b.y1}
+                        x2={b.x2}
+                        y2={b.y2}
+                        stroke={b.color}
+                        strokeOpacity="0.4"
+                        strokeWidth="0.7"
+                        strokeLinecap="round"
+                      />
+                      <circle cx={b.x2} cy={b.y2} r={b.r} fill={b.color} opacity="0.6" />
+                    </g>
+                  ))}
                   {ABOUT_NETWORK_TENDRILS_LG.map((t, i) => (
                     <g key={i}>
                       <line
@@ -475,7 +489,7 @@ export default async function Home() {
                       <circle
                         cx={p.x}
                         cy={p.y}
-                        r={p.glow ? "3" : "2.2"}
+                        r={p.r}
                         fill={p.color}
                         opacity="0.85"
                         className="animate-[pulse-dot_3s_ease-in-out_infinite]"
@@ -497,12 +511,27 @@ export default async function Home() {
                     </filter>
                   </defs>
                   <path
-                    d="M45,6 Q49,19.65 45,33.3 Q41,50 45,66.6 Q49,80.3 45,94"
+                    d="M42,5 Q53,17 49,32 Q45,52 40,68 Q37,83 47,96"
                     stroke={NETWORK_PURPLE}
                     strokeOpacity="0.55"
                     strokeWidth="1"
                     strokeLinecap="round"
                   />
+                  {ABOUT_NETWORK_BRANCHES_SM.map((b, i) => (
+                    <g key={i}>
+                      <line
+                        x1={b.x1}
+                        y1={b.y1}
+                        x2={b.x2}
+                        y2={b.y2}
+                        stroke={b.color}
+                        strokeOpacity="0.4"
+                        strokeWidth="0.6"
+                        strokeLinecap="round"
+                      />
+                      <circle cx={b.x2} cy={b.y2} r={b.r} fill={b.color} opacity="0.6" />
+                    </g>
+                  ))}
                   {ABOUT_NETWORK_TENDRILS_SM.map((t, i) => (
                     <g key={i}>
                       <line
@@ -534,7 +563,7 @@ export default async function Home() {
                       <circle
                         cx={p.x}
                         cy={p.y}
-                        r={p.glow ? "2.3" : "1.6"}
+                        r={p.r}
                         fill={p.color}
                         opacity="0.85"
                         className="animate-[pulse-dot_3s_ease-in-out_infinite]"
@@ -565,6 +594,25 @@ export default async function Home() {
                 })}
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* OBSZARY DZIAŁALNOŚCI */}
+      <section className="border-t border-[#4A1D6E]/10 py-16 dark:border-white/10">
+        <div className="mx-auto max-w-6xl px-6">
+          <p className="mb-6 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
+            Obszary działalności
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {areas.map((area) => (
+              <span
+                key={area}
+                className="rounded-full border border-[#4A1D6E]/20 bg-white px-5 py-2.5 text-sm font-medium text-[#4A3360] dark:bg-neutral-900 dark:border-white/10 dark:text-neutral-300"
+              >
+                {area}
+              </span>
+            ))}
           </div>
         </div>
       </section>

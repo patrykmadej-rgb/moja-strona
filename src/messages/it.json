@@ -1,6 +1,6 @@
 {
   "Nav": {
-    "tagline": "Psicologia · Criminologia · Vittimologia",
+    "tagline": "Sicurezza · Psicologia · Criminologia · Vittimologia",
     "oMnie": "Chi sono",
     "badania": "Ricerca",
     "publikacje": "Pubblicazioni",
@@ -88,6 +88,7 @@
     "eyebrow": "Psicoterapia",
     "h1": "La persona al centro.",
     "intro": "Per me la psicoterapia è uno spazio in cui la teoria incontra la persona — la sua storia, le sue relazioni e la possibilità di cambiamento.",
+    "ctaKontakt": "Prenota una consulenza",
     "warningTitle": "Informazione importante",
     "warningText": "Sono attualmente in formazione psicoterapeutica — non gestisco ancora uno studio né seguo pazienti. Questa pagina ha carattere puramente informativo. Se sei in una situazione di crisi o la tua vita o la tua salute sono a rischio, chiama il numero di emergenza <strong>112</strong> oppure contatta una linea di ascolto per adulti in crisi emotiva: <strong>116 123</strong>.",
     "sections": {
