@@ -255,8 +255,11 @@ export default async function Home() {
 
       {/* CYTAT + OSTATNIE PUBLIKACJE */}
       <section className="border-t border-[#4A1D6E]/10 bg-[#F5F1EC] py-10 dark:border-white/10 dark:bg-neutral-950">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_2fr]">
+        <div className="relative left-[calc(-50vw+50%)] w-screen">
+          {/* pl odtwarza normalny lewy margines kontenera max-w-6xl (żeby cytat zostawał
+              w tym samym miejscu co dotychczas), pr-6 puszcza prawą kolumnę do prawej
+              krawędzi ekranu zamiast kończyć się na krawędzi max-w-6xl. */}
+          <div className="grid grid-cols-1 gap-12 pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] pr-6 lg:grid-cols-[1fr_2fr]">
             {/* CYTAT */}
             <div>
               <p className="text-4xl leading-none text-[#4A1D6E] dark:text-purple-400">
@@ -308,7 +311,7 @@ export default async function Home() {
                       className="group flex items-start gap-4"
                     >
                       {thumb ? (
-                        <div className="relative aspect-square w-16 shrink-0 overflow-hidden rounded-xl">
+                        <div className="relative aspect-[3/4] w-16 shrink-0 overflow-hidden rounded-xl">
                           <Image
                             src={thumb}
                             alt={pub.title}
@@ -317,7 +320,7 @@ export default async function Home() {
                           />
                         </div>
                       ) : (
-                        <div className="flex aspect-square w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#4A1D6E]">
+                        <div className="flex aspect-[3/4] w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#4A1D6E]">
                           <Icon className="h-6 w-6 text-white" />
                         </div>
                       )}
@@ -328,10 +331,10 @@ export default async function Home() {
                         <p className="line-clamp-3 text-base font-bold text-[#1C1028] dark:text-white">
                           {pub.title}
                         </p>
-                        <p className="mt-1.5 text-sm text-[#4A3360] dark:text-neutral-400">
+                        <p className="mt-1.5 text-xs text-[#4A3360] dark:text-neutral-400">
                           {pub.type}
                         </p>
-                        <p className="text-sm text-[#4A3360] dark:text-neutral-400">
+                        <p className="text-xs text-[#4A3360] dark:text-neutral-400">
                           {yearLabel}
                         </p>
                         {pub.coAuthors && pub.coAuthors.length > 0 && (
@@ -339,7 +342,7 @@ export default async function Home() {
                             {tDetail("coAuthors")}: {pub.coAuthors.join(", ")}
                           </p>
                         )}
-                        <p className="mt-2 text-sm font-semibold uppercase text-[#4A1D6E] transition-transform group-hover:translate-x-1 dark:text-purple-400">
+                        <p className="mt-2 text-sm font-normal uppercase text-[#4A1D6E] transition-transform group-hover:translate-x-1 dark:text-purple-400">
                           {tQuote("readMore")}
                         </p>
                       </div>
