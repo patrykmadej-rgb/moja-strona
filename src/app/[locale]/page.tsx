@@ -1,46 +1,16 @@
-import Link from "next/link";
 import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 import { Search, FileText, Share2, Brain, PenTool, Shield, Globe, Landmark } from "lucide-react";
-import { siteConfig } from "@/lib/site-config";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { publications } from "@/lib/publications";
 
-const pillars = [
-  {
-    href: "/badania",
-    label: "Badania",
-    description:
-      "Projekty badawcze, modele i analizy naukowe z obszaru psychologii, kryminologii i wiktymologii.",
-    Icon: Search,
-  },
-  {
-    href: "/publikacje",
-    label: "Publikacje",
-    description:
-      "Artykuły naukowe, rozdziały w monografiach i teksty popularnonaukowe.",
-    Icon: FileText,
-  },
-  {
-    href: "/projekty",
-    label: "Projekty i modele",
-    description:
-      "Autorskie koncepcje i modele analityczne dotyczące ofiar, sprawców i systemu.",
-    Icon: Share2,
-  },
-  {
-    href: "/psychoterapia",
-    label: "Psychoterapia",
-    description:
-      "Szkolenie, podejście, obszary zainteresowań i przyszła praktyka terapeutyczna.",
-    Icon: Brain,
-  },
-  {
-    href: "/wiedza",
-    label: "Wiedza",
-    description:
-      "Artykuły, komentarze i analizy o człowieku, traumie, przestępczości i bezpieczeństwie.",
-    Icon: PenTool,
-  },
+const pillars: { key: string; href: string; Icon: LucideIcon }[] = [
+  { key: "badania", href: "/badania", Icon: Search },
+  { key: "publikacje", href: "/publikacje", Icon: FileText },
+  { key: "projekty", href: "/projekty", Icon: Share2 },
+  { key: "psychoterapia", href: "/psychoterapia", Icon: Brain },
+  { key: "wiedza", href: "/wiedza", Icon: PenTool },
 ];
 
 const publicationIcons: Record<string, LucideIcon> = {
@@ -65,7 +35,21 @@ const areas = [
   "AI i analiza danych",
 ];
 
-export default function Home() {
+const aboutCardKeys = [
+  "wyksztalcenie",
+  "doktorat",
+  "specjalizacja",
+  "jezyki",
+  "psychoterapiaCard",
+] as const;
+
+export default async function Home() {
+  const tNav = await getTranslations("Nav");
+  const tHero = await getTranslations("Hero");
+  const tPillars = await getTranslations("Pillars");
+  const tQuote = await getTranslations("QuotePublications");
+  const tAbout = await getTranslations("AboutMe");
+
   return (
     <div>
       {/* HERO */}
@@ -82,28 +66,28 @@ export default function Home() {
           <div className="relative z-10 flex lg:min-h-[600px] items-center">
             <div className="max-w-xl pl-16 pb-12">
               <p className="mb-5 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
-                {siteConfig.title}
+                {tNav("tagline")}
               </p>
               <h1 className="text-5xl leading-tight font-bold tracking-tight text-[#1C1028] lg:text-6xl dark:text-white">
-                Badania.<br />
-                Zrozumienie.<br />
-                <span className="text-[#4A1D6E] dark:text-purple-400">Realna zmiana.</span>
+                {tHero("line1")}<br />
+                {tHero("line2")}<br />
+                <span className="text-[#4A1D6E] dark:text-purple-400">{tHero("line3")}</span>
               </h1>
               <p className="mt-8 text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
-                {siteConfig.description}
+                {tHero("description")}
               </p>
               <div className="mt-10 flex flex-wrap gap-4">
                 <Link
                   href="/badania"
                   className="rounded-full bg-[#4A1D6E] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
                 >
-                  Zobacz moje badania →
+                  {tHero("ctaBadania")}
                 </Link>
                 <Link
                   href="/#o-mnie"
                   className="rounded-full border border-[#4A1D6E] px-7 py-3 text-sm font-semibold text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E] hover:text-white dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
                 >
-                  Dowiedz się więcej o mnie
+                  {tHero("ctaOMnie")}
                 </Link>
               </div>
             </div>
@@ -113,28 +97,28 @@ export default function Home() {
         {/* Mobile: prosty układ pionowy, bez nakładki */}
         <div className="px-6 py-16 lg:hidden">
           <p className="mb-5 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
-            {siteConfig.title}
+            {tNav("tagline")}
           </p>
           <h1 className="text-5xl leading-tight font-bold tracking-tight text-[#1C1028] dark:text-white">
-            Badania.<br />
-            Zrozumienie.<br />
-            <span className="text-[#4A1D6E] dark:text-purple-400">Realna zmiana.</span>
+            {tHero("line1")}<br />
+            {tHero("line2")}<br />
+            <span className="text-[#4A1D6E] dark:text-purple-400">{tHero("line3")}</span>
           </h1>
           <p className="mt-8 text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
-            {siteConfig.description}
+            {tHero("description")}
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
               href="/badania"
               className="rounded-full bg-[#4A1D6E] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
             >
-              Zobacz moje badania →
+              {tHero("ctaBadania")}
             </Link>
             <Link
               href="/#o-mnie"
               className="rounded-full border border-[#4A1D6E] px-7 py-3 text-sm font-semibold text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E] hover:text-white dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
             >
-              Dowiedz się więcej o mnie
+              {tHero("ctaOMnie")}
             </Link>
           </div>
           <div className="mt-10">
@@ -157,21 +141,21 @@ export default function Home() {
               <Link
                 key={pillar.href}
                 href={pillar.href}
-                className={`group flex flex-row items-start gap-3 px-6 py-0 transition-opacity hover:opacity-80 md:px-8 ${
+                className={`group flex flex-row items-start gap-2 px-6 py-0 transition-opacity hover:opacity-80 md:px-8 ${
                   i < pillars.length - 1
                     ? "lg:border-r lg:border-black/10 dark:lg:border-white/10"
                     : ""
                 }`}
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#2E1A42]">
-                  <pillar.Icon className="h-5 w-5 text-white" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2E1A42]">
+                  <pillar.Icon className="h-4 w-4 text-white" />
                 </div>
                 <div className="flex-1 text-left">
                   <p className="text-sm font-bold tracking-wide uppercase text-[#1C1028] dark:text-white">
-                    {pillar.label}
+                    {tPillars(`${pillar.key}.title`)}
                   </p>
-                  <p className="mt-1 text-sm leading-snug text-[#4A3360] dark:text-neutral-300">
-                    {pillar.description}
+                  <p className="mt-1 text-sm leading-snug text-[#7A7285] dark:text-neutral-400">
+                    {tPillars(`${pillar.key}.description`)}
                   </p>
                   <p className="mt-1 text-[#4A1D6E] transition-transform group-hover:translate-x-1 dark:text-purple-400">
                     →
@@ -184,18 +168,18 @@ export default function Home() {
       </section>
 
       {/* CYTAT + OSTATNIE PUBLIKACJE */}
-      <section className="border-t border-[#4A1D6E]/10 bg-[#F5F1EC] py-16 dark:border-white/10 dark:bg-neutral-950">
+      <section className="border-t border-[#4A1D6E]/10 bg-[#F5F1EC] py-10 dark:border-white/10 dark:bg-neutral-950">
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_2fr]">
             {/* CYTAT */}
             <div>
-              <p className="text-6xl leading-none text-[#4A1D6E] dark:text-purple-400">
+              <p className="text-4xl leading-none text-[#4A1D6E] dark:text-purple-400">
                 &ldquo;
               </p>
-              <p className="mt-2 text-xl leading-relaxed italic text-[#1C1028] lg:text-2xl dark:text-white">
-                Zrozumieć człowieka w jego historii, kontekście i relacjach – to pierwszy krok do realnej zmiany.
+              <p className="mt-1 text-lg leading-snug italic text-[#1C1028] lg:text-xl dark:text-white">
+                {tQuote("quote")}
               </p>
-              <div className="mt-6">
+              <div className="mt-4">
                 <Image
                   src="/podpis.png"
                   alt="Patryk Madej"
@@ -204,7 +188,7 @@ export default function Home() {
                   className="h-8 w-auto object-contain"
                 />
                 <p className="mt-2 text-sm tracking-widest uppercase text-[#4A3360] dark:text-neutral-400">
-                  Patryk Madej
+                  {tQuote("quoteAuthor")}
                 </p>
               </div>
             </div>
@@ -214,7 +198,7 @@ export default function Home() {
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-lg font-bold uppercase text-[#1C1028] dark:text-white">
-                    Ostatnie publikacje
+                    {tQuote("recentTitle")}
                   </p>
                   <div className="mt-2 h-1 w-12 bg-[#4A1D6E]" />
                 </div>
@@ -222,11 +206,11 @@ export default function Home() {
                   href="/publikacje"
                   className="text-sm font-semibold uppercase text-[#4A1D6E] hover:underline dark:text-purple-400"
                 >
-                  Zobacz wszystkie →
+                  {tQuote("seeAll")}
                 </Link>
               </div>
 
-              <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
                 {recentPublications.map((pub) => {
                   const Icon = publicationIcons[pub.slug] ?? FileText;
                   const thumb = pub.coverImageThumb ?? pub.coverImage;
@@ -250,7 +234,7 @@ export default function Home() {
                           <Icon className="h-16 w-16 text-white" />
                         </div>
                       )}
-                      <p className="mt-3 line-clamp-2 text-base font-bold text-[#1C1028] dark:text-white">
+                      <p className="mt-2 line-clamp-2 text-base font-bold text-[#1C1028] dark:text-white">
                         {pub.title}
                       </p>
                       <p className="mt-1 text-sm text-[#4A3360] dark:text-neutral-400">
@@ -259,8 +243,8 @@ export default function Home() {
                       <p className="text-sm text-[#4A3360] dark:text-neutral-400">
                         {pub.year}
                       </p>
-                      <p className="mt-3 text-sm font-semibold uppercase text-[#4A1D6E] transition-transform group-hover:translate-x-1 dark:text-purple-400">
-                        Czytaj więcej →
+                      <p className="mt-2 text-sm font-semibold uppercase text-[#4A1D6E] transition-transform group-hover:translate-x-1 dark:text-purple-400">
+                        {tQuote("readMore")}
                       </p>
                     </Link>
                   );
@@ -296,50 +280,35 @@ export default function Home() {
           <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
             <div>
               <p className="mb-4 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
-                O mnie
+                {tAbout("eyebrow")}
               </p>
               <h2 className="text-3xl font-semibold tracking-tight text-[#1C1028] dark:text-white">
-                Połączenie perspektyw.<br />Zrozumienie człowieka.
+                {tAbout("heading1")}<br />{tAbout("heading2")}
               </h2>
               <div className="mt-6 space-y-4 text-[#4A3360] leading-relaxed dark:text-neutral-300">
-                <p>
-                  Jestem doktorantem w Instytucie Nauk o Polityce i Bezpieczeństwie
-                  Uniwersytetu Szczecińskiego oraz studentem psychologii. Od lat zajmuję się
-                  separatyzmem, bezpieczeństwem międzynarodowym i sytuacją na Bałkanach
-                  Zachodnich — to główny obszar moich badań, który rozwijam w pracy doktorskiej.
-                  Równolegle poszerzam swoje zainteresowania o kryminologię, wiktymologię
-                  i psychologię bezpieczeństwa, a także szkolę się w psychoterapii w nurcie
-                  integracyjno-psychodynamicznym, w tym metodą EMDR w pracy z traumą.
-                </p>
-                <p>
-                  Łączę różne dziedziny wiedzy i doświadczenia, aby lepiej rozumieć człowieka,
-                  jego decyzje, zachowania oraz konteksty, w których funkcjonuje.
-                </p>
+                <p>{tAbout("paragraph1")}</p>
+                <p>{tAbout("paragraph2")}</p>
               </div>
               <Link
                 href="/#o-mnie"
                 className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[#4A1D6E] hover:underline dark:text-purple-400"
               >
-                Więcej o mnie →
+                {tAbout("moreLink")}
               </Link>
             </div>
 
             <div className="space-y-4">
-              {[
-                { label: "Wykształcenie", value: "Prawo (mgr), Bezpieczeństwo wewnętrzne (lic.) — Uniwersytet Szczeciński · Psychologia (3. rok, w toku)" },
-                { label: "Doktorat", value: "Instytut Nauk o Polityce i Bezpieczeństwie, Uniwersytet Szczeciński" },
-                { label: "Specjalizacja badawcza", value: "Bałkany Zachodnie, separatyzm, bezpieczeństwo międzynarodowe — dodatkowo: wiktymologia, kryminologia" },
-                { label: "Języki", value: "Polski (ojczysty) · Angielski (biegle) · Włoski (płynnie)" },
-                { label: "Psychoterapia", value: "Szkolenie w nurcie integracyjno-psychodynamicznym z metodą EMDR (od września 2026)" },
-              ].map((item) => (
+              {aboutCardKeys.map((key) => (
                 <div
-                  key={item.label}
+                  key={key}
                   className="rounded-xl border border-[#4A1D6E]/15 bg-white p-5 dark:bg-neutral-900 dark:border-white/10"
                 >
                   <p className="text-xs font-semibold tracking-widest uppercase text-[#4A1D6E] dark:text-purple-400">
-                    {item.label}
+                    {tAbout(`cards.${key}.label`)}
                   </p>
-                  <p className="mt-2 text-sm text-[#4A3360] dark:text-neutral-300">{item.value}</p>
+                  <p className="mt-2 text-sm text-[#4A3360] dark:text-neutral-300">
+                    {tAbout(`cards.${key}.value`)}
+                  </p>
                 </div>
               ))}
             </div>

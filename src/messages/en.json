@@ -1,0 +1,147 @@
+{
+  "Nav": {
+    "tagline": "Psychology · Criminology · Victimology",
+    "oMnie": "About",
+    "badania": "Research",
+    "publikacje": "Publications",
+    "projekty": "Projects",
+    "psychoterapia": "Psychotherapy",
+    "wiedza": "Insights",
+    "kontakt": "Contact"
+  },
+  "Footer": {
+    "copyright": "© {year} Patryk Madej"
+  },
+  "Hero": {
+    "line1": "Research.",
+    "line2": "Understanding.",
+    "line3": "Real change.",
+    "description": "I bring together psychological, criminological and legal perspectives to better understand people in the context of trauma, crime and the systems around them.",
+    "ctaBadania": "See my research →",
+    "ctaOMnie": "Learn more about me"
+  },
+  "Pillars": {
+    "badania": {
+      "title": "Research",
+      "description": "Research projects, models and academic analyses in psychology, criminology and victimology."
+    },
+    "publikacje": {
+      "title": "Publications",
+      "description": "Academic articles, book chapters and popular-science writing."
+    },
+    "projekty": {
+      "title": "Projects & Models",
+      "description": "Original concepts and analytical models concerning victims, offenders and the system."
+    },
+    "psychoterapia": {
+      "title": "Psychotherapy",
+      "description": "Training, approach, areas of interest and future therapeutic practice."
+    },
+    "wiedza": {
+      "title": "Insights",
+      "description": "Articles, commentary and analysis on trauma, crime and safety."
+    }
+  },
+  "QuotePublications": {
+    "quote": "Understanding a person within their history, context and relationships is the first step toward real change.",
+    "quoteAuthor": "Patryk Madej",
+    "recentTitle": "Recent publications",
+    "seeAll": "See all →",
+    "readMore": "Read more →"
+  },
+  "AboutMe": {
+    "eyebrow": "About me",
+    "heading1": "Bridging perspectives.",
+    "heading2": "Understanding the person.",
+    "paragraph1": "I am a doctoral candidate at the Institute of Political and Security Studies, University of Szczecin, and a psychology student. For years I have focused on separatism, international security and the situation in the Western Balkans — the main area of my research, which I develop in my doctoral work. In parallel, I am expanding into criminology, victimology and the psychology of security, and training in integrative-psychodynamic psychotherapy, including EMDR for trauma work.",
+    "paragraph2": "I bring together different fields of knowledge and experience to better understand people — their decisions, behaviour and the contexts in which they act.",
+    "moreLink": "More about me →",
+    "cards": {
+      "wyksztalcenie": {
+        "label": "Education",
+        "value": "Law (MA), Internal Security (BA) — University of Szczecin · Psychology (3rd year, in progress)"
+      },
+      "doktorat": {
+        "label": "Doctorate",
+        "value": "Institute of Political and Security Studies, University of Szczecin"
+      },
+      "specjalizacja": {
+        "label": "Research focus",
+        "value": "Western Balkans, separatism, international security — plus: victimology, criminology"
+      },
+      "jezyki": {
+        "label": "Languages",
+        "value": "Polish (native) · English (fluent) · Italian (fluent)"
+      },
+      "psychoterapiaCard": {
+        "label": "Psychotherapy",
+        "value": "Integrative-psychodynamic training with EMDR (from September 2026)"
+      }
+    }
+  },
+  "PsychoterapiaPage": {
+    "metaTitle": "Psychotherapy",
+    "metaDescription": "Information about my psychotherapy training, approach and future practice.",
+    "eyebrow": "Psychotherapy",
+    "h1": "The person at the centre.",
+    "intro": "For me, psychotherapy is a space where theory meets the person — their history, relationships and capacity for change.",
+    "warningTitle": "Important notice",
+    "warningText": "I am currently in psychotherapy training — I do not yet run a practice or see clients. This page is for informational purposes only. If you are in crisis or your life or health is at risk, call the emergency number <strong>112</strong> or contact a crisis helpline for adults in emotional distress: <strong>116 123</strong>.",
+    "sections": {
+      "szkolenie": {
+        "eyebrow": "Training",
+        "heading": "Four years, one goal",
+        "p1": "Since September 2026 I have been enrolled in a four-year psychotherapy programme accredited by the Scientific Section of Psychotherapy and Family Therapy of the <strong>Polish Psychiatric Association</strong>.",
+        "p2": "The training comprises over 1,080 teaching hours — lectures, workshops, supervision and personal therapeutic experience. Sessions are held on weekends."
+      },
+      "podejscie": {
+        "eyebrow": "Approach",
+        "heading": "Integrative-psychodynamic orientation",
+        "p1": "I work within the integrative-psychodynamic orientation, which combines classical psychoanalytic foundations with contemporary clinical approaches. The programme includes:",
+        "list": [
+          "Object relations theory and attachment theory",
+          "Self psychology and ego theory",
+          "Mentalization-Based Treatment (MBT)",
+          "Transference-Focused Psychotherapy (TFP)"
+        ],
+        "emdrLine": "The <strong>EMDR</strong> method (Eye Movement Desensitization and Reprocessing) for trauma work — recommended by the WHO",
+        "p2": "My clinical interests focus particularly on trauma, victimization, anxiety disorders and neurodiversity."
+      },
+      "dlaKogo": {
+        "eyebrow": "Who it's for",
+        "heading": "Eventually: adults",
+        "p1": "I plan to work with adults, particularly around trauma (including secondary trauma and victimization), anxiety disorders, relationship difficulties, and the search for meaning and identity. My research background in criminology and victimology provides additional context for understanding clients' specific experiences."
+      },
+      "wyksztalcenie": {
+        "eyebrow": "Education and experience",
+        "heading": "An interdisciplinary context",
+        "p1": "I combine a background in law and political science (a doctorate at the University of Szczecin) with ongoing training in psychology (integrated studies). This combination lets me view people within a broad context — systemic, legal and interpersonal.",
+        "p2": "My psychotherapy training adds clinical competence and a practical skill set for working with another person."
+      }
+    }
+  },
+  "KontaktPage": {
+    "metaTitle": "Contact",
+    "metaDescription": "Get in touch with Patryk Madej.",
+    "eyebrow": "Contact",
+    "h1": "Get in touch",
+    "intro": "I'm happy to answer questions about my research, academic collaboration, talks or expert commentary.",
+    "emailLabel": "Email",
+    "noteTitle": "Important notice — psychotherapy",
+    "noteText": "I am currently in psychotherapy training and do not yet run a practice. If you are looking for psychological or therapeutic help, please contact a psychologist or psychotherapist in your area."
+  },
+  "AbstractToggle": {
+    "label": "Abstract",
+    "comingSoon": "The abstract will be added soon.",
+    "pl": "PL",
+    "en": "EN",
+    "it": "IT"
+  },
+  "PublicationNote": {
+    "polish": "This publication is in Polish.",
+    "english": "This publication is in English."
+  },
+  "PublicationDetail": {
+    "backToAll": "← All publications"
+  }
+}

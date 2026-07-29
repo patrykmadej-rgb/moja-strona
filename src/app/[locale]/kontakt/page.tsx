@@ -1,23 +1,28 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { siteConfig } from "@/lib/site-config";
 
-export const metadata: Metadata = {
-  title: `Kontakt — ${siteConfig.name}`,
-  description: "Skontaktuj się z Patrykiem Madejem.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("KontaktPage");
+  return {
+    title: `${t("metaTitle")} — ${siteConfig.name}`,
+    description: t("metaDescription"),
+  };
+}
 
-export default function KontaktPage() {
+export default async function KontaktPage() {
+  const t = await getTranslations("KontaktPage");
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-20">
       <p className="mb-4 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
-        Kontakt
+        {t("eyebrow")}
       </p>
       <h1 className="text-4xl font-semibold tracking-tight text-[#1C1028] dark:text-white">
-        Napisz do mnie
+        {t("h1")}
       </h1>
       <p className="mt-5 text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
-        Chętnie odpowiem na pytania dotyczące moich badań, współpracy naukowej
-        lub prelekcji i komentarzy eksperckich.
+        {t("intro")}
       </p>
 
       <div className="mt-12 space-y-4">
@@ -30,7 +35,7 @@ export default function KontaktPage() {
           </div>
           <div>
             <p className="text-xs font-semibold tracking-widest uppercase text-[#4A1D6E] dark:text-purple-400">
-              E-mail
+              {t("emailLabel")}
             </p>
             <p className="mt-0.5 font-medium text-[#1C1028] dark:text-white">
               {siteConfig.email}
@@ -41,12 +46,10 @@ export default function KontaktPage() {
 
       <div className="mt-12 rounded-2xl border border-[#4A1D6E]/15 bg-[#EDE6F8] p-7 dark:bg-[#4A1D6E]/10 dark:border-purple-400/20">
         <p className="text-sm font-semibold text-[#1C1028] dark:text-white">
-          Ważna informacja — psychoterapia
+          {t("noteTitle")}
         </p>
         <p className="mt-2 text-sm leading-relaxed text-[#4A3360] dark:text-neutral-300">
-          Jestem w trakcie szkolenia psychoterapeutycznego i nie prowadzę jeszcze gabinetu.
-          Jeśli szukasz pomocy psychologicznej lub terapeutycznej, skontaktuj się
-          z psychologiem lub psychoterapeutą w swoim regionie.
+          {t("noteText")}
         </p>
       </div>
     </div>

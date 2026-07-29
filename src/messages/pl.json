@@ -1,0 +1,147 @@
+{
+  "Nav": {
+    "tagline": "Psychologia · Kryminologia · Wiktymologia",
+    "oMnie": "O mnie",
+    "badania": "Badania",
+    "publikacje": "Publikacje",
+    "projekty": "Projekty",
+    "psychoterapia": "Psychoterapia",
+    "wiedza": "Wiedza",
+    "kontakt": "Kontakt"
+  },
+  "Footer": {
+    "copyright": "© {year} Patryk Madej"
+  },
+  "Hero": {
+    "line1": "Badania.",
+    "line2": "Zrozumienie.",
+    "line3": "Realna zmiana.",
+    "description": "Łączę perspektywę psychologiczną, kryminologiczną i prawną, aby lepiej rozumieć człowieka w kontekście traumy, przestępczości i systemu.",
+    "ctaBadania": "Zobacz moje badania →",
+    "ctaOMnie": "Dowiedz się więcej o mnie"
+  },
+  "Pillars": {
+    "badania": {
+      "title": "Badania",
+      "description": "Projekty badawcze, modele i analizy naukowe z obszaru psychologii, kryminologii i wiktymologii."
+    },
+    "publikacje": {
+      "title": "Publikacje",
+      "description": "Artykuły naukowe, rozdziały w monografiach i teksty popularnonaukowe."
+    },
+    "projekty": {
+      "title": "Projekty i modele",
+      "description": "Autorskie koncepcje i modele analityczne dotyczące ofiar, sprawców i systemu."
+    },
+    "psychoterapia": {
+      "title": "Psychoterapia",
+      "description": "Szkolenie, podejście, obszary zainteresowań i przyszła praktyka terapeutyczna."
+    },
+    "wiedza": {
+      "title": "Wiedza",
+      "description": "Artykuły, komentarze i analizy o człowieku, traumie, przestępczości i bezpieczeństwie."
+    }
+  },
+  "QuotePublications": {
+    "quote": "Zrozumieć człowieka w jego historii, kontekście i relacjach – to pierwszy krok do realnej zmiany.",
+    "quoteAuthor": "Patryk Madej",
+    "recentTitle": "Ostatnie publikacje",
+    "seeAll": "Zobacz wszystkie →",
+    "readMore": "Czytaj więcej →"
+  },
+  "AboutMe": {
+    "eyebrow": "O mnie",
+    "heading1": "Połączenie perspektyw.",
+    "heading2": "Zrozumienie człowieka.",
+    "paragraph1": "Jestem doktorantem w Instytucie Nauk o Polityce i Bezpieczeństwie Uniwersytetu Szczecińskiego oraz studentem psychologii. Od lat zajmuję się separatyzmem, bezpieczeństwem międzynarodowym i sytuacją na Bałkanach Zachodnich — to główny obszar moich badań, który rozwijam w pracy doktorskiej. Równolegle poszerzam swoje zainteresowania o kryminologię, wiktymologię i psychologię bezpieczeństwa, a także szkolę się w psychoterapii w nurcie integracyjno-psychodynamicznym, w tym metodą EMDR w pracy z traumą.",
+    "paragraph2": "Łączę różne dziedziny wiedzy i doświadczenia, aby lepiej rozumieć człowieka, jego decyzje, zachowania oraz konteksty, w których funkcjonuje.",
+    "moreLink": "Więcej o mnie →",
+    "cards": {
+      "wyksztalcenie": {
+        "label": "Wykształcenie",
+        "value": "Prawo (mgr), Bezpieczeństwo wewnętrzne (lic.) — Uniwersytet Szczeciński · Psychologia (3. rok, w toku)"
+      },
+      "doktorat": {
+        "label": "Doktorat",
+        "value": "Instytut Nauk o Polityce i Bezpieczeństwie, Uniwersytet Szczeciński"
+      },
+      "specjalizacja": {
+        "label": "Specjalizacja badawcza",
+        "value": "Bałkany Zachodnie, separatyzm, bezpieczeństwo międzynarodowe — dodatkowo: wiktymologia, kryminologia"
+      },
+      "jezyki": {
+        "label": "Języki",
+        "value": "Polski (ojczysty) · Angielski (biegle) · Włoski (płynnie)"
+      },
+      "psychoterapiaCard": {
+        "label": "Psychoterapia",
+        "value": "Szkolenie w nurcie integracyjno-psychodynamicznym z metodą EMDR (od września 2026)"
+      }
+    }
+  },
+  "PsychoterapiaPage": {
+    "metaTitle": "Psychoterapia",
+    "metaDescription": "Informacje o moim szkoleniu psychoterapeutycznym, podejściu i planowanej praktyce.",
+    "eyebrow": "Psychoterapia",
+    "h1": "Człowiek w centrum.",
+    "intro": "Psychoterapia to dla mnie przestrzeń, w której teoria spotyka się z człowiekiem — jego historią, relacjami i możliwością zmiany.",
+    "warningTitle": "Ważna informacja",
+    "warningText": "Jestem w trakcie szkolenia psychoterapeutycznego — nie prowadzę jeszcze gabinetu ani nie przyjmuję klientów. Ta strona ma charakter wyłącznie informacyjny. Jeśli jesteś w kryzysie lub Twoje życie bądź zdrowie jest zagrożone, zadzwoń pod numer alarmowy <strong>112</strong> lub skontaktuj się z Telefonem Zaufania dla Dorosłych w Kryzysie Emocjonalnym: <strong>116 123</strong>.",
+    "sections": {
+      "szkolenie": {
+        "eyebrow": "Szkolenie",
+        "heading": "Cztery lata, jeden cel",
+        "p1": "Od września 2026 roku jestem uczestnikiem czteroletniego kursu psychoterapii akredytowanego przez Sekcję Naukową Psychoterapii i Terapii Rodzin <strong>Polskiego Towarzystwa Psychiatrycznego</strong>.",
+        "p2": "Szkolenie obejmuje ponad 1080 godzin dydaktycznych — wykłady, ćwiczenia, superwizje oraz własne doświadczenie terapeutyczne. Zjazdy odbywają się w trybie weekendowym."
+      },
+      "podejscie": {
+        "eyebrow": "Podejście",
+        "heading": "Nurt integracyjno-psychodynamiczny",
+        "p1": "Pracuję w nurcie integracyjno-psychodynamicznym, który łączy klasyczne fundamenty teorii psychoanalitycznej z nowoczesnymi podejściami klinicznymi. Program obejmuje m.in.:",
+        "list": [
+          "Teorię relacji z obiektem i teorię przywiązania",
+          "Psychologię self i teorię ego",
+          "Terapię opartą na mentalizacji (MBT)",
+          "Terapię opartą na przeniesieniu (TFP)"
+        ],
+        "emdrLine": "Metodę <strong>EMDR</strong> (Eye Movement Desensitization and Reprocessing) w pracy z traumą — rekomendowaną przez WHO",
+        "p2": "Moje zainteresowania kliniczne obejmują szczególnie traumę, wiktymizację, zaburzenia lękowe i neuroróżnorodność."
+      },
+      "dlaKogo": {
+        "eyebrow": "Dla kogo",
+        "heading": "Docelowo: osoby dorosłe",
+        "p1": "Planuję pracę z osobami dorosłymi, szczególnie w zakresie traumy (w tym traumy wtórnej i wiktymizacji), zaburzeń lękowych, trudności w relacjach oraz poszukiwania sensu i tożsamości. Moje doświadczenie badawcze z obszaru kryminologii i wiktymologii stanowi dodatkowe tło do rozumienia specyficznych doświadczeń klientów."
+      },
+      "wyksztalcenie": {
+        "eyebrow": "Wykształcenie i doświadczenie",
+        "heading": "Interdyscyplinarny kontekst",
+        "p1": "Łączę wykształcenie prawnicze i politologiczne (doktorat na Uniwersytecie Szczecińskim) z aktualnym kształceniem w psychologii (studia jednolite). Taka kombinacja pozwala mi patrzeć na człowieka w szerokim kontekście — systemowym, prawnym i interpersonalnym.",
+        "p2": "Szkolenie psychoterapeutyczne uzupełnia tę perspektywę o kompetencje kliniczne i warsztat pracy z drugą osobą."
+      }
+    }
+  },
+  "KontaktPage": {
+    "metaTitle": "Kontakt",
+    "metaDescription": "Skontaktuj się z Patrykiem Madejem.",
+    "eyebrow": "Kontakt",
+    "h1": "Napisz do mnie",
+    "intro": "Chętnie odpowiem na pytania dotyczące moich badań, współpracy naukowej lub prelekcji i komentarzy eksperckich.",
+    "emailLabel": "E-mail",
+    "noteTitle": "Ważna informacja — psychoterapia",
+    "noteText": "Jestem w trakcie szkolenia psychoterapeutycznego i nie prowadzę jeszcze gabinetu. Jeśli szukasz pomocy psychologicznej lub terapeutycznej, skontaktuj się z psychologiem lub psychoterapeutą w swoim regionie."
+  },
+  "AbstractToggle": {
+    "label": "Streszczenie",
+    "comingSoon": "Streszczenie zostanie dodane wkrótce.",
+    "pl": "PL",
+    "en": "EN",
+    "it": "IT"
+  },
+  "PublicationNote": {
+    "polish": "Ta publikacja jest w języku polskim.",
+    "english": "Ta publikacja jest w języku angielskim."
+  },
+  "PublicationDetail": {
+    "backToAll": "← Wszystkie publikacje"
+  }
+}

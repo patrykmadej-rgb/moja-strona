@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
 import { publications } from "@/lib/publications";
 import { tagToSlug, slugToTag, getAllTags } from "@/lib/tags";

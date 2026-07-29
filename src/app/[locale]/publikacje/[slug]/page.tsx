@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getPublicationBySlug, publications } from "@/lib/publications";
 import { tagToSlug } from "@/lib/tags";
 import { siteConfig } from "@/lib/site-config";
@@ -34,8 +35,15 @@ export default async function PublikacjaPage({
   const pub = getPublicationBySlug(slug);
   if (!pub) notFound();
 
+  const locale = await getLocale();
+  const tDetail = await getTranslations("PublicationDetail");
+  const tNote = await getTranslations("PublicationNote");
+  const titleLang = pub.titleLang ?? "pl";
+  const showLanguageNote = locale !== "pl" && titleLang !== locale;
+  const languageNote = titleLang === "en" ? tNote("english") : tNote("polish");
+
   return (
-    <div className="mx-auto max-w-3xl px-6 py-20">
+    <div className={`mx-auto max-w-3xl px-6 pb-20 ${pub.coverImage ? "" : "pt-20"}`}>
       {pub.coverImage ? (
         <div className="relative left-[calc(-50vw+50%)] mb-10 w-screen">
           <div className="relative min-h-[480px] w-full overflow-hidden rounded-none">
@@ -52,7 +60,7 @@ export default async function PublikacjaPage({
                 href="/publikacje"
                 className="mb-6 inline-flex w-fit items-center gap-2 text-sm text-white/90 hover:underline"
               >
-                ← Wszystkie publikacje
+                {tDetail("backToAll")}
               </Link>
 
               <span className="inline-block w-fit rounded-full bg-white/20 px-3 py-0.5 text-xs font-medium text-white">
@@ -62,6 +70,10 @@ export default async function PublikacjaPage({
               <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white leading-snug">
                 {pub.title}
               </h1>
+
+              {showLanguageNote && (
+                <p className="mt-1 text-xs italic text-white/70">{languageNote}</p>
+              )}
 
               <p className="mt-3 text-white/80">
                 {pub.venue} · {pub.year}
@@ -89,7 +101,7 @@ export default async function PublikacjaPage({
             href="/publikacje"
             className="inline-flex items-center gap-2 text-sm text-[#4A1D6E] hover:underline dark:text-purple-400 mb-10"
           >
-            ← Wszystkie publikacje
+            {tDetail("backToAll")}
           </Link>
 
           <span className="inline-block rounded-full bg-[#EDE6F8] px-3 py-0.5 text-xs font-medium text-[#4A1D6E] dark:bg-purple-900/30 dark:text-purple-300">
@@ -99,6 +111,12 @@ export default async function PublikacjaPage({
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[#1C1028] leading-snug dark:text-white">
             {pub.title}
           </h1>
+
+          {showLanguageNote && (
+            <p className="mt-1 text-xs italic text-[#4A3360]/70 dark:text-neutral-500">
+              {languageNote}
+            </p>
+          )}
 
           <p className="mt-3 text-[#4A3360] dark:text-neutral-400">
             {pub.venue} · {pub.year}
@@ -146,7 +164,7 @@ export default async function PublikacjaPage({
         </div>
       )}
 
-      <AbstractToggle abstractPl={pub.abstractPl} abstractEn={pub.abstractEn} />
+      <AbstractToggle abstractPl={pub.abstractPl} abstractEn={pub.abstractEn} abstractIt={pub.abstractIt} />
     </div>
   );
 }

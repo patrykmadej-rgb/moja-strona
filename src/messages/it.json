@@ -1,0 +1,147 @@
+{
+  "Nav": {
+    "tagline": "Psicologia · Criminologia · Vittimologia",
+    "oMnie": "Chi sono",
+    "badania": "Ricerca",
+    "publikacje": "Pubblicazioni",
+    "projekty": "Progetti",
+    "psychoterapia": "Psicoterapia",
+    "wiedza": "Approfondimenti",
+    "kontakt": "Contatti"
+  },
+  "Footer": {
+    "copyright": "© {year} Patryk Madej"
+  },
+  "Hero": {
+    "line1": "Ricerca.",
+    "line2": "Comprensione.",
+    "line3": "Cambiamento reale.",
+    "description": "Unisco la prospettiva psicologica, criminologica e giuridica per comprendere meglio la persona nel contesto del trauma, della criminalità e del sistema.",
+    "ctaBadania": "Scopri le mie ricerche →",
+    "ctaOMnie": "Scopri di più su di me"
+  },
+  "Pillars": {
+    "badania": {
+      "title": "Ricerca",
+      "description": "Progetti di ricerca, modelli e analisi scientifiche nell'ambito della psicologia, criminologia e vittimologia."
+    },
+    "publikacje": {
+      "title": "Pubblicazioni",
+      "description": "Articoli scientifici, capitoli di monografie e testi divulgativi."
+    },
+    "projekty": {
+      "title": "Progetti e modelli",
+      "description": "Concetti originali e modelli analitici riguardanti vittime, autori di reato e sistema."
+    },
+    "psychoterapia": {
+      "title": "Psicoterapia",
+      "description": "Formazione, approccio, aree di interesse e futura pratica terapeutica."
+    },
+    "wiedza": {
+      "title": "Approfondimenti",
+      "description": "Articoli, commenti e analisi sull'uomo, il trauma, la criminalità e la sicurezza."
+    }
+  },
+  "QuotePublications": {
+    "quote": "Comprendere la persona nella sua storia, nel suo contesto e nelle sue relazioni è il primo passo verso un cambiamento reale.",
+    "quoteAuthor": "Patryk Madej",
+    "recentTitle": "Ultime pubblicazioni",
+    "seeAll": "Vedi tutte →",
+    "readMore": "Leggi di più →"
+  },
+  "AboutMe": {
+    "eyebrow": "Chi sono",
+    "heading1": "Unire prospettive.",
+    "heading2": "Comprendere la persona.",
+    "paragraph1": "Sono dottorando presso l'Istituto di Scienze Politiche e della Sicurezza dell'Università di Stettino e studente di psicologia. Da anni mi occupo di separatismo, sicurezza internazionale e della situazione nei Balcani occidentali — il principale ambito delle mie ricerche, che sviluppo nella tesi di dottorato. Parallelamente amplio i miei interessi verso la criminologia, la vittimologia e la psicologia della sicurezza, e mi sto formando in psicoterapia a orientamento integrativo-psicodinamico, incluso il metodo EMDR nel lavoro con il trauma.",
+    "paragraph2": "Unisco diversi ambiti del sapere e dell'esperienza per comprendere meglio la persona, le sue decisioni, i suoi comportamenti e i contesti in cui agisce.",
+    "moreLink": "Scopri di più su di me →",
+    "cards": {
+      "wyksztalcenie": {
+        "label": "Formazione",
+        "value": "Giurisprudenza (laurea magistrale), Sicurezza interna (laurea triennale) — Università di Stettino · Psicologia (3° anno, in corso)"
+      },
+      "doktorat": {
+        "label": "Dottorato",
+        "value": "Istituto di Scienze Politiche e della Sicurezza, Università di Stettino"
+      },
+      "specjalizacja": {
+        "label": "Ambito di ricerca",
+        "value": "Balcani occidentali, separatismo, sicurezza internazionale — inoltre: vittimologia, criminologia"
+      },
+      "jezyki": {
+        "label": "Lingue",
+        "value": "Polacco (madrelingua) · Inglese (fluente) · Italiano (fluente)"
+      },
+      "psychoterapiaCard": {
+        "label": "Psicoterapia",
+        "value": "Formazione a orientamento integrativo-psicodinamico con metodo EMDR (da settembre 2026)"
+      }
+    }
+  },
+  "PsychoterapiaPage": {
+    "metaTitle": "Psicoterapia",
+    "metaDescription": "Informazioni sulla mia formazione in psicoterapia, sul mio approccio e sulla futura pratica clinica.",
+    "eyebrow": "Psicoterapia",
+    "h1": "La persona al centro.",
+    "intro": "Per me la psicoterapia è uno spazio in cui la teoria incontra la persona — la sua storia, le sue relazioni e la possibilità di cambiamento.",
+    "warningTitle": "Informazione importante",
+    "warningText": "Sono attualmente in formazione psicoterapeutica — non gestisco ancora uno studio né seguo pazienti. Questa pagina ha carattere puramente informativo. Se sei in una situazione di crisi o la tua vita o la tua salute sono a rischio, chiama il numero di emergenza <strong>112</strong> oppure contatta una linea di ascolto per adulti in crisi emotiva: <strong>116 123</strong>.",
+    "sections": {
+      "szkolenie": {
+        "eyebrow": "Formazione",
+        "heading": "Quattro anni, un unico obiettivo",
+        "p1": "Da settembre 2026 partecipo a un corso quadriennale di psicoterapia accreditato dalla Sezione Scientifica di Psicoterapia e Terapia Familiare della <strong>Società Polacca di Psichiatria</strong>.",
+        "p2": "La formazione comprende oltre 1080 ore didattiche — lezioni, esercitazioni, supervisioni ed esperienza terapeutica personale. Gli incontri si svolgono nei weekend."
+      },
+      "podejscie": {
+        "eyebrow": "Approccio",
+        "heading": "Orientamento integrativo-psicodinamico",
+        "p1": "Lavoro secondo l'orientamento integrativo-psicodinamico, che unisce i fondamenti classici della teoria psicoanalitica ad approcci clinici contemporanei. Il programma comprende tra l'altro:",
+        "list": [
+          "La teoria delle relazioni oggettuali e la teoria dell'attaccamento",
+          "La psicologia del sé e la teoria dell'Io",
+          "La terapia basata sulla mentalizzazione (MBT)",
+          "La psicoterapia focalizzata sul transfert (TFP)"
+        ],
+        "emdrLine": "Il metodo <strong>EMDR</strong> (Eye Movement Desensitization and Reprocessing) nel lavoro con il trauma — raccomandato dall'OMS",
+        "p2": "I miei interessi clinici riguardano in particolare il trauma, la vittimizzazione, i disturbi d'ansia e la neurodiversità."
+      },
+      "dlaKogo": {
+        "eyebrow": "A chi si rivolge",
+        "heading": "In prospettiva: persone adulte",
+        "p1": "Intendo lavorare con persone adulte, in particolare su temi legati al trauma (compreso il trauma secondario e la vittimizzazione), ai disturbi d'ansia, alle difficoltà relazionali e alla ricerca di senso e identità. La mia esperienza di ricerca in criminologia e vittimologia costituisce uno sfondo aggiuntivo per comprendere le esperienze specifiche dei pazienti."
+      },
+      "wyksztalcenie": {
+        "eyebrow": "Formazione ed esperienza",
+        "heading": "Un contesto interdisciplinare",
+        "p1": "Unisco una formazione giuridica e politologica (dottorato presso l'Università di Stettino) a un percorso attuale in psicologia (corso di laurea a ciclo unico). Questa combinazione mi permette di guardare alla persona in un contesto ampio — sistemico, giuridico e interpersonale.",
+        "p2": "La formazione in psicoterapia completa questa prospettiva con competenze cliniche e strumenti concreti per il lavoro con l'altro."
+      }
+    }
+  },
+  "KontaktPage": {
+    "metaTitle": "Contatti",
+    "metaDescription": "Contatta Patryk Madej.",
+    "eyebrow": "Contatti",
+    "h1": "Scrivimi",
+    "intro": "Sarò felice di rispondere a domande sulle mie ricerche, su collaborazioni scientifiche o su interventi e commenti da esperto.",
+    "emailLabel": "E-mail",
+    "noteTitle": "Informazione importante — psicoterapia",
+    "noteText": "Sono attualmente in formazione psicoterapeutica e non gestisco ancora uno studio. Se cerchi un aiuto psicologico o terapeutico, contatta uno psicologo o uno psicoterapeuta della tua zona."
+  },
+  "AbstractToggle": {
+    "label": "Abstract",
+    "comingSoon": "L'abstract sarà aggiunto a breve.",
+    "pl": "PL",
+    "en": "EN",
+    "it": "IT"
+  },
+  "PublicationNote": {
+    "polish": "Questa pubblicazione è in lingua polacca.",
+    "english": "Questa pubblicazione è in lingua inglese."
+  },
+  "PublicationDetail": {
+    "backToAll": "← Tutte le pubblicazioni"
+  }
+}
