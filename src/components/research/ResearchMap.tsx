@@ -10,29 +10,34 @@ import { useRevealOnce } from "./useRevealOnce";
 
 const NODE_ORDER: ResearchAxisId[] = ["balkans", "security", "profiling", "victimology", "clinical"];
 
+// Współrzędne węzłów i linii przeskalowane ok. 0.62x bliżej środka (450,260)
+// względem oryginalnych, żeby dopasować proporcje mapy do wzorca wizualnego
+// (public/_reference/research-page-mockup.png) — węzły bliżej medalionu, mniej
+// pustej przestrzeni. Musi zostać spójne z RESEARCH_MAP_NODE_POSITIONS w research.ts.
 const CONNECTIONS: { axis: ResearchAxisId; d: string }[] = [
-  { axis: "balkans", d: "M450 260C365 195 285 155 166 143" },
-  { axis: "security", d: "M450 260C540 190 624 143 742 126" },
-  { axis: "profiling", d: "M450 260C345 272 260 298 142 327" },
-  { axis: "victimology", d: "M450 260C458 338 485 388 548 440" },
-  { axis: "clinical", d: "M450 260C560 275 648 300 755 326" },
+  { axis: "balkans", d: "M450 260C397 220 348 195 274 187" },
+  { axis: "security", d: "M450 260C506 217 558 188 631 177" },
+  { axis: "profiling", d: "M450 260C385 267 332 284 259 302" },
+  { axis: "victimology", d: "M450 260C455 308 472 339 511 372" },
+  { axis: "clinical", d: "M450 260C518 269 573 285 639 301" },
 ];
 
 const SECONDARY_CONNECTIONS = [
-  "M166 143C302 70 581 60 742 126",
-  "M142 327C290 455 402 482 548 440",
-  "M548 440C650 420 716 385 755 326",
+  "M274 187C358 142 531 136 631 177",
+  "M259 302C351 381 420 398 511 372",
+  "M511 372C574 359 615 338 639 301",
 ];
 
 const CONNECTION_DOTS = [
-  { cx: 333, cy: 205, duration: 3.8 },
-  { cx: 568, cy: 190, duration: 4.2 },
-  { cx: 350, cy: 286, duration: 4.6 },
-  { cx: 500, cy: 350, duration: 5 },
-  { cx: 620, cy: 286, duration: 5.2 },
+  { cx: 378, cy: 226, duration: 3.8 },
+  { cx: 523, cy: 217, duration: 4.2 },
+  { cx: 388, cy: 276, duration: 4.6 },
+  { cx: 481, cy: 316, duration: 5 },
+  { cx: 555, cy: 276, duration: 5.2 },
 ];
 
 type Labels = {
+  mapLabel: string;
   mapAriaLabel: string;
   mapNodeOpenDetails: string;
   mapCenterLabel: string;
@@ -89,14 +94,25 @@ export default function ResearchMap({
   return (
     <div data-reveal={revealed ? "in" : undefined} style={{ transitionDelay: "100ms" }}>
       {/* ============ DESKTOP / TABLET: scena z warstwami ============ */}
+      <p className="mb-3 hidden text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] min-[720px]:block dark:text-purple-400">
+        {labels.mapLabel}
+      </p>
       <div
         ref={ref}
         role="group"
         aria-label={labels.mapAriaLabel}
         className="relative mx-auto hidden aspect-[900/520] w-full max-w-[560px] min-[720px]:block lg:max-w-none"
       >
-        {/* Warstwa 1: tło rastrowe (fallback gradientowy, dopóki nie podmienisz na research-map-background.png) */}
-        <div className="absolute inset-0 overflow-hidden rounded-research-lg">
+        {/* Warstwa 1: tło — bez twardej ramki/karty; maska radialna rozmywa krawędzie
+            tak, żeby akwarela organicznie wtapiała się w tło strony (fallback
+            gradientowy, dopóki nie podmienisz na research-map-background.png). */}
+        <div
+          className="absolute inset-0"
+          style={{
+            maskImage: "radial-gradient(ellipse 62% 68% at 50% 50%, black 40%, transparent 90%)",
+            WebkitMaskImage: "radial-gradient(ellipse 62% 68% at 50% 50%, black 40%, transparent 90%)",
+          }}
+        >
           {hasBackgroundImage ? (
             <Image
               src="/research/research-map-background.png"
@@ -114,7 +130,7 @@ export default function ResearchMap({
               className="h-full w-full"
               style={{
                 background:
-                  "radial-gradient(circle at 32% 28%, var(--research-lavender-soft), var(--research-ivory) 55%, var(--research-paper) 100%)",
+                  "radial-gradient(circle at 32% 28%, var(--research-lavender-soft), var(--research-ivory) 55%, transparent 100%)",
               }}
             />
           )}
@@ -169,7 +185,7 @@ export default function ResearchMap({
         {/* Warstwa 3: centralny medalion (dekoracyjny) */}
         <div
           aria-hidden="true"
-          className="absolute top-1/2 left-1/2 w-[24%] -translate-x-1/2 -translate-y-1/2"
+          className="absolute top-1/2 left-1/2 w-[19%] -translate-x-1/2 -translate-y-1/2"
           style={{ animation: "research-breathe 5.5s ease-in-out infinite" }}
         >
           <Image
@@ -209,23 +225,24 @@ export default function ResearchMap({
                 left: `${pos.x}%`,
                 top: `${pos.y}%`,
                 opacity: isDimmed ? 0.38 : 1,
-                transform: isFocused ? "translate(-50%, calc(-50% - 4px)) scale(1.04)" : "translate(-50%, -50%) scale(1)",
+                transform: isFocused ? "translate(-50%, calc(-50% - 3px)) scale(1.04)" : "translate(-50%, -50%) scale(1)",
                 transition: "opacity 250ms var(--research-ease), transform 250ms var(--research-ease)",
               }}
-              className="group absolute flex flex-col items-center gap-1.5 rounded-research-md p-2 text-center outline-none focus-visible:ring-[3px] focus-visible:ring-offset-4 focus-visible:ring-[var(--research-gold)]"
+              className="group absolute flex flex-col items-center gap-1 rounded-research-md p-1.5 text-center outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2 focus-visible:ring-[var(--research-gold)]"
             >
               <span
-                className="flex h-11 w-11 items-center justify-center rounded-full border-2 bg-[var(--research-paper)] shadow-[var(--research-shadow)]"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--research-paper)]"
                 style={{
+                  border: "1.5px solid",
                   borderColor: isFocused ? "var(--research-gold)" : "var(--research-amethyst)",
-                  boxShadow: isFocused ? "0 0 0 7px rgba(195,154,59,.12)" : undefined,
+                  boxShadow: isFocused ? "0 0 0 5px rgba(195,154,59,.12)" : undefined,
                   color: isFocused ? "var(--research-plum-800)" : "var(--research-violet)",
                   transition: "border-color 250ms var(--research-ease), box-shadow 250ms var(--research-ease), color 250ms var(--research-ease)",
                 }}
               >
-                <Icon className="h-[22px] w-[22px]" />
+                <Icon className="h-4 w-4" />
               </span>
-              <span className="max-w-[7.5rem] text-[11px] leading-tight font-semibold text-[var(--research-plum-800)] dark:text-white">
+              <span className="max-w-[6.5rem] text-[10px] leading-tight font-semibold text-[var(--research-plum-800)] dark:text-white">
                 {axis.shortTitle}
               </span>
             </button>
@@ -234,7 +251,9 @@ export default function ResearchMap({
       </div>
 
       {/* ============ MOBILE (<720px): medalion + accordion pionowy ============ */}
-      <div className="min-[720px]:hidden">
+      {/* id służy jako cel przewinięcia dla CTA "Poznaj moje obszary" na mobile,
+          gdzie sekcja kart osi (#osie-badawcze) jest ukryta, żeby nie dublować treści. */}
+      <div id="osie-badawcze-mobile" className="min-[720px]:hidden">
         <div className="relative mx-auto aspect-square w-40 overflow-hidden rounded-full">
           {hasBackgroundImage && (
             <Image

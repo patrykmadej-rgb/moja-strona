@@ -9,13 +9,12 @@ import CurrentWorkCarousel from "./CurrentWorkCarousel";
 import { EXPLORE_AXES_EVENT } from "./ExploreAxesButton";
 
 export type ResearchLabels = {
+  mapLabel: string;
   mapAriaLabel: string;
   mapNodeOpenDetails: string;
   mapCenterLabel: string;
   mapMobileHint: string;
   axesEyebrow: string;
-  axesHeading: string;
-  axesIntro: string;
   expand: string;
   selected: string;
   questionsHeading: string;

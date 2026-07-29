@@ -27,13 +27,12 @@ export default async function BadaniaPage() {
   );
 
   const labels = {
+    mapLabel: t("mapLabel"),
     mapAriaLabel: t("mapAriaLabel"),
     mapNodeOpenDetails: t("mapNodeOpenDetails"),
     mapCenterLabel: t("mapCenterLabel"),
     mapMobileHint: t("mapMobileHint"),
     axesEyebrow: t("axesEyebrow"),
-    axesHeading: t("axesHeading"),
-    axesIntro: t("axesIntro"),
     expand: t("expand"),
     selected: t("selected"),
     questionsHeading: t("questionsHeading"),
@@ -53,7 +52,7 @@ export default async function BadaniaPage() {
       <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
         {t("eyebrow")}
       </p>
-      <h1 className="mt-4 text-4xl font-semibold tracking-tight text-[#1C1028] lg:text-5xl dark:text-white">
+      <h1 className="mt-4 text-4xl leading-tight font-medium tracking-tight text-[#1C1028] lg:text-5xl dark:text-white">
         {t("h1")}
       </h1>
       <p className="mt-5 max-w-md text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">

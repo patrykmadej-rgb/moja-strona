@@ -8,8 +8,6 @@ import { useRevealOnce } from "./useRevealOnce";
 
 type Labels = {
   axesEyebrow: string;
-  axesHeading: string;
-  axesIntro: string;
   expand: string;
   selected: string;
   questionsHeading: string;
@@ -175,18 +173,14 @@ export default function ResearchAxisCards({
   }, [activeAxis]);
 
   return (
-    <section id="osie-badawcze" className="mx-auto max-w-6xl px-6 py-20">
+    <section id="osie-badawcze" className="mx-auto hidden max-w-6xl px-6 py-20 min-[720px]:block">
       <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
         {labels.axesEyebrow}
       </p>
-      <h2 className="mt-3 text-3xl font-semibold tracking-tight text-[#1C1028] dark:text-white">
-        {labels.axesHeading}
-      </h2>
-      <p className="mt-4 max-w-2xl leading-relaxed text-[#4A3360] dark:text-neutral-300">{labels.axesIntro}</p>
 
       <div
         ref={ref}
-        className="mt-10 grid grid-cols-1 gap-5 min-[640px]:grid-cols-2 min-[900px]:grid-cols-3 min-[1280px]:grid-cols-5"
+        className="mt-6 grid grid-cols-1 gap-5 min-[640px]:grid-cols-2 min-[900px]:grid-cols-3 min-[1280px]:grid-cols-5"
       >
         {axes.map((axis, index) => (
           <AxisCard
