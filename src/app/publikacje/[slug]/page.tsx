@@ -36,49 +36,86 @@ export default async function PublikacjaPage({
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-20">
-      <Link
-        href="/publikacje"
-        className="inline-flex items-center gap-2 text-sm text-[#5C2D91] hover:underline dark:text-purple-400 mb-10"
-      >
-        ← Wszystkie publikacje
-      </Link>
-
-      <span className="inline-block rounded-full bg-[#EDE6F8] px-3 py-0.5 text-xs font-medium text-[#5C2D91] dark:bg-purple-900/30 dark:text-purple-300">
-        {pub.type}
-      </span>
-
-      <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[#1C1028] leading-snug dark:text-white">
-        {pub.title}
-      </h1>
-
-      <p className="mt-3 text-[#4A3360] dark:text-neutral-400">
-        {pub.venue} · {pub.year}
-      </p>
-
-      {pub.tags.length > 0 && (
-        <div className="mt-6 flex flex-wrap gap-2">
-          {pub.tags.map((tag) => (
-            <Link
-              key={tag}
-              href={`/tagi/${tagToSlug(tag)}`}
-              className="rounded-full border border-[#5C2D91]/20 px-3 py-0.5 text-xs text-[#5C2D91] hover:bg-[#EDE6F8] hover:border-[#5C2D91]/50 transition-colors dark:border-purple-400/20 dark:text-purple-300 dark:hover:bg-purple-900/20"
-            >
-              {tag}
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {pub.coverImage && (
-        <div className="relative mt-8 mb-10 aspect-video w-full overflow-hidden rounded-2xl">
+      {pub.coverImage ? (
+        <div className="relative mb-10 min-h-[560px] w-full overflow-hidden rounded-2xl">
           <Image
             src={pub.coverImage}
             alt={pub.title}
             fill
             priority
-            className="object-cover"
+            className="z-0 object-cover"
           />
+          <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
+          <div className="relative z-10 flex min-h-[560px] flex-col justify-end p-8 md:p-10">
+            <Link
+              href="/publikacje"
+              className="mb-6 inline-flex w-fit items-center gap-2 text-sm text-white/90 hover:underline"
+            >
+              ← Wszystkie publikacje
+            </Link>
+
+            <span className="inline-block w-fit rounded-full bg-white/20 px-3 py-0.5 text-xs font-medium text-white">
+              {pub.type}
+            </span>
+
+            <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white leading-snug">
+              {pub.title}
+            </h1>
+
+            <p className="mt-3 text-white/80">
+              {pub.venue} · {pub.year}
+            </p>
+
+            {pub.tags.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-2">
+                {pub.tags.map((tag) => (
+                  <Link
+                    key={tag}
+                    href={`/tagi/${tagToSlug(tag)}`}
+                    className="rounded-full border border-white/40 bg-white/10 px-3 py-0.5 text-xs text-white hover:bg-white/20 transition-colors"
+                  >
+                    {tag}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+      ) : (
+        <>
+          <Link
+            href="/publikacje"
+            className="inline-flex items-center gap-2 text-sm text-[#5C2D91] hover:underline dark:text-purple-400 mb-10"
+          >
+            ← Wszystkie publikacje
+          </Link>
+
+          <span className="inline-block rounded-full bg-[#EDE6F8] px-3 py-0.5 text-xs font-medium text-[#5C2D91] dark:bg-purple-900/30 dark:text-purple-300">
+            {pub.type}
+          </span>
+
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[#1C1028] leading-snug dark:text-white">
+            {pub.title}
+          </h1>
+
+          <p className="mt-3 text-[#4A3360] dark:text-neutral-400">
+            {pub.venue} · {pub.year}
+          </p>
+
+          {pub.tags.length > 0 && (
+            <div className="mt-6 flex flex-wrap gap-2">
+              {pub.tags.map((tag) => (
+                <Link
+                  key={tag}
+                  href={`/tagi/${tagToSlug(tag)}`}
+                  className="rounded-full border border-[#5C2D91]/20 px-3 py-0.5 text-xs text-[#5C2D91] hover:bg-[#EDE6F8] hover:border-[#5C2D91]/50 transition-colors dark:border-purple-400/20 dark:text-purple-300 dark:hover:bg-purple-900/20"
+                >
+                  {tag}
+                </Link>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {(pub.pdfUrl || (pub.externalLinks && pub.externalLinks.length > 0)) && (
