@@ -53,7 +53,9 @@ export default async function BadaniaPage() {
         {t("eyebrow")}
       </p>
       <h1 className="mt-4 text-4xl leading-tight font-medium tracking-tight text-[#1C1028] lg:text-5xl dark:text-white">
-        {t("h1")}
+        {t("h1Line1")}
+        <br />
+        {t("h1Line2")}
       </h1>
       <p className="mt-5 max-w-md text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
         {t("intro")}

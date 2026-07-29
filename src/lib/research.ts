@@ -58,11 +58,11 @@ export type CurrentWorkItem = {
 // proporcji z public/_reference/research-page-mockup.png. Musi zostać spójne
 // z krzywymi w ResearchMap.tsx (CONNECTIONS/SECONDARY_CONNECTIONS/CONNECTION_DOTS).
 export const RESEARCH_MAP_NODE_POSITIONS: Record<ResearchAxisId, { x: number; y: number }> = {
-  balkans: { x: 30.4, y: 36.1 },
-  security: { x: 70.1, y: 34 },
-  profiling: { x: 28.8, y: 58 },
-  victimology: { x: 56.8, y: 71.5 },
-  clinical: { x: 71, y: 57.9 },
+  balkans: { x: 32.3, y: 37.3 },
+  security: { x: 68.2, y: 35.6 },
+  profiling: { x: 30.9, y: 57.3 },
+  victimology: { x: 56.1, y: 69.4 },
+  clinical: { x: 69, y: 57.1 },
 };
 
 export const researchAxes: ResearchAxis[] = [

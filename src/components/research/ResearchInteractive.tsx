@@ -84,13 +84,16 @@ export default function ResearchInteractive({ heroLeft, axes, currentWork, hasBa
     <>
       {/* Hero "wyłamuje się" z max-w-6xl na szeroki viewport (tak jak hero strony
           głównej), żeby mapa dostała dużo więcej miejsca niż połowa zwykłego
-          kontenera. items-start (nie items-center), żeby krótsza kolumna tekstu
-          nie była wyśrodkowana w wysokości wyznaczanej przez mapę — to właśnie
-          tworzyło pusty pas pod przyciskiem CTA. */}
+          kontenera. Kolumny w stałej proporcji 38/62 (zbliżonej do mockupu) przez
+          CSS grid z minmax(0, Nfr) — mapa rośnie w ramach SWOJEJ kolumny, nie
+          kosztem tekstu. Górna granica szerokości (max-w-[1600px]) + spory
+          padding poziomy, żeby mapa nie stykała się z krawędzią na szerokich
+          ekranach. items-start (nie items-center), żeby krótsza kolumna tekstu
+          nie była wyśrodkowana w wysokości wyznaczanej przez mapę. */}
       <section className="relative left-0 w-full min-[720px]:left-[calc(-50vw+50%)] min-[720px]:w-screen">
-        <div className="mx-auto flex max-w-6xl flex-col gap-10 px-6 pt-14 pb-8 min-[720px]:max-w-none min-[720px]:flex-row min-[720px]:items-start min-[720px]:gap-10 min-[720px]:px-10 min-[720px]:pt-16 min-[720px]:pb-10 lg:px-16">
-          <div className="w-full shrink-0 min-[720px]:max-w-[320px]">{heroLeft}</div>
-          <div className="w-full min-[720px]:flex-1">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 pt-14 pb-8 min-[720px]:max-w-[1600px] min-[720px]:grid-cols-[minmax(0,38fr)_minmax(0,62fr)] min-[720px]:items-start min-[720px]:gap-12 min-[720px]:px-12 min-[720px]:pt-16 min-[720px]:pb-10 lg:px-20">
+          <div className="w-full">{heroLeft}</div>
+          <div className="w-full">
             <ResearchMap
               axes={axes}
               activeAxis={activeAxis}

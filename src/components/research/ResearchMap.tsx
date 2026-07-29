@@ -10,30 +10,31 @@ import { useRevealOnce } from "./useRevealOnce";
 
 const NODE_ORDER: ResearchAxisId[] = ["balkans", "security", "profiling", "victimology", "clinical"];
 
-// Współrzędne węzłów i linii przeskalowane ok. 0.62x bliżej środka (450,260)
+// Współrzędne węzłów i linii przeskalowane ok. 0.56x bliżej środka (450,260)
 // względem oryginalnych, żeby dopasować proporcje mapy do wzorca wizualnego
-// (public/_reference/research-page-mockup.png) — węzły bliżej medalionu, mniej
-// pustej przestrzeni. Musi zostać spójne z RESEARCH_MAP_NODE_POSITIONS w research.ts.
+// (public/_reference/research-page-mockup.png) i zostawić margines: węzły nie
+// mają wychodzić blisko krawędzi kontenera, etykiety mają mieć oddech od dołu.
+// Musi zostać spójne z RESEARCH_MAP_NODE_POSITIONS w research.ts.
 const CONNECTIONS: { axis: ResearchAxisId; d: string }[] = [
-  { axis: "balkans", d: "M450 260C397 220 348 195 274 187" },
-  { axis: "security", d: "M450 260C506 217 558 188 631 177" },
-  { axis: "profiling", d: "M450 260C385 267 332 284 259 302" },
-  { axis: "victimology", d: "M450 260C455 308 472 339 511 372" },
-  { axis: "clinical", d: "M450 260C518 269 573 285 639 301" },
+  { axis: "balkans", d: "M450 260C402 224 358 201 291 194" },
+  { axis: "security", d: "M450 260C500 221 547 194 614 185" },
+  { axis: "profiling", d: "M450 260C391 267 344 281 278 298" },
+  { axis: "victimology", d: "M450 260C454 304 470 332 505 361" },
+  { axis: "clinical", d: "M450 260C512 268 561 282 621 297" },
 ];
 
 const SECONDARY_CONNECTIONS = [
-  "M274 187C358 142 531 136 631 177",
-  "M259 302C351 381 420 398 511 372",
-  "M511 372C574 359 615 338 639 301",
+  "M291 194C367 154 523 148 614 185",
+  "M278 298C360 369 423 384 505 361",
+  "M505 361C562 350 599 330 621 297",
 ];
 
 const CONNECTION_DOTS = [
-  { cx: 378, cy: 226, duration: 3.8 },
-  { cx: 523, cy: 217, duration: 4.2 },
-  { cx: 388, cy: 276, duration: 4.6 },
-  { cx: 481, cy: 316, duration: 5 },
-  { cx: 555, cy: 276, duration: 5.2 },
+  { cx: 384, cy: 229, duration: 3.8 },
+  { cx: 516, cy: 221, duration: 4.2 },
+  { cx: 394, cy: 275, duration: 4.6 },
+  { cx: 478, cy: 310, duration: 5 },
+  { cx: 545, cy: 301, duration: 5.2 },
 ];
 
 type Labels = {
