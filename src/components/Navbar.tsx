@@ -164,9 +164,8 @@ export default async function Navbar() {
           })}
         </div>
 
-        {/* Przełącznik języka + przycisk KONTAKT / Panel */}
+        {/* Przycisk KONTAKT / Panel + przełącznik języka */}
         <div className="flex items-center gap-6">
-          <LanguageSwitcher />
           {user ? (
             <div className="flex items-center gap-3">
               <NextLink
@@ -193,6 +192,7 @@ export default async function Navbar() {
               <Mail className="h-4 w-4" />
             </Link>
           )}
+          <LanguageSwitcher />
         </div>
       </nav>
     </header>
