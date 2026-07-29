@@ -179,17 +179,39 @@ export default function PublicationsExplorer({
   return (
     <div>
       {/* HERO */}
-      <section className="border-b border-[#4A1D6E]/10 pt-16 pb-10 dark:border-white/10">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2">
-            <div>
-              <p className="mb-4 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
+      <section className="relative">
+        {/* Desktop / tablet: pełne tło na całą szerokość ekranu, tekst nałożony (jak hero
+            strony głównej) */}
+        <div className="relative left-[calc(-50vw+50%)] hidden w-screen lg:block lg:min-h-[560px]">
+          <Image
+            src="/publikacje-hero-book.png"
+            alt="Ilustracja przedstawiająca otwartą książkę, mapę i sieć neuronową symbolizujące dorobek naukowy"
+            fill
+            priority
+            className="z-0 object-cover object-center"
+          />
+          {/* Podkładka pod tekstem — jasny (kremowy) gradient tylko w strefie, gdzie faktycznie
+              nakłada się tekst (lewa ~połowa), szybko zanikający, żeby reszta grafiki (książka,
+              mapa, sieć) została w pełni widoczna — tak jak na hero głównej i /psychoterapia. */}
+          <div className="absolute inset-0 z-[5] bg-gradient-to-r from-[#F5F1EC] from-0% via-[#F5F1EC]/70 via-25% to-transparent to-48% dark:from-neutral-950 dark:via-neutral-950/70" />
+          <div className="relative z-10 flex lg:min-h-[560px] items-center">
+            <div className="max-w-xl pl-16 py-16">
+              <p
+                className="mb-4 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400"
+                style={{ textShadow: "0 1px 12px rgba(245,241,236,0.9)" }}
+              >
                 Publikacje
               </p>
-              <h1 className="text-5xl font-semibold tracking-tight text-[#1C1028] dark:text-white">
+              <h1
+                className="text-5xl font-semibold tracking-tight text-[#1C1028] dark:text-white"
+                style={{ textShadow: "0 2px 20px rgba(245,241,236,0.85)" }}
+              >
                 Dorobek naukowy
               </h1>
-              <p className="mt-5 max-w-xl text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
+              <p
+                className="mt-5 text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300"
+                style={{ textShadow: "0 1px 16px rgba(245,241,236,0.85)" }}
+              >
                 Artykuły naukowe, rozdziały w monografiach i teksty popularnonaukowe
                 z obszaru kryminologii, wiktymologii i psychologii bezpieczeństwa.
               </p>
@@ -211,59 +233,87 @@ export default function PublicationsExplorer({
                   ORCID ↗
                 </a>
               </div>
-
-              {/* SZUKAJ + FILTR TYPU */}
-              <div className="mt-6 flex flex-col gap-3 rounded-2xl bg-white p-3 shadow-sm sm:flex-row sm:items-center dark:bg-neutral-900">
-                <div className="relative sm:flex-1">
-                  <Search className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-[#4A3360]/50 dark:text-neutral-500" />
-                  <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Szukaj publikacji"
-                    className="w-full rounded-full border border-[#4A1D6E]/10 bg-[#F5F1EC] py-2.5 pr-4 pl-11 text-sm text-[#1C1028] placeholder:text-[#4A3360]/50 focus:border-[#4A1D6E]/40 focus:outline-none dark:border-white/10 dark:bg-neutral-950 dark:text-white"
-                  />
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {TYPE_FILTERS.map((f) => (
-                    <button
-                      key={f.key}
-                      type="button"
-                      onClick={() => setTypeFilter(f.key)}
-                      className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                        typeFilter === f.key
-                          ? "bg-[#4A1D6E] text-white"
-                          : "border border-[#4A1D6E]/20 text-[#4A3360] hover:border-[#4A1D6E]/40 dark:border-white/10 dark:text-neutral-300 dark:hover:border-purple-400/40"
-                      }`}
-                    >
-                      {f.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
             </div>
+          </div>
+        </div>
 
-            {/* Dekoracyjna ilustracja — widoczna od lg wzwyż, lekko wychodząca poza kolumnę */}
-            <div className="hidden lg:block">
-              <div className="-mt-8 -mr-10 scale-110">
-                <Image
-                  src="/publikacje-hero-book.png"
-                  alt="Ilustracja przedstawiająca otwartą książkę, mapę i sieć neuronową symbolizujące dorobek naukowy"
-                  width={1672}
-                  height={941}
-                  priority
-                  className="h-auto w-full object-contain"
-                />
-              </div>
-            </div>
+        {/* Mobile: prosty układ pionowy, bez nakładki */}
+        <div className="px-6 py-16 lg:hidden">
+          <p className="mb-4 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
+            Publikacje
+          </p>
+          <h1 className="text-4xl font-semibold tracking-tight text-[#1C1028] dark:text-white">
+            Dorobek naukowy
+          </h1>
+          <p className="mt-5 text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
+            Artykuły naukowe, rozdziały w monografiach i teksty popularnonaukowe
+            z obszaru kryminologii, wiktymologii i psychologii bezpieczeństwa.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a
+              href="https://scholar.google.com/citations?user=zyzQJ0kAAAAJ&hl=pl"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#4A1D6E]/30 px-5 py-2.5 text-sm font-semibold text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E]/5 dark:border-purple-400/30 dark:text-purple-300 dark:hover:bg-purple-400/10"
+            >
+              Google Scholar ↗
+            </a>
+            <a
+              href="https://orcid.org/0000-0002-7185-2441"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#4A1D6E]/30 px-5 py-2.5 text-sm font-semibold text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E]/5 dark:border-purple-400/30 dark:text-purple-300 dark:hover:bg-purple-400/10"
+            >
+              ORCID ↗
+            </a>
+          </div>
+
+          <div className="mt-10">
+            <Image
+              src="/publikacje-hero-book.png"
+              alt="Ilustracja przedstawiająca otwartą książkę, mapę i sieć neuronową symbolizujące dorobek naukowy"
+              width={1672}
+              height={941}
+              className="h-auto w-full rounded-2xl"
+            />
           </div>
         </div>
       </section>
 
       <div className="mx-auto max-w-6xl px-6 py-10">
+        {/* SZUKAJ + FILTR TYPU — pełna szerokość kontenera, tak jak karty poniżej */}
+        <div className="flex flex-col gap-4 rounded-2xl bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between dark:bg-neutral-900">
+          <div className="relative sm:w-80">
+            <Search className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-[#4A3360]/50 dark:text-neutral-500" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Szukaj publikacji"
+              className="w-full rounded-full border border-[#4A1D6E]/10 bg-[#F5F1EC] py-2.5 pr-4 pl-11 text-sm text-[#1C1028] placeholder:text-[#4A3360]/50 focus:border-[#4A1D6E]/40 focus:outline-none dark:border-white/10 dark:bg-neutral-950 dark:text-white"
+            />
+          </div>
+          <div className="flex flex-wrap gap-2 sm:justify-end">
+            {TYPE_FILTERS.map((f) => (
+              <button
+                key={f.key}
+                type="button"
+                onClick={() => setTypeFilter(f.key)}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  typeFilter === f.key
+                    ? "bg-[#4A1D6E] text-white"
+                    : "border border-[#4A1D6E]/20 text-[#4A3360] hover:border-[#4A1D6E]/40 dark:border-white/10 dark:text-neutral-300 dark:hover:border-purple-400/40"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* 3 WYRÓŻNIONE PUBLIKACJE */}
         {isDefaultView && (
-          <div className="flex flex-col gap-4">
+          <div className="mt-8 flex flex-col gap-4">
             {featured.map((pub) => (
               <FeaturedCard key={pub.slug} pub={pub} inPreparationLabel={inPreparationLabel} />
             ))}
@@ -271,7 +321,7 @@ export default function PublicationsExplorer({
         )}
 
         {/* POZOSTAŁE / WYNIKI FILTROWANIA */}
-        <div className={isDefaultView ? "mt-8" : ""}>
+        <div className="mt-8">
           {gridItems.length === 0 ? (
             <p className="py-12 text-center text-[#4A3360] dark:text-neutral-400">
               Brak publikacji spełniających kryteria wyszukiwania.

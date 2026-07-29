@@ -33,27 +33,27 @@ export default async function PsychoterapiaPage() {
             priority
             className="z-0 object-cover object-center"
           />
-          {/* Podkładka pod tekstem — jasny (kremowy) gradient tylko w strefie, gdzie faktycznie
-              nakłada się tekst (lewa ~połowa), szybko zanikający, żeby reszta sceny (druga
-              postać + sieć neuronowa) została w pełni widoczna. */}
-          <div className="absolute inset-0 z-[5] bg-gradient-to-r from-[#F5F1EC] from-0% via-[#F5F1EC]/70 via-25% to-transparent to-48% dark:from-neutral-950 dark:via-neutral-950/70" />
+          {/* Bardzo lekka, wąska podkładka — tylko delikatny "odblask" tuż za tekstem,
+              żeby postać po lewej NIE wyglądała na wypłowiałą. Czytelność tekstu zapewnia
+              głównie warstwowy text-shadow (miękka jasna poświata) poniżej, nie tło. */}
+          <div className="absolute inset-0 z-[5] bg-gradient-to-r from-[#F5F1EC]/35 from-0% via-[#F5F1EC]/12 via-18% to-transparent to-32% dark:from-neutral-950/35 dark:via-neutral-950/12" />
           <div className="relative z-10 flex lg:min-h-[560px] items-center">
-            <div className="max-w-xl pl-16 py-16">
+            <div className="max-w-xl pt-28 pb-12 pl-16">
               <p
                 className="mb-4 text-xs font-semibold tracking-[0.15em] uppercase text-[#4A1D6E] dark:text-purple-400"
-                style={{ textShadow: "0 1px 12px rgba(245,241,236,0.9)" }}
+                style={{ textShadow: "0 0 6px rgba(245,241,236,0.95), 0 0 16px rgba(245,241,236,0.85), 0 1px 3px rgba(245,241,236,0.7)" }}
               >
                 {t("eyebrow")}
               </p>
               <h1
                 className="text-4xl font-semibold tracking-tight text-[#1C1028] lg:text-5xl dark:text-white"
-                style={{ textShadow: "0 2px 20px rgba(245,241,236,0.85)" }}
+                style={{ textShadow: "0 0 10px rgba(245,241,236,0.95), 0 0 26px rgba(245,241,236,0.85), 0 2px 6px rgba(245,241,236,0.7)" }}
               >
                 {t("h1")}
               </h1>
               <p
                 className="mt-5 text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300"
-                style={{ textShadow: "0 1px 16px rgba(245,241,236,0.85)" }}
+                style={{ textShadow: "0 0 8px rgba(245,241,236,0.95), 0 0 22px rgba(245,241,236,0.85), 0 1px 4px rgba(245,241,236,0.7)" }}
               >
                 {t("intro")}
               </p>
@@ -86,8 +86,8 @@ export default async function PsychoterapiaPage() {
 
       <div className="mx-auto max-w-3xl px-6 py-20">
         {/* Ważna informacja - na górze */}
-        <div className="rounded-2xl border border-amber-300/60 bg-amber-50 p-5 text-sm text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/40 dark:text-amber-200">
-          <p className="font-semibold">{t("warningTitle")}</p>
+        <div className="rounded-2xl border border-[#4A1D6E]/15 bg-gradient-to-br from-[#EDE6F8] to-[#F5EAD3] p-5 text-sm text-[#4A3360] dark:border-purple-400/20 dark:from-purple-900/20 dark:to-amber-900/10 dark:text-neutral-300">
+          <p className="font-semibold text-[#4A1D6E] dark:text-purple-300">{t("warningTitle")}</p>
           <p className="mt-2 leading-relaxed">
             {t.rich("warningText", { strong })}
           </p>

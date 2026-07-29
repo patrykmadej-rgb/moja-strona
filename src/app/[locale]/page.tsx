@@ -22,15 +22,23 @@ const NETWORK_PURPLE = "#8B5CB8";
 const NETWORK_PURPLE_DEEP = "#6B3AA0";
 const NETWORK_WARM_DEEP = "#D4C08A";
 
-// Współrzędne celowo nieregularne (jitter wokół styków kart, różne kąty/promienie) —
-// żeby sieć wyglądała jak organiczna konstelacja, a nie lustrzany, geometryczny wzór.
-const ABOUT_NETWORK_POINTS_LG: { x: number; y: number; r: number; color: string; glow?: boolean }[] = [
-  { x: 68, y: 9, r: 1.8, color: NETWORK_PURPLE },
-  { x: 143, y: 5, r: 1.4, color: "#E8D9B5" },
-  { x: 65, y: 49, r: 2.9, color: NETWORK_PURPLE_DEEP, glow: true },
-  { x: 146, y: 54, r: 2.4, color: "#E8D9B5", glow: true },
-  { x: 73, y: 89, r: 1.6, color: "#E8D9B5" },
-  { x: 136, y: 95, r: 2, color: NETWORK_PURPLE },
+// Sieć na całą sekcję "O mnie" (desktop/lg) — viewBox 0 0 400 200 obejmuje cały
+// dwukolumnowy układ (zdjęcie ~0-190, przerwa ~190-215, tekst+kafelki ~215-400),
+// żeby węzły i linie subtelnie łączyły zdjęcie, tekst i kafelki w jedną dekorację.
+// Współrzędne i promienie celowo nieregularne — organiczna konstelacja, nie lustrzany wzór.
+const ABOUT_SECTION_NETWORK_POINTS: { x: number; y: number; r: number; color: string; glow?: boolean }[] = [
+  { x: 25, y: 15, r: 1.6, color: NETWORK_PURPLE },
+  { x: 175, y: 12, r: 1.3, color: "#E8D9B5" },
+  { x: 15, y: 100, r: 1.8, color: NETWORK_PURPLE_DEEP, glow: true },
+  { x: 180, y: 95, r: 1.5, color: "#E8D9B5" },
+  { x: 30, y: 180, r: 1.4, color: "#E8D9B5" },
+  { x: 170, y: 185, r: 1.7, color: NETWORK_PURPLE },
+  { x: 240, y: 25, r: 1.5, color: NETWORK_PURPLE },
+  { x: 250, y: 95, r: 1.6, color: NETWORK_PURPLE_DEEP, glow: true },
+  { x: 325, y: 130, r: 1.8, color: NETWORK_PURPLE },
+  { x: 390, y: 125, r: 1.4, color: "#E8D9B5" },
+  { x: 320, y: 175, r: 2, color: NETWORK_PURPLE_DEEP, glow: true },
+  { x: 392, y: 180, r: 1.6, color: "#E8D9B5", glow: true },
 ];
 
 const ABOUT_NETWORK_POINTS_SM: { x: number; y: number; r: number; color: string; glow?: boolean }[] = [
@@ -40,29 +48,27 @@ const ABOUT_NETWORK_POINTS_SM: { x: number; y: number; r: number; color: string;
   { x: 47, y: 96, r: 1.5, color: "#E8D9B5" },
 ];
 
-// Krótkie "odgałęzienia" wewnątrz siatki, poza główną linią — łamią symetrię, jak
-// przypadkowe dodatkowe połączenia w prawdziwej konstelacji.
-const ABOUT_NETWORK_BRANCHES_LG: { x1: number; y1: number; x2: number; y2: number; r: number; color: string }[] = [
-  { x1: 68, y1: 9, x2: 98, y2: 20, r: 1.1, color: NETWORK_PURPLE },
-  { x1: 146, y1: 54, x2: 158, y2: 74, r: 1, color: "#E8D9B5" },
+// Krzywe łączące klastry węzłów w jedną spójną, nieregularną sieć na całą szerokość sekcji.
+const ABOUT_SECTION_NETWORK_PATHS: { d: string; color: string; opacity: number }[] = [
+  { d: "M25,15 Q110,8 175,12", color: NETWORK_PURPLE, opacity: 0.45 },
+  { d: "M175,12 Q210,18 240,25 Q300,55 325,130", color: NETWORK_WARM_DEEP, opacity: 0.4 },
+  { d: "M15,100 Q90,115 180,95", color: NETWORK_PURPLE_DEEP, opacity: 0.45 },
+  { d: "M180,95 Q210,90 250,95 Q290,110 320,175", color: NETWORK_PURPLE, opacity: 0.4 },
+  { d: "M30,180 Q100,190 170,185", color: "#E8D9B5", opacity: 0.45 },
+  { d: "M170,185 Q250,195 320,175", color: NETWORK_PURPLE_DEEP, opacity: 0.4 },
+  { d: "M325,130 Q360,150 390,125", color: NETWORK_PURPLE, opacity: 0.5 },
+  { d: "M320,175 Q355,178 392,180", color: "#E8D9B5", opacity: 0.5 },
+];
+
+// Krótkie "odgałęzienia" poza głównymi liniami — łamią symetrię, jak przypadkowe
+// dodatkowe połączenia w prawdziwej konstelacji.
+const ABOUT_SECTION_NETWORK_BRANCHES: { x1: number; y1: number; x2: number; y2: number; r: number; color: string }[] = [
+  { x1: 240, y1: 25, x2: 265, y2: 12, r: 1, color: NETWORK_PURPLE },
+  { x1: 390, y1: 125, x2: 398, y2: 150, r: 0.9, color: "#E8D9B5" },
 ];
 
 const ABOUT_NETWORK_BRANCHES_SM: { x1: number; y1: number; x2: number; y2: number; r: number; color: string }[] = [
   { x1: 49, y1: 32, x2: 71, y2: 26, r: 0.9, color: NETWORK_PURPLE },
-];
-
-// "Czułki" wychodzące poza obszar siatki kart, z rogów/krawędzi węzłów granicznych —
-// żeby sieć wizualnie wykraczała poza kafelki. Wymaga overflow-visible na <svg>,
-// bo współrzędne celowo wychodzą poza viewBox. Długości i kąty celowo różne
-// (nie lustrzane), żeby uniknąć sztywnej symetrii.
-// Górne czułki celowo krótsze niż dolne — powyżej siatki jest przycisk "Więcej o mnie"
-// (mt-5, niewielki odstęp), więc sieć nie może sięgać zbyt wysoko, żeby na niego nie nachodzić.
-const ABOUT_NETWORK_TENDRILS_LG: { x1: number; y1: number; x2: number; y2: number; color: string }[] = [
-  { x1: 68, y1: 9, x2: 26, y2: -10, color: NETWORK_PURPLE },
-  { x1: 143, y1: 5, x2: 178, y2: -6, color: "#E8D9B5" },
-  { x1: 73, y1: 89, x2: 15, y2: 114, color: "#E8D9B5" },
-  { x1: 136, y1: 95, x2: 188, y2: 128, color: NETWORK_PURPLE },
-  { x1: 158, y1: 74, x2: 204, y2: 92, color: NETWORK_PURPLE_DEEP },
 ];
 
 const ABOUT_NETWORK_TENDRILS_SM: { x1: number; y1: number; x2: number; y2: number; color: string }[] = [
@@ -152,7 +158,7 @@ export default async function Home() {
                 {tNav("tagline")}
               </p>
               <h1
-                className="text-5xl leading-tight font-bold tracking-tight text-[#1C1028] lg:text-6xl dark:text-white"
+                className="text-5xl leading-tight font-medium tracking-tight text-[#1C1028] lg:text-6xl dark:text-white"
                 style={{ textShadow: "0 2px 20px rgba(245,241,236,0.85)" }}
               >
                 {tHero("line1")}<br />
@@ -165,13 +171,13 @@ export default async function Home() {
               <div className="mt-10 flex flex-wrap gap-4">
                 <Link
                   href="/badania"
-                  className="rounded-full bg-[#4A1D6E] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
+                  className="rounded-none bg-[#4A1D6E] px-7 py-3 text-sm font-normal text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
                 >
                   {tHero("ctaBadania")}
                 </Link>
                 <Link
                   href="/#o-mnie"
-                  className="rounded-full border border-[#4A1D6E] px-7 py-3 text-sm font-semibold text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E] hover:text-white dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
+                  className="rounded-none border border-[#4A1D6E] px-7 py-3 text-sm font-normal text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E] hover:text-white dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
                 >
                   {tHero("ctaOMnie")}
                 </Link>
@@ -185,7 +191,7 @@ export default async function Home() {
           <p className="mb-5 text-[8px] font-semibold tracking-[0.03em] uppercase text-[#4A1D6E] sm:text-[10px] sm:tracking-[0.08em] md:text-[11px] md:tracking-[0.1em] dark:text-purple-400">
             {tNav("tagline")}
           </p>
-          <h1 className="text-5xl leading-tight font-bold tracking-tight text-[#1C1028] dark:text-white">
+          <h1 className="text-5xl leading-tight font-medium tracking-tight text-[#1C1028] dark:text-white">
             {tHero("line1")}<br />
             {tHero("line2")}<br />
             <span className="text-[#4A1D6E] dark:text-purple-400">{tHero("line3")}</span>
@@ -202,7 +208,7 @@ export default async function Home() {
             </Link>
             <Link
               href="/#o-mnie"
-              className="rounded-full border border-[#4A1D6E] px-7 py-3 text-sm font-semibold text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E] hover:text-white dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
+              className="rounded-none border border-[#4A1D6E] px-7 py-3 text-sm font-normal text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E] hover:text-white dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
             >
               {tHero("ctaOMnie")}
             </Link>
@@ -227,7 +233,7 @@ export default async function Home() {
               <Link
                 key={pillar.href}
                 href={pillar.href}
-                className={`group flex flex-row items-start gap-2 px-6 py-0 transition-opacity hover:opacity-80 md:px-8 ${
+                className={`group flex flex-row items-center gap-2 px-6 py-0 transition-opacity hover:opacity-80 md:px-8 ${
                   i < pillars.length - 1
                     ? "lg:border-r lg:border-black/10 dark:lg:border-white/10"
                     : ""
@@ -237,7 +243,7 @@ export default async function Home() {
                   <pillar.Icon className="h-4 w-4 text-white" />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-bold tracking-wide uppercase text-[#1C1028] dark:text-white">
+                  <p className="text-sm font-normal tracking-wide uppercase text-[#1C1028] dark:text-white">
                     {tPillars(`${pillar.key}.title`)}
                   </p>
                   <p className="mt-1 text-sm leading-snug text-[#7A7285] dark:text-neutral-400">
@@ -308,10 +314,10 @@ export default async function Home() {
                     <Link
                       key={pub.slug}
                       href={`/publikacje/${pub.slug}`}
-                      className="group flex items-start gap-4"
+                      className="group flex items-stretch gap-4"
                     >
                       {thumb ? (
-                        <div className="relative aspect-[3/4] w-16 shrink-0 overflow-hidden rounded-xl">
+                        <div className="relative aspect-[3/4] h-full shrink-0 overflow-hidden rounded-xl">
                           <Image
                             src={thumb}
                             alt={pub.title}
@@ -320,7 +326,7 @@ export default async function Home() {
                           />
                         </div>
                       ) : (
-                        <div className="flex aspect-[3/4] w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#4A1D6E]">
+                        <div className="flex aspect-[3/4] h-full shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#4A1D6E]">
                           <Icon className="h-6 w-6 text-white" />
                         </div>
                       )}
@@ -358,9 +364,66 @@ export default async function Home() {
       {/* O MNIE */}
       <section id="o-mnie" className="overflow-x-hidden border-t border-[#4A1D6E]/10 py-20 dark:border-white/10">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2">
+          <div className="relative grid grid-cols-1 items-start gap-12 lg:grid-cols-2">
+            {/* Sieć na całą sekcję (zdjęcie + tekst + kafelki) — tylko na lg, subtelne tło.
+                Osobna, mniejsza wersja mobilna zostaje lokalnie przy siatce kafelków niżej. */}
+            <svg
+              className="pointer-events-none absolute inset-0 z-0 hidden h-full w-full lg:block"
+              viewBox="0 0 400 200"
+              preserveAspectRatio="xMidYMid slice"
+              fill="none"
+              aria-hidden="true"
+            >
+              <defs>
+                <filter id="about-section-network-glow" x="-200%" y="-200%" width="500%" height="500%">
+                  <feGaussianBlur stdDeviation="3" />
+                </filter>
+              </defs>
+              {ABOUT_SECTION_NETWORK_PATHS.map((p, i) => (
+                <path
+                  key={i}
+                  d={p.d}
+                  stroke={p.color}
+                  strokeOpacity={p.opacity}
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                />
+              ))}
+              {ABOUT_SECTION_NETWORK_BRANCHES.map((b, i) => (
+                <g key={i}>
+                  <line
+                    x1={b.x1}
+                    y1={b.y1}
+                    x2={b.x2}
+                    y2={b.y2}
+                    stroke={b.color}
+                    strokeOpacity="0.35"
+                    strokeWidth="0.7"
+                    strokeLinecap="round"
+                  />
+                  <circle cx={b.x2} cy={b.y2} r={b.r} fill={b.color} opacity="0.55" />
+                </g>
+              ))}
+              {ABOUT_SECTION_NETWORK_POINTS.map((p, i) => (
+                <g key={i}>
+                  {p.glow && (
+                    <circle cx={p.x} cy={p.y} r="7" fill={p.color} opacity="0.35" filter="url(#about-section-network-glow)" />
+                  )}
+                  <circle
+                    cx={p.x}
+                    cy={p.y}
+                    r={p.r}
+                    fill={p.color}
+                    opacity="0.75"
+                    className="animate-[pulse-dot_3s_ease-in-out_infinite]"
+                    style={{ animationDelay: `${i * 0.3}s` }}
+                  />
+                </g>
+              ))}
+            </svg>
+
             {/* ZDJĘCIE */}
-            <div className="relative aspect-square overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5 dark:ring-white/10">
+            <div className="relative z-10 aspect-square overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5 dark:ring-white/10">
               <Image
                 src="/o-mnie-portret.png"
                 alt="Patryk Madej"
@@ -376,7 +439,7 @@ export default async function Home() {
             </div>
 
             {/* TREŚĆ */}
-            <div>
+            <div className="relative z-10">
               <div className="flex items-center gap-3">
                 <span className="h-4 w-1 bg-[#5C2D91]" />
                 <p className="text-sm font-semibold tracking-wide uppercase text-[#5C2D91]">
@@ -398,96 +461,9 @@ export default async function Home() {
 
               {/* SIATKA FAKTÓW */}
               <div className="relative mt-5 grid grid-cols-2 gap-3 lg:grid-cols-3">
-                {/* Subtelna dekoracyjna "sieć" w miejscach styku kart — organiczne krzywe,
-                    poświata i pulsowanie, w stylu efektu hover z navbara. */}
-                <svg
-                  className="pointer-events-none absolute inset-0 z-0 hidden h-full w-full overflow-visible lg:block"
-                  viewBox="0 0 210 100"
-                  preserveAspectRatio="xMidYMid slice"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <defs>
-                    <filter id="about-network-glow-lg" x="-200%" y="-200%" width="500%" height="500%">
-                      <feGaussianBlur stdDeviation="3" />
-                    </filter>
-                  </defs>
-                  <path
-                    d="M68,9 Q79,26 65,49 Q56,66 73,89"
-                    stroke={NETWORK_PURPLE}
-                    strokeOpacity="0.55"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M143,5 Q133,31 146,54 Q156,73 136,95"
-                    stroke={NETWORK_WARM_DEEP}
-                    strokeOpacity="0.55"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M65,49 Q100,36 146,54"
-                    stroke={NETWORK_PURPLE_DEEP}
-                    strokeOpacity="0.5"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                  />
-                  {ABOUT_NETWORK_BRANCHES_LG.map((b, i) => (
-                    <g key={i}>
-                      <line
-                        x1={b.x1}
-                        y1={b.y1}
-                        x2={b.x2}
-                        y2={b.y2}
-                        stroke={b.color}
-                        strokeOpacity="0.4"
-                        strokeWidth="0.7"
-                        strokeLinecap="round"
-                      />
-                      <circle cx={b.x2} cy={b.y2} r={b.r} fill={b.color} opacity="0.6" />
-                    </g>
-                  ))}
-                  {ABOUT_NETWORK_TENDRILS_LG.map((t, i) => (
-                    <g key={i}>
-                      <line
-                        x1={t.x1}
-                        y1={t.y1}
-                        x2={t.x2}
-                        y2={t.y2}
-                        stroke={t.color}
-                        strokeOpacity="0.4"
-                        strokeWidth="0.8"
-                        strokeLinecap="round"
-                      />
-                      <circle
-                        cx={t.x2}
-                        cy={t.y2}
-                        r="1.6"
-                        fill={t.color}
-                        opacity="0.55"
-                        className="animate-[pulse-dot_3s_ease-in-out_infinite]"
-                        style={{ animationDelay: `${i * 0.4}s` }}
-                      />
-                    </g>
-                  ))}
-                  {ABOUT_NETWORK_POINTS_LG.map((p, i) => (
-                    <g key={i}>
-                      {p.glow && (
-                        <circle cx={p.x} cy={p.y} r="7.5" fill={p.color} opacity="0.4" filter="url(#about-network-glow-lg)" />
-                      )}
-                      <circle
-                        cx={p.x}
-                        cy={p.y}
-                        r={p.r}
-                        fill={p.color}
-                        opacity="0.85"
-                        className="animate-[pulse-dot_3s_ease-in-out_infinite]"
-                        style={{ animationDelay: `${i * 0.35}s` }}
-                      />
-                    </g>
-                  ))}
-                </svg>
+                {/* Na mobile/tablet (poniżej lg) sekcja jest jednokolumnowa, więc sieć na całą
+                    sekcję (powyżej, tylko lg:block) się nie pokazuje — tutaj zostaje osobna,
+                    lokalna wersja tylko dla siatki kafelków. */}
                 <svg
                   className="pointer-events-none absolute inset-0 z-0 h-full w-full overflow-visible lg:hidden"
                   viewBox="0 0 90 100"
