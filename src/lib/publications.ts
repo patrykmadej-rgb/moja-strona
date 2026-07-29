@@ -64,6 +64,9 @@ export const publications: Publication[] = [
     type: "Recenzja",
     abstractPl: "",
     tags: ["Unia Europejska", "kryzys", "politologia"],
+    externalLinks: [
+      { label: "CEEOL", href: "https://www.ceeol.com/search/article-detail?id=772504" },
+    ],
     coverImage: "/publications/recenzja-grosse-pokryzysowa-europa-2018.png",
     coverImageThumb: "/publications/recenzja-grosse-pokryzysowa-europa-2018-miniatura.png",
   },
@@ -75,6 +78,18 @@ export const publications: Publication[] = [
     type: "Recenzja",
     abstractPl: "",
     tags: ["Bośnia", "Bałkany", "politologia"],
+    externalLinks: [
+      {
+        label: "ResearchGate",
+        href: "https://www.researchgate.net/publication/360673352_Book_review_Szymon_Sochacki_Bosnia_i_Hercegowina_1995_-_2012_Studium_politologiczne_Bosnia_Herzegovina_1995_-_2012_Political_science_study_Wydawnictwo_Adam_Marszalek_Torun_2015_pp_345",
+      },
+      {
+        label: "CEJSH",
+        href: "https://cejsh.icm.edu.pl/cejsh/element/bwmeta1.element.ojs-doi-10_15804_rop201614?q=bwmeta1.element.ojs-issn-2082-3959-year-2016-issue-7;13&qt=CHILDREN-STATELESS",
+      },
+    ],
+    pdfUrl:
+      "https://cejsh.icm.edu.pl/cejsh/element/bwmeta1.element.ojs-doi-10_15804_rop201614/c/16-3f20d5c0-87ad-487b-bafc-87a8ca9c3753.pdf.pdf",
     coverImage: "/publications/recenzja-sochacki-bosnia-2016.png",
     coverImageThumb: "/publications/recenzja-sochacki-bosnia-2016-miniatura.png",
   },

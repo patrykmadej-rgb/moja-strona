@@ -195,7 +195,7 @@ export default function PublicationsExplorer({
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <a
-                  href="#"
+                  href="https://scholar.google.com/citations?user=zyzQJ0kAAAAJ&hl=pl"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 rounded-full border border-[#4A1D6E]/30 px-5 py-2.5 text-sm font-semibold text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E]/5 dark:border-purple-400/30 dark:text-purple-300 dark:hover:bg-purple-400/10"
