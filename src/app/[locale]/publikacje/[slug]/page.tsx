@@ -91,17 +91,53 @@ export default async function PublikacjaPage({
                 {pub.venue} · {pub.year ?? (isInProgress ? tStatus("inPreparation") : "")}
               </p>
 
-              {pub.tags.length > 0 && (
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {pub.tags.map((tag) => (
-                    <Link
-                      key={tag}
-                      href={`/tagi/${tagToSlug(tag)}`}
-                      className="rounded-full border border-white/40 bg-white/10 px-3 py-0.5 text-xs text-white hover:bg-white/20 transition-colors"
-                    >
-                      {tag}
-                    </Link>
-                  ))}
+              {pub.coAuthors && pub.coAuthors.length > 0 && (
+                <p className="mt-1 text-sm text-white/70">
+                  {tDetail("coAuthors")}: {pub.coAuthors.join(", ")}
+                </p>
+              )}
+
+              {(pub.tags.length > 0 || pub.pdfUrl || (pub.externalLinks && pub.externalLinks.length > 0)) && (
+                <div className="mt-6 flex flex-wrap items-end gap-x-6 gap-y-4">
+                  {pub.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {pub.tags.map((tag) => (
+                        <Link
+                          key={tag}
+                          href={`/tagi/${tagToSlug(tag)}`}
+                          className="rounded-full border border-white/40 bg-white/10 px-3 py-0.5 text-xs text-white hover:bg-white/20 transition-colors"
+                        >
+                          {tag}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+
+                  {(pub.pdfUrl || (pub.externalLinks && pub.externalLinks.length > 0)) && (
+                    <div className="ml-auto flex flex-wrap justify-end gap-3">
+                      {pub.pdfUrl && (
+                        <a
+                          href={pub.pdfUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full bg-[#4A1D6E] px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-black/40 hover:bg-[#7B4DB8] transition-colors"
+                        >
+                          ↓ Pobierz PDF
+                        </a>
+                      )}
+                      {pub.externalLinks?.map((link) => (
+                        <a
+                          key={link.href}
+                          href={link.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-black/40 hover:bg-white/20 transition-colors"
+                        >
+                          {link.label} →
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -143,6 +179,12 @@ export default async function PublikacjaPage({
             {pub.venue} · {pub.year ?? (isInProgress ? tStatus("inPreparation") : "")}
           </p>
 
+          {pub.coAuthors && pub.coAuthors.length > 0 && (
+            <p className="mt-1 text-sm text-[#4A3360] dark:text-neutral-400">
+              {tDetail("coAuthors")}: {pub.coAuthors.join(", ")}
+            </p>
+          )}
+
           {pub.tags.length > 0 && (
             <div className="mt-6 flex flex-wrap gap-2">
               {pub.tags.map((tag) => (
@@ -159,7 +201,7 @@ export default async function PublikacjaPage({
         </>
       )}
 
-      {(pub.pdfUrl || (pub.externalLinks && pub.externalLinks.length > 0)) && (
+      {!pub.coverImage && (pub.pdfUrl || (pub.externalLinks && pub.externalLinks.length > 0)) && (
         <div className="mt-8 flex flex-wrap gap-3">
           {pub.pdfUrl && (
             <a

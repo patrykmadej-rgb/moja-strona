@@ -13,6 +13,7 @@ export type Publication = {
   /** Domyślnie "opublikowana", gdy pole nie jest ustawione. */
   status?: "opublikowana" | "w-trakcie";
   expectedPublicationDate?: string;
+  coAuthors?: string[];
   tags: string[];
   href?: string;
   pdfUrl?: string;
@@ -119,6 +120,81 @@ export const publications: Publication[] = [
     pdfUrl: "/publikacje/recenzja-olszewski-spotkania-2015.pdf",
     coverImage: "/publications/recenzja-olszewski-spotkania-2015.png",
     coverImageThumb: "/publications/recenzja-olszewski-spotkania-2015-miniatura.png",
+  },
+  {
+    slug: "osobowosc-zalezna-uwarunkowania-rozwojowe-2027",
+    title: "Analiza uwarunkowań rozwojowych minimalizujących ryzyko kształtowania się osobowości zależnej w dzieciństwie i wczesnej adolescencji",
+    venue: "Zachowania – Osobowość – Umysł – Emocje. Wybrane zagadnienia socjologii, psychologii i pedagogiki (Center for American & European Studies Publishing Press)",
+    type: "Rozdział w monografii",
+    status: "w-trakcie",
+    expectedPublicationDate: "luty 2027",
+    coAuthors: ["Mateusz Jakóbiak"],
+    abstractPl:
+      "Artykuł analizuje uwarunkowania rozwojowe, które mogą zmniejszać ryzyko utrwalenia zależnego stylu funkcjonowania w dzieciństwie i wczesnej adolescencji. Na podstawie klasycznych teorii psychologicznych oraz wyników badań empirycznych pokazujemy, że osobowość zależna nie rozwija się wskutek jednego doświadczenia ani określonej postawy rodzicielskiej. Jej kształtowanie może być rezultatem wzajemnego oddziaływania temperamentu dziecka, jakości przywiązania, zachowań opiekunów, doświadczeń sprawstwa i późniejszych relacji społecznych. Szczególną uwagę poświęcamy nadopiekuńczości, wyręczaniu, kontroli psychologicznej oraz ograniczaniu prawa dziecka do podejmowania decyzji i popełniania błędów. Wskazujemy trzy szczególnie ważne etapy rozwoju: wczesne dzieciństwo, okres szkolny i wczesną adolescencję. Najważniejszym czynnikiem ochronnym jest bezpieczna relacja, która pozwala dziecku stopniowo rozwijać autonomię, poczucie kompetencji i własną tożsamość bez obawy przed utratą bliskości.",
+    abstractEn:
+      "Dependent personality disorder is characterized by an excessive need to be cared for, submissiveness, difficulty making decisions and fear of separation. This paper analyses developmental conditions that may reduce the risk of consolidating a dependent pattern of functioning in childhood and early adolescence. It is a problem-oriented narrative review. Classical developmental theories are confronted with prospective research, twin studies, retrospective studies and meta-analyses concerning attachment, overprotection, psychological control and autonomy support. Empirical findings indicate that autonomy restriction, high control, substitution for the child, maltreatment and neglect may contribute to conditions that favour dependency. The evidence does not, however, permit any single parenting practice to be treated as a direct cause of DPD. A transactional model, in which child temperament, caregiver behaviour, attachment quality, agency experiences and later social relationships interact over time, is the most justified.",
+    tags: ["Psychologia", "Osobowość zależna", "Psychologia rozwojowa", "Autonomia dziecka", "Teoria przywiązania", "Nadopiekuńczość", "Profilaktyka zaburzeń osobowości"],
+    coverImage: "/publications/osobowosc-zalezna-uwarunkowania-rozwojowe-2027.png",
+    coverImageThumb: "/publications/osobowosc-zalezna-uwarunkowania-rozwojowe-2027-miniatura.png",
+  },
+  {
+    slug: "demographic-crisis-western-balkans-2026",
+    title: "Demographic Crisis and the Institutional Capacity of the Western Balkan States",
+    venue: "Reality of Politics. Estimates – Comments – Forecasts (Wydawnictwo Adam Marszałek)",
+    type: "Artykuł naukowy",
+    titleLang: "en",
+    status: "w-trakcie",
+    abstractPl:
+      "Artykuł analizuje sposób, w jaki Albania, Bośnia i Hercegowina, Kosowo, Czarnogóra, Macedonia Północna oraz Serbia reagują na spadek liczby ludności, starzenie się społeczeństw i emigrację. Na podstawie strategii rządowych, raportów Komisji Europejskiej oraz ocen SIGMA pokazuję, że działania władz koncentrują się przede wszystkim na zwiększaniu dzietności, ograniczaniu wyjazdów, zachęcaniu emigrantów do powrotu i współpracy z diasporą. Znacznie rzadziej obejmują natomiast dostosowanie administracji publicznej, zatrudnienia, finansowania i sieci usług do funkcjonowania z mniejszą i starszą populacją. Powstaje w ten sposób luka adaptacyjna między próbami odwrócenia zmian demograficznych a przygotowaniem państwa na ich trwałe konsekwencje. Analiza wskazuje, że o zdolności instytucjonalnej nie decyduje liczba przyjętych strategii, lecz przejrzystość zatrudnienia, stabilność organizacyjna, podział kompetencji, sposób finansowania oraz rzeczywiste wykorzystanie cyfryzacji.",
+    abstractEn:
+      "The Western Balkan states have for many years faced population decline, ageing and emigration. The purpose of this article is to determine how the authorities of Albania, Bosnia and Herzegovina, Kosovo, Montenegro, North Macedonia and Serbia respond to these developments and whether the measures they undertake include the adaptation of public administration. The analysis covers demographic and migration strategies, documents concerning the diaspora, the European Commission's 2025 reports and the SIGMA assessment for 2024. Government documents were used to examine political objectives, whereas external reports were used to assess their implementation and the situation of public administration. The analysis indicates that the authorities focus mainly on increasing fertility, limiting emigration, returns and cooperation with the diaspora. They devote considerably less attention to preparing public administration and the network of services for permanent operation with a smaller and older population. This creates a gap between attempts to reverse demographic change and the adaptation of the state to its consequences. The number of adopted strategies does not explain the size of this gap. The distribution of competences, political employment practices, institutional stability and the use of digitalisation are more important.",
+    tags: ["Bałkany Zachodnie", "Kryzys demograficzny", "Zdolność instytucjonalna państwa", "Administracja publiczna", "Polityka demograficzna", "Integracja europejska"],
+    externalLinks: [
+      { label: "CEEOL", href: "https://www.ceeol.com/search/journal-detail?id=1717" },
+    ],
+    coverImage: "/publications/demographic-crisis-western-balkans-2026.png",
+    coverImageThumb: "/publications/demographic-crisis-western-balkans-2026-miniatura.png",
+  },
+  {
+    slug: "recenzja-vidacak-western-balkans-eu-2026",
+    title: "Review of the book \"The Western Balkans and the Challenges of EU Accession: The Resilient Transformation\" edited by Igor Vidačak",
+    venue: "Reality of Politics. Estimates – Comments – Forecasts (Wydawnictwo Adam Marszałek)",
+    type: "Recenzja",
+    titleLang: "en",
+    status: "w-trakcie",
+    abstractPl:
+      "Recenzja dotyczy monografii zbiorowej „The Western Balkans and the Challenges of EU Accession: The Resilient Transformation” pod redakcją Igora Vidačaka. Książka analizuje proces integracji Bałkanów Zachodnich z Unią Europejską, obejmując wiarygodność polityki rozszerzenia, reformy administracji publicznej, migrację oraz transformację gospodarczą, cyfrową i energetyczną. W recenzji doceniam aktualność publikacji, szeroki zakres materiału i trafne analizy pozornych reform oraz słabości instytucjonalnych. Wskazuję jednak, że tytułowa koncepcja „odpornej transformacji” nie została zastosowana jako wspólna metoda badawcza. Poszczególne rozdziały odmiennie rozumieją trwałość, głębokość i społeczną dystrybucję reform, przez co książka nie tworzy spójnego modelu analitycznego. Zwracam również uwagę na niewystarczające uwzględnienie kryzysu demograficznego oraz dominację perspektywy instytucji europejskich. Publikacja stanowi wartościowe kompendium problemów akcesyjnych, lecz nie realizuje w pełni swojej głównej obietnicy teoretycznej.",
+    tags: ["Bałkany Zachodnie", "Integracja europejska", "Rozszerzenie Unii Europejskiej", "Odporność instytucjonalna", "Reformy demokratyczne", "Recenzja naukowa"],
+    externalLinks: [
+      { label: "CEEOL", href: "https://www.ceeol.com/search/journal-detail?id=1717" },
+    ],
+    coverImage: "/publications/recenzja-vidacak-western-balkans-eu-2026.png",
+    coverImageThumb: "/publications/recenzja-vidacak-western-balkans-eu-2026-miniatura.png",
+  },
+  {
+    slug: "separatyzm-bez-secesji-rs-bih-2026",
+    title:
+      "Separatyzm bez secesji. Kwestionowanie kompetencji i ograniczanie funkcjonowania instytucji państwowych Bośni i Hercegowiny przez władze Republiki Serbskiej",
+    venue: "Reality of Politics. Estimates – Comments – Forecasts (Wydawnictwo Adam Marszałek)",
+    type: "Artykuł naukowy",
+    status: "w-trakcie",
+    abstractPl:
+      "Przedmiotem artykułu jest polityka władz Republiki Serbskiej wobec instytucji Bośni i Hercegowiny od przyjęcia konkluzji Zgromadzenia Narodowego Republiki Serbskiej 10 grudnia 2021 r. do uchylenia sześciu ustaw 18 października 2025 r. Celem badania było ustalenie, czy działania te prowadziły do wytworzenia trwałej zdolności secesyjnej, czy też służyły ograniczaniu wykonywania kompetencji państwowych bez przeprowadzenia secesji. Zastosowano analizę instytucjonalną oraz ustrukturyzowaną analizę dokumentów. Porównano zakres aktów normatywnych, czynności wykonawczych i ich trwałość w odniesieniu do sądownictwa, organów ścigania, administracji wyborczej, obronności i podatków pośrednich. Ustalono, że eskalacja miała charakter selektywny. Najsilniej obejmowała instytucje zdolne do kontroli lub sankcjonowania elit Republiki Serbskiej, podczas gdy współpraca zapewniająca dochody i usługi publiczne była utrzymywana. Różnica między szerokimi deklaracjami a ograniczonym wykonaniem, niewielka skala odejść z instytucji państwowych oraz uchylenie ustaw w październiku 2025 r. wskazują, że analizowana polityka nie tworzyła kompletnej infrastruktury niepodległego państwa. Jej rezultatem było natomiast okresowe osłabienie jurysdykcji, pewności prawa i zdolności koordynacyjnej Bośni i Hercegowiny. Separatyzm bez secesji stanowił zatem sposób prowadzenia konfliktu o zakres i wykonalność kompetencji państwowych, a zarazem instrument ochrony pozycji politycznej władz Republiki Serbskiej.",
+    abstractEn:
+      "The article examines the policy of the Republika Srpska authorities towards the institutions of Bosnia and Herzegovina from the adoption of the Republika Srpska National Assembly conclusions on 10 December 2021 to the repeal of six laws on 18 October 2025. It asks whether these actions produced a durable capacity for secession or restricted the exercise of state competences without carrying secession through. The study combines institutional analysis with a structured qualitative analysis of documents. Normative scope, executive implementation and durability are compared across the judiciary, law-enforcement agencies, election administration, defence and indirect taxation. The findings show a selective pattern of escalation. Institutions capable of overseeing or sanctioning the Republika Srpska elite were targeted most strongly, while cooperation delivering revenue and public services was largely preserved. The gap between extensive declarations and limited implementation, the small number of departures from state institutions and the repeal of the laws in October 2025 indicate that a comprehensive infrastructure of an independent state was not created. The policy nevertheless temporarily weakened jurisdiction, legal certainty and the coordinating capacity of Bosnia and Herzegovina. Separatism without secession therefore operated as a method of contesting the scope and enforceability of state competences and as an instrument for protecting the political position of the Republika Srpska authorities.",
+    tags: [
+      "Republika Serbska",
+      "Bośnia i Hercegowina",
+      "Separatyzm",
+      "Secesja",
+      "Dezintegracja instytucjonalna",
+      "Bałkany Zachodnie",
+    ],
+    externalLinks: [
+      { label: "CEEOL", href: "https://www.ceeol.com/search/journal-detail?id=1717" },
+    ],
+    coverImage: "/publications/separatyzm-bez-secesji-rs-bih-2026.png",
+    coverImageThumb: "/publications/separatyzm-bez-secesji-rs-bih-2026-miniatura.png",
   },
 ];
 
