@@ -53,33 +53,32 @@
     "eyebrow": "O mnie",
     "heading1": "Połączenie perspektyw.",
     "heading2": "Zrozumienie człowieka.",
-    "paragraph1": "Jestem doktorantem w Instytucie Nauk o Polityce i Bezpieczeństwie Uniwersytetu Szczecińskiego oraz studentem psychologii. Głównym obszarem moich badań jest separatyzm, bezpieczeństwo międzynarodowe i Bałkany Zachodnie, a dodatkowo rozwijam się w kryminologii i wiktymologii.",
-    "paragraph2": "Szkolę się też w psychoterapii integracyjno-psychodynamicznej, w tym metodą EMDR, łącząc różne perspektywy, by lepiej rozumieć człowieka, jego decyzje i konteksty, w których funkcjonuje.",
+    "paragraph1": "Doktorant w Instytucie Nauk o Polityce i Bezpieczeństwie US, student psychologii. Badam separatyzm i bezpieczeństwo międzynarodowe, a dodatkowo kryminologię, wiktymologię i psychoterapię EMDR.",
     "moreLink": "Więcej o mnie →",
     "cards": {
       "wyksztalcenie": {
         "label": "Wykształcenie",
-        "value": "Prawo (mgr), Bezpieczeństwo wewnętrzne (lic.) — Uniwersytet Szczeciński · Psychologia (3. rok, w toku)"
+        "value": "Prawo, bezpieczeństwo wewnętrzne, psychologia"
       },
       "doktorat": {
         "label": "Doktorat",
-        "value": "Instytut Nauk o Polityce i Bezpieczeństwie, Uniwersytet Szczeciński"
+        "value": "Nauki o Polityce i Bezpieczeństwie (US)"
       },
       "badania": {
         "label": "Badania",
-        "value": "Bałkany Zachodnie, separatyzm, bezpieczeństwo międzynarodowe oraz wiktymologia i kryminologia"
+        "value": "Separatyzm, Bałkany Zachodnie, wiktymologia"
       },
       "jezyki": {
         "label": "Języki",
-        "value": "Polski (ojczysty) · Angielski (biegle) · Włoski (płynnie)"
+        "value": "Polski, angielski, włoski"
       },
       "psychoterapiaCard": {
         "label": "Psychoterapia",
-        "value": "Szkolenie w nurcie integracyjno-psychodynamicznym z metodą EMDR (od września 2026)"
+        "value": "Psychodynamiczna, EMDR (2026)"
       },
       "obszaryLaczace": {
-        "label": "Obszary, które łączę",
-        "value": "Prawo · Psychologia · Bezpieczeństwo · Badania naukowe · Psychoterapia · Rozwój wiedzy · Praktyka"
+        "label": "Co łączę",
+        "value": "Prawo, psychologia, bezpieczeństwo, badania"
       }
     }
   },

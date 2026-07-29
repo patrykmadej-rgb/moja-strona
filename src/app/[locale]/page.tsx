@@ -17,6 +17,27 @@ import { Link } from "@/i18n/navigation";
 import { getFeaturedPublications } from "@/lib/publications";
 import PublicationStatusBadge from "@/components/PublicationStatusBadge";
 
+// Kolorystyka dekoracyjnej "sieci" w siatce faktów o mnie — spójna z efektem hover w navbarze.
+const NETWORK_PURPLE = "#8B5CB8";
+const NETWORK_PURPLE_DEEP = "#6B3AA0";
+const NETWORK_WARM_DEEP = "#D4C08A";
+
+const ABOUT_NETWORK_POINTS_LG: { x: number; y: number; color: string; glow?: boolean }[] = [
+  { x: 70, y: 8, color: NETWORK_PURPLE },
+  { x: 140, y: 8, color: "#E8D9B5" },
+  { x: 70, y: 50, color: NETWORK_PURPLE_DEEP, glow: true },
+  { x: 140, y: 50, color: "#E8D9B5", glow: true },
+  { x: 70, y: 92, color: "#E8D9B5" },
+  { x: 140, y: 92, color: NETWORK_PURPLE },
+];
+
+const ABOUT_NETWORK_POINTS_SM: { x: number; y: number; color: string; glow?: boolean }[] = [
+  { x: 45, y: 6, color: NETWORK_PURPLE },
+  { x: 45, y: 33.3, color: NETWORK_PURPLE_DEEP, glow: true },
+  { x: 45, y: 66.6, color: "#E8D9B5", glow: true },
+  { x: 45, y: 94, color: "#E8D9B5" },
+];
+
 const pillars: { key: string; href: string; Icon: LucideIcon }[] = [
   { key: "badania", href: "/badania", Icon: Search },
   { key: "publikacje", href: "/publikacje", Icon: FileText },
@@ -329,22 +350,33 @@ export default async function Home() {
       </section>
 
       {/* O MNIE */}
-      <section id="o-mnie" className="border-t border-[#4A1D6E]/10 py-20 dark:border-white/10">
+      <section id="o-mnie" className="overflow-x-hidden border-t border-[#4A1D6E]/10 py-20 dark:border-white/10">
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2">
             {/* ZDJĘCIE */}
-            <div className="relative aspect-square overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5 dark:ring-white/10">
+            <div className="relative isolate">
               <Image
-                src="/o-mnie-portret.png"
-                alt="Patryk Madej"
-                fill
-                className="object-cover"
+                src="/o-mnie-dekoracja.png"
+                alt=""
+                width={1254}
+                height={1254}
+                aria-hidden="true"
+                className="absolute -z-10 max-w-none object-cover pointer-events-none"
+                style={{ width: "118%", height: "118%", inset: "-9%" }}
               />
-              <div className="absolute bottom-6 left-6 rounded-xl bg-[#F5F1EC] px-4 py-3 shadow-lg dark:bg-neutral-900">
-                <p className="font-bold text-[#1C1028] dark:text-white">Patryk Madej</p>
-                <p className="mt-0.5 text-xs font-medium tracking-wide uppercase text-[#4A3360] dark:text-neutral-400">
-                  Badacz · Psycholog · Prawnik
-                </p>
+              <div className="relative aspect-square overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5 dark:ring-white/10">
+                <Image
+                  src="/o-mnie-portret.png"
+                  alt="Patryk Madej"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute bottom-6 left-6 rounded-xl bg-[#F5F1EC] px-4 py-3 shadow-lg dark:bg-neutral-900">
+                  <p className="font-bold text-[#1C1028] dark:text-white">Patryk Madej</p>
+                  <p className="mt-0.5 text-xs font-medium tracking-wide uppercase text-[#4A3360] dark:text-neutral-400">
+                    Badacz · Student psychologii · Prawnik
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -359,56 +391,104 @@ export default async function Home() {
               <h2 className="mt-4 text-3xl font-bold tracking-tight text-[#1C1028] lg:text-4xl dark:text-white">
                 {tAbout("heading1")} {tAbout("heading2")}
               </h2>
-              <div className="mt-6 space-y-4 text-[#4A3360] leading-relaxed dark:text-neutral-300">
-                <p>{tAbout("paragraph1")}</p>
-                <p>{tAbout("paragraph2")}</p>
-              </div>
+              <p className="mt-4 text-[#4A3360] leading-relaxed dark:text-neutral-300">
+                {tAbout("paragraph1")}
+              </p>
               <Link
                 href="/#o-mnie"
-                className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#4A1D6E] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
+                className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#4A1D6E] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
               >
                 {tAbout("moreLink")}
               </Link>
 
               {/* SIATKA FAKTÓW */}
-              <div className="relative mt-10 grid grid-cols-2 gap-4 lg:grid-cols-3">
-                {/* Bardzo subtelna dekoracyjna "sieć" łącząca karty w miejscach ich styku. */}
+              <div className="relative mt-5 grid grid-cols-2 gap-3 lg:grid-cols-3">
+                {/* Subtelna dekoracyjna "sieć" w miejscach styku kart — organiczne krzywe,
+                    poświata i pulsowanie, w stylu efektu hover z navbara. */}
                 <svg
                   className="pointer-events-none absolute inset-0 z-0 hidden h-full w-full lg:block"
-                  viewBox="0 0 100 100"
-                  preserveAspectRatio="none"
+                  viewBox="0 0 210 100"
+                  preserveAspectRatio="xMidYMid slice"
                   fill="none"
                   aria-hidden="true"
                 >
-                  <line x1="33.33" y1="6" x2="33.33" y2="94" stroke="#4A1D6E" strokeOpacity="0.12" strokeWidth="0.4" />
-                  <line x1="66.66" y1="6" x2="66.66" y2="94" stroke="#4A1D6E" strokeOpacity="0.12" strokeWidth="0.4" />
-                  <line x1="4" y1="50" x2="96" y2="50" stroke="#4A1D6E" strokeOpacity="0.12" strokeWidth="0.4" />
-                  {[
-                    [33.33, 6],
-                    [66.66, 6],
-                    [33.33, 50],
-                    [66.66, 50],
-                    [33.33, 94],
-                    [66.66, 94],
-                  ].map(([x, y], di) => (
-                    <circle key={di} cx={x} cy={y} r="0.9" fill="#4A1D6E" opacity="0.18" />
+                  <defs>
+                    <filter id="about-network-glow-lg" x="-200%" y="-200%" width="500%" height="500%">
+                      <feGaussianBlur stdDeviation="2.5" />
+                    </filter>
+                  </defs>
+                  <path
+                    d="M70,8 Q74,29 70,50 Q66,71 70,92"
+                    stroke={NETWORK_PURPLE}
+                    strokeOpacity="0.35"
+                    strokeWidth="0.6"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M140,8 Q136,29 140,50 Q144,71 140,92"
+                    stroke={NETWORK_WARM_DEEP}
+                    strokeOpacity="0.35"
+                    strokeWidth="0.6"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M70,50 Q105,42 140,50"
+                    stroke={NETWORK_PURPLE_DEEP}
+                    strokeOpacity="0.3"
+                    strokeWidth="0.6"
+                    strokeLinecap="round"
+                  />
+                  {ABOUT_NETWORK_POINTS_LG.map((p, i) => (
+                    <g key={i}>
+                      {p.glow && (
+                        <circle cx={p.x} cy={p.y} r="6" fill={p.color} opacity="0.28" filter="url(#about-network-glow-lg)" />
+                      )}
+                      <circle
+                        cx={p.x}
+                        cy={p.y}
+                        r={p.glow ? "2.2" : "1.6"}
+                        fill={p.color}
+                        opacity="0.7"
+                        className="animate-[pulse-dot_3s_ease-in-out_infinite]"
+                        style={{ animationDelay: `${i * 0.35}s` }}
+                      />
+                    </g>
                   ))}
                 </svg>
                 <svg
                   className="pointer-events-none absolute inset-0 z-0 h-full w-full lg:hidden"
-                  viewBox="0 0 100 100"
-                  preserveAspectRatio="none"
+                  viewBox="0 0 90 100"
+                  preserveAspectRatio="xMidYMid slice"
                   fill="none"
                   aria-hidden="true"
                 >
-                  <line x1="50" y1="4" x2="50" y2="96" stroke="#4A1D6E" strokeOpacity="0.12" strokeWidth="0.4" />
-                  <line x1="6" y1="33.33" x2="94" y2="33.33" stroke="#4A1D6E" strokeOpacity="0.12" strokeWidth="0.4" />
-                  <line x1="6" y1="66.66" x2="94" y2="66.66" stroke="#4A1D6E" strokeOpacity="0.12" strokeWidth="0.4" />
-                  {[
-                    [50, 33.33],
-                    [50, 66.66],
-                  ].map(([x, y], di) => (
-                    <circle key={di} cx={x} cy={y} r="0.9" fill="#4A1D6E" opacity="0.18" />
+                  <defs>
+                    <filter id="about-network-glow-sm" x="-200%" y="-200%" width="500%" height="500%">
+                      <feGaussianBlur stdDeviation="2" />
+                    </filter>
+                  </defs>
+                  <path
+                    d="M45,6 Q49,19.65 45,33.3 Q41,50 45,66.6 Q49,80.3 45,94"
+                    stroke={NETWORK_PURPLE}
+                    strokeOpacity="0.35"
+                    strokeWidth="0.6"
+                    strokeLinecap="round"
+                  />
+                  {ABOUT_NETWORK_POINTS_SM.map((p, i) => (
+                    <g key={i}>
+                      {p.glow && (
+                        <circle cx={p.x} cy={p.y} r="4.5" fill={p.color} opacity="0.28" filter="url(#about-network-glow-sm)" />
+                      )}
+                      <circle
+                        cx={p.x}
+                        cy={p.y}
+                        r={p.glow ? "1.7" : "1.2"}
+                        fill={p.color}
+                        opacity="0.7"
+                        className="animate-[pulse-dot_3s_ease-in-out_infinite]"
+                        style={{ animationDelay: `${i * 0.35}s` }}
+                      />
+                    </g>
                   ))}
                 </svg>
 
@@ -417,15 +497,15 @@ export default async function Home() {
                   return (
                     <div
                       key={key}
-                      className={`relative z-10 rounded-xl p-4 shadow-sm ${styles.card}`}
+                      className={`relative z-10 rounded-xl p-3 shadow-sm ${styles.card}`}
                     >
-                      <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${styles.iconWrap}`}>
-                        <Icon className={`h-4 w-4 ${styles.icon}`} />
+                      <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${styles.iconWrap}`}>
+                        <Icon className={`h-3.5 w-3.5 ${styles.icon}`} />
                       </div>
-                      <p className={`mt-3 text-xs font-bold tracking-wide uppercase ${styles.label}`}>
+                      <p className={`mt-2 text-xs font-bold tracking-wide uppercase ${styles.label}`}>
                         {tAbout(`cards.${key}.label`)}
                       </p>
-                      <p className={`mt-1.5 text-xs leading-snug ${styles.value}`}>
+                      <p className={`mt-1 text-xs leading-snug ${styles.value}`}>
                         {tAbout(`cards.${key}.value`)}
                       </p>
                     </div>

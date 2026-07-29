@@ -53,33 +53,32 @@
     "eyebrow": "Chi sono",
     "heading1": "Unire prospettive.",
     "heading2": "Comprendere la persona.",
-    "paragraph1": "Sono dottorando presso l'Istituto di Scienze Politiche e della Sicurezza dell'Università di Stettino e studente di psicologia. Il mio principale ambito di ricerca è il separatismo, la sicurezza internazionale e i Balcani occidentali, accanto a un interesse crescente per criminologia e vittimologia.",
-    "paragraph2": "Mi sto inoltre formando in psicoterapia a orientamento integrativo-psicodinamico, incluso il metodo EMDR, unendo prospettive diverse per comprendere meglio le persone, le loro decisioni e i contesti in cui agiscono.",
+    "paragraph1": "Dottorando presso l'Istituto di Scienze Politiche e della Sicurezza (US), studente di psicologia. Mi occupo di separatismo e sicurezza internazionale, oltre a criminologia, vittimologia e psicoterapia EMDR.",
     "moreLink": "Scopri di più su di me →",
     "cards": {
       "wyksztalcenie": {
         "label": "Formazione",
-        "value": "Giurisprudenza (laurea magistrale), Sicurezza interna (laurea triennale) — Università di Stettino · Psicologia (3° anno, in corso)"
+        "value": "Giurisprudenza, sicurezza interna, psicologia"
       },
       "doktorat": {
         "label": "Dottorato",
-        "value": "Istituto di Scienze Politiche e della Sicurezza, Università di Stettino"
+        "value": "Scienze Politiche e della Sicurezza (US)"
       },
       "badania": {
         "label": "Ricerca",
-        "value": "Balcani occidentali, separatismo, sicurezza internazionale, oltre a vittimologia e criminologia"
+        "value": "Separatismo, Balcani occidentali, vittimologia"
       },
       "jezyki": {
         "label": "Lingue",
-        "value": "Polacco (madrelingua) · Inglese (fluente) · Italiano (fluente)"
+        "value": "Polacco, inglese, italiano"
       },
       "psychoterapiaCard": {
         "label": "Psicoterapia",
-        "value": "Formazione a orientamento integrativo-psicodinamico con metodo EMDR (da settembre 2026)"
+        "value": "Psicodinamica, EMDR (2026)"
       },
       "obszaryLaczace": {
-        "label": "Ambiti che unisco",
-        "value": "Diritto · Psicologia · Sicurezza · Ricerca · Psicoterapia · Conoscenza · Pratica"
+        "label": "Cosa unisco",
+        "value": "Diritto, psicologia, sicurezza, ricerca"
       }
     }
   },

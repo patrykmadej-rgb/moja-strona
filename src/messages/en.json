@@ -53,33 +53,32 @@
     "eyebrow": "About me",
     "heading1": "Bridging perspectives.",
     "heading2": "Understanding the person.",
-    "paragraph1": "I am a doctoral candidate at the Institute of Political and Security Studies, University of Szczecin, and a psychology student. My main research focus is separatism, international security and the Western Balkans, alongside a growing interest in criminology and victimology.",
-    "paragraph2": "I am also training in integrative-psychodynamic psychotherapy, including EMDR, bringing different perspectives together to better understand people, their decisions and the contexts they act in.",
+    "paragraph1": "Doctoral candidate at the Institute of Political and Security Studies (US), psychology student. I research separatism and international security, plus criminology, victimology and EMDR psychotherapy.",
     "moreLink": "More about me →",
     "cards": {
       "wyksztalcenie": {
         "label": "Education",
-        "value": "Law (MA), Internal Security (BA) — University of Szczecin · Psychology (3rd year, in progress)"
+        "value": "Law, Internal Security, Psychology"
       },
       "doktorat": {
         "label": "Doctorate",
-        "value": "Institute of Political and Security Studies, University of Szczecin"
+        "value": "Political & Security Studies (US)"
       },
       "badania": {
         "label": "Research",
-        "value": "Western Balkans, separatism, international security, plus victimology and criminology"
+        "value": "Separatism, Western Balkans, victimology"
       },
       "jezyki": {
         "label": "Languages",
-        "value": "Polish (native) · English (fluent) · Italian (fluent)"
+        "value": "Polish, English, Italian"
       },
       "psychoterapiaCard": {
         "label": "Psychotherapy",
-        "value": "Integrative-psychodynamic training with EMDR (from September 2026)"
+        "value": "Psychodynamic, EMDR (2026)"
       },
       "obszaryLaczace": {
-        "label": "Areas I bring together",
-        "value": "Law · Psychology · Security · Research · Psychotherapy · Knowledge · Practice"
+        "label": "What I combine",
+        "value": "Law, psychology, security, research"
       }
     }
   },
