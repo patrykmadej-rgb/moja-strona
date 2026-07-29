@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import { siteConfig } from "@/lib/site-config";
 import { publications } from "@/lib/publications";
-import PublicationStatusBadge from "@/components/PublicationStatusBadge";
+import PublicationsExplorer from "@/components/PublicationsExplorer";
 
 export const metadata: Metadata = {
   title: `Publikacje — ${siteConfig.name}`,
@@ -12,55 +12,67 @@ export const metadata: Metadata = {
 
 export default async function PublikacjePage() {
   const tStatus = await getTranslations("PublicationStatus");
-  const tDetail = await getTranslations("PublicationDetail");
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-20">
-      <p className="mb-4 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
-        Publikacje
-      </p>
-      <h1 className="text-4xl font-semibold tracking-tight text-[#1C1028] dark:text-white">
-        Dorobek naukowy
-      </h1>
-      <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
-        Artykuły naukowe, rozdziały w monografiach i teksty popularnonaukowe
-        z obszaru kryminologii, wiktymologii i psychologii bezpieczeństwa.
-      </p>
+    <div>
+      {/* HERO */}
+      <section className="border-b border-[#4A1D6E]/10 pt-16 pb-10 dark:border-white/10">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2">
+            <div>
+              <p className="mb-4 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
+                Publikacje
+              </p>
+              <h1 className="text-5xl font-semibold tracking-tight text-[#1C1028] dark:text-white">
+                Dorobek naukowy
+              </h1>
+              <p className="mt-5 max-w-xl text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
+                Artykuły naukowe, rozdziały w monografiach i teksty popularnonaukowe
+                z obszaru kryminologii, wiktymologii i psychologii bezpieczeństwa.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#4A1D6E]/30 px-5 py-2.5 text-sm font-semibold text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E]/5 dark:border-purple-400/30 dark:text-purple-300 dark:hover:bg-purple-400/10"
+                >
+                  Google Scholar ↗
+                </a>
+                <a
+                  href="https://orcid.org/0000-0002-7185-2441"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#4A1D6E]/30 px-5 py-2.5 text-sm font-semibold text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E]/5 dark:border-purple-400/30 dark:text-purple-300 dark:hover:bg-purple-400/10"
+                >
+                  ORCID ↗
+                </a>
+              </div>
+            </div>
 
-      <div className="mt-16">
-        <ul className="flex flex-col gap-4">
-          {publications.map((pub) => (
-            <li key={pub.slug}>
-              <Link
-                href={`/publikacje/${pub.slug}`}
-                className="group flex items-start justify-between gap-4 rounded-2xl border border-[#4A1D6E]/15 bg-white p-6 transition-all hover:border-[#4A1D6E]/40 hover:shadow-md dark:bg-neutral-900 dark:border-white/10 dark:hover:border-purple-400/30"
-              >
-                <div className="flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="inline-block rounded-full bg-[#EDE6F8] px-3 py-0.5 text-xs font-medium text-[#4A1D6E] dark:bg-purple-900/30 dark:text-purple-300">
-                      {pub.type}
-                    </span>
-                    {pub.status === "w-trakcie" && <PublicationStatusBadge />}
-                  </div>
-                  <h2 className="mt-2 font-semibold text-[#1C1028] group-hover:text-[#4A1D6E] transition-colors dark:text-white dark:group-hover:text-purple-300">
-                    {pub.title}
-                  </h2>
-                  <p className="mt-1 text-sm text-[#4A3360] dark:text-neutral-400">
-                    {pub.venue} · {pub.year ?? (pub.status === "w-trakcie" ? tStatus("inPreparation") : "")}
-                  </p>
-                  {pub.coAuthors && pub.coAuthors.length > 0 && (
-                    <p className="mt-0.5 text-sm text-[#4A3360] dark:text-neutral-400">
-                      {tDetail("coAuthors")}: {pub.coAuthors.join(", ")}
-                    </p>
-                  )}
-                </div>
-                <span className="mt-1 shrink-0 text-[#4A1D6E] opacity-0 group-hover:opacity-100 transition-opacity dark:text-purple-400">
-                  →
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+            {/* Dekoracyjna ilustracja — widoczna od lg wzwyż, lekko wychodząca poza kolumnę */}
+            <div className="hidden lg:block">
+              <div className="-mt-8 -mr-10 scale-110">
+                <Image
+                  src="/publikacje-hero-book.png"
+                  alt="Ilustracja przedstawiająca otwartą książkę, mapę i sieć neuronową symbolizujące dorobek naukowy"
+                  width={1672}
+                  height={941}
+                  priority
+                  className="h-auto w-full object-contain"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-6xl px-6 py-10">
+        <PublicationsExplorer
+          publications={publications}
+          inPreparationLabel={tStatus("inPreparation")}
+          inProgressLabel={tStatus("inProgress")}
+        />
       </div>
     </div>
   );
