@@ -73,8 +73,16 @@ export const publications: Publication[] = [
     venue: "Wydawnictwo Adam Marszałek",
     year: 2015,
     type: "Recenzja",
-    abstractPl: "",
-    tags: ["Chorwacja", "Polska", "relacje kulturowe"],
+    abstractPl:
+      "Tekst stanowi recenzję interdyscyplinarnej monografii zbiorowej „Spotkania polsko-chorwackie” pod redakcją Edwarda Olszewskiego i Bogusława Zielińskiego. Publikacja ukazuje relacje między Polską a Chorwacją z perspektywy historycznej, politycznej i kulturowej, zwracając uwagę zarówno na doświadczenia łączące oba państwa, jak i na odmienność ich dróg rozwoju. Istotnym kontekstem rozważań jest integracja Chorwacji z Unią Europejską oraz znaczenie polskich doświadczeń transformacyjnych i europejskich dla stosunków dwustronnych. W recenzji podkreślam szeroki zakres tematyczny książki oraz wartość zestawienia różnych perspektyw badawczych. Monografia zostaje przedstawiona jako użyteczne źródło wiedzy o polsko-chorwackich kontaktach, miejscu Chorwacji w Europie oraz znaczeniu współpracy naukowej i kulturowej dla wzajemnego poznania obu społeczeństw.",
+    abstractEn:
+      "The text reviews the interdisciplinary edited volume “Spotkania polsko-chorwackie” (“Polish-Croatian Meetings”), edited by Edward Olszewski and Bogusław Zieliński. The book examines relations between Poland and Croatia from historical, political and cultural perspectives, addressing both the experiences shared by the two countries and the differences between their respective paths of development. An important context for the discussion is Croatia's integration into the European Union and the relevance of Poland's transformation and European experience to bilateral relations. The review highlights the publication's broad thematic scope and the value of combining different academic perspectives. The volume is presented as a useful contribution to understanding Polish-Croatian relations, Croatia's place in Europe and the role of academic and cultural cooperation in strengthening mutual knowledge between the two societies.",
+    tags: ["Stosunki polsko-chorwackie", "Chorwacja", "Bałkany", "Integracja europejska", "Stosunki międzynarodowe", "Recenzja naukowa"],
+    externalLinks: [
+      { label: "CEJSH", href: "https://cejsh.icm.edu.pl/cejsh/element/bwmeta1.element.ojs-doi-10_15804_rop201510" },
+      { label: "CEEOL", href: "https://www.ceeol.com/search/article-detail?id=525489" },
+    ],
+    pdfUrl: "/publikacje/recenzja-olszewski-spotkania-2015.pdf",
   },
 ];
 
