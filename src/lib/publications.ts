@@ -76,8 +76,16 @@ export const publications: Publication[] = [
     venue: "Wydawnictwo Adam Marszałek",
     year: 2016,
     type: "Recenzja",
-    abstractPl: "",
-    tags: ["Bośnia", "Bałkany", "politologia"],
+    abstractPl:
+      "W recenzji analizuję książkę Szymona Sochackiego Bośnia i Hercegowina 1995–2012. Studium politologiczne, poświęconą powojennemu systemowi politycznemu tego państwa. Publikacja przedstawia rozpad Jugosławii, porozumienie z Dayton, strukturę administracyjną Bośni i Hercegowiny, działalność partii politycznych, przebieg wyborów oraz kierunki polityki wewnętrznej i zagranicznej. Jej zaletami są logiczna konstrukcja, szeroka baza źródłowa oraz uporządkowane przedstawienie rozwoju instytucjonalnego kraju.\n\nJednocześnie wskazuję na liczne błędy rzeczowe i terminologiczne, niespójny system skrótów, zbyt opisowy charakter analizy prawnej oraz problemy z jakością materiałów graficznych. Szczególnie istotne zastrzeżenia dotyczą sposobu przedstawienia narodów konstytutywnych oraz modelu demokracji konsocjonalnej. Książka dostarcza wartościowych informacji, jednak ze względu na występujące nieścisłości wymaga od czytelnika krytycznego podejścia i znajomości realiów Bałkanów.",
+    tags: [
+      "Bośnia i Hercegowina",
+      "Bałkany Zachodnie",
+      "system polityczny",
+      "demokracja konsocjonalna",
+      "porozumienie z Dayton",
+      "recenzja naukowa",
+    ],
     externalLinks: [
       {
         label: "ResearchGate",
