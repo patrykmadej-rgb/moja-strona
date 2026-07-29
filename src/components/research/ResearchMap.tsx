@@ -103,6 +103,8 @@ export default function ResearchMap({
               alt=""
               fill
               priority
+              loading="eager"
+              sizes="(min-width: 1024px) 560px, (min-width: 720px) 560px, 100vw"
               aria-hidden="true"
               className="object-cover"
             />
@@ -239,6 +241,7 @@ export default function ResearchMap({
               src="/research/research-map-background.png"
               alt=""
               fill
+              sizes="160px"
               aria-hidden="true"
               className="object-cover opacity-35"
             />

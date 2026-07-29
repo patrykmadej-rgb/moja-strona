@@ -10,10 +10,12 @@ import { useEffect, useRef, useState } from "react";
  */
 export function useRevealOnce<T extends HTMLElement>(threshold = 0.15) {
   const ref = useRef<T | null>(null);
-  const [revealed, setRevealed] = useState(() => typeof IntersectionObserver === "undefined");
+  // Zaczyna jako false zarówno na serwerze, jak i na kliencie (przed hydratacją) —
+  // inaczej różnica w dostępności IntersectionObserver między SSR (Node, brak API)
+  // a przeglądarką powodowała hydration mismatch na atrybucie data-reveal.
+  const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
-    if (revealed) return;
     const node = ref.current;
     if (!node) return;
     const observer = new IntersectionObserver(
