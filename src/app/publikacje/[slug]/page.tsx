@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPublicationBySlug, publications } from "@/lib/publications";
@@ -65,6 +66,18 @@ export default async function PublikacjaPage({
               {tag}
             </Link>
           ))}
+        </div>
+      )}
+
+      {pub.coverImage && (
+        <div className="relative mt-8 mb-10 aspect-video w-full overflow-hidden rounded-2xl">
+          <Image
+            src={pub.coverImage}
+            alt={pub.title}
+            fill
+            priority
+            className="object-cover"
+          />
         </div>
       )}
 

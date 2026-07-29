@@ -229,16 +229,17 @@ export default function Home() {
               <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
                 {recentPublications.map((pub) => {
                   const Icon = publicationIcons[pub.slug] ?? FileText;
+                  const thumb = pub.coverImageThumb ?? pub.coverImage;
                   return (
                     <Link
                       key={pub.slug}
                       href={`/publikacje/${pub.slug}`}
                       className="group"
                     >
-                      {pub.coverImage ? (
+                      {thumb ? (
                         <div className="relative aspect-square overflow-hidden rounded-xl">
                           <Image
-                            src={pub.coverImage}
+                            src={thumb}
                             alt={pub.title}
                             fill
                             className="object-cover"
