@@ -281,8 +281,10 @@ export default function PublicationsExplorer({
       </section>
 
       <div className="mx-auto max-w-6xl px-6 py-10">
-        {/* SZUKAJ + FILTR TYPU — pełna szerokość kontenera, tak jak karty poniżej */}
-        <div className="flex flex-col gap-4 rounded-2xl bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between dark:bg-neutral-900">
+        {/* SZUKAJ + FILTR TYPU — "okrakiem" na granicy hero i reszty strony: ujemny margines
+            górny podciąga element w górę, tak że górna połowa nachodzi jeszcze na hero, a
+            dolna jest już na tle strony. Mocniejszy cień, żeby dobrze odcinał się od obu teł. */}
+        <div className="relative z-10 -mt-16 flex flex-col gap-4 rounded-2xl bg-white p-4 shadow-xl sm:flex-row sm:items-center sm:justify-between dark:bg-neutral-900">
           <div className="relative sm:w-80">
             <Search className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-[#4A3360]/50 dark:text-neutral-500" />
             <input

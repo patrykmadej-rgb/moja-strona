@@ -24,3 +24,10 @@ html {
     opacity: 1;
   }
 }
+
+/* Estetyka "ostrych kątów" na życzenie — wszystkie widoczne ramki/kontenery
+   (przyciski, karty, badge, pola, itp.) mają być kwadratowe, bez zaokrągleń,
+   niezależnie od klasy rounded-* użytej w komponencie. */
+* {
+  border-radius: 0 !important;
+}
