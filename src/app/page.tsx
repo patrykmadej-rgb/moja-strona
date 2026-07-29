@@ -81,13 +81,13 @@ export default function Home() {
           />
           <div className="relative z-10 flex lg:min-h-[600px] items-center">
             <div className="max-w-xl pl-16 pb-12">
-              <p className="mb-5 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
+              <p className="mb-5 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
                 {siteConfig.title}
               </p>
               <h1 className="text-5xl leading-tight font-bold tracking-tight text-[#1C1028] lg:text-6xl dark:text-white">
                 Badania.<br />
                 Zrozumienie.<br />
-                <span className="text-[#5C2D91] dark:text-purple-400">Realna zmiana.</span>
+                <span className="text-[#4A1D6E] dark:text-purple-400">Realna zmiana.</span>
               </h1>
               <p className="mt-8 text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
                 {siteConfig.description}
@@ -95,13 +95,13 @@ export default function Home() {
               <div className="mt-10 flex flex-wrap gap-4">
                 <Link
                   href="/badania"
-                  className="rounded-full bg-[#5C2D91] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
+                  className="rounded-full bg-[#4A1D6E] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
                 >
                   Zobacz moje badania →
                 </Link>
                 <Link
                   href="/#o-mnie"
-                  className="rounded-full border border-[#5C2D91] px-7 py-3 text-sm font-semibold text-[#5C2D91] transition-colors hover:bg-[#5C2D91] hover:text-white dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
+                  className="rounded-full border border-[#4A1D6E] px-7 py-3 text-sm font-semibold text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E] hover:text-white dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
                 >
                   Dowiedz się więcej o mnie
                 </Link>
@@ -112,13 +112,13 @@ export default function Home() {
 
         {/* Mobile: prosty układ pionowy, bez nakładki */}
         <div className="px-6 py-16 lg:hidden">
-          <p className="mb-5 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
+          <p className="mb-5 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
             {siteConfig.title}
           </p>
           <h1 className="text-5xl leading-tight font-bold tracking-tight text-[#1C1028] dark:text-white">
             Badania.<br />
             Zrozumienie.<br />
-            <span className="text-[#5C2D91] dark:text-purple-400">Realna zmiana.</span>
+            <span className="text-[#4A1D6E] dark:text-purple-400">Realna zmiana.</span>
           </h1>
           <p className="mt-8 text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
             {siteConfig.description}
@@ -126,13 +126,13 @@ export default function Home() {
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
               href="/badania"
-              className="rounded-full bg-[#5C2D91] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
+              className="rounded-full bg-[#4A1D6E] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
             >
               Zobacz moje badania →
             </Link>
             <Link
               href="/#o-mnie"
-              className="rounded-full border border-[#5C2D91] px-7 py-3 text-sm font-semibold text-[#5C2D91] transition-colors hover:bg-[#5C2D91] hover:text-white dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
+              className="rounded-full border border-[#4A1D6E] px-7 py-3 text-sm font-semibold text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E] hover:text-white dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
             >
               Dowiedz się więcej o mnie
             </Link>
@@ -151,13 +151,13 @@ export default function Home() {
 
       {/* PIĘĆ FILARÓW */}
       <section className="relative">
-        <div className="relative left-[calc(-50vw+50%)] w-screen bg-[#EAE5DE] py-10 dark:bg-neutral-900">
-          <div className="grid grid-cols-2 gap-y-8 md:grid-cols-3 lg:grid-cols-5">
+        <div className="relative left-[calc(-50vw+50%)] w-screen bg-[#EAE5DE] py-6 dark:bg-neutral-900">
+          <div className="grid grid-cols-2 gap-y-6 md:grid-cols-3 lg:grid-cols-5">
             {pillars.map((pillar, i) => (
               <Link
                 key={pillar.href}
                 href={pillar.href}
-                className={`group flex flex-row items-start gap-4 px-6 py-0 transition-opacity hover:opacity-80 md:px-8 ${
+                className={`group flex flex-row items-start gap-3 px-6 py-0 transition-opacity hover:opacity-80 md:px-8 ${
                   i < pillars.length - 1
                     ? "lg:border-r lg:border-black/10 dark:lg:border-white/10"
                     : ""
@@ -170,10 +170,10 @@ export default function Home() {
                   <p className="text-sm font-bold tracking-wide uppercase text-[#1C1028] dark:text-white">
                     {pillar.label}
                   </p>
-                  <p className="mt-2 text-sm leading-relaxed text-[#4A3360] dark:text-neutral-300">
+                  <p className="mt-1 text-sm leading-snug text-[#4A3360] dark:text-neutral-300">
                     {pillar.description}
                   </p>
-                  <p className="mt-4 text-[#5C2D91] transition-transform group-hover:translate-x-1 dark:text-purple-400">
+                  <p className="mt-1 text-[#4A1D6E] transition-transform group-hover:translate-x-1 dark:text-purple-400">
                     →
                   </p>
                 </div>
@@ -184,12 +184,12 @@ export default function Home() {
       </section>
 
       {/* CYTAT + OSTATNIE PUBLIKACJE */}
-      <section className="border-t border-[#5C2D91]/10 bg-[#F5F1EC] py-16 dark:border-white/10 dark:bg-neutral-950">
+      <section className="border-t border-[#4A1D6E]/10 bg-[#F5F1EC] py-16 dark:border-white/10 dark:bg-neutral-950">
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_2fr]">
             {/* CYTAT */}
             <div>
-              <p className="text-6xl leading-none text-[#5C2D91] dark:text-purple-400">
+              <p className="text-6xl leading-none text-[#4A1D6E] dark:text-purple-400">
                 &ldquo;
               </p>
               <p className="mt-2 text-xl leading-relaxed italic text-[#1C1028] lg:text-2xl dark:text-white">
@@ -216,11 +216,11 @@ export default function Home() {
                   <p className="text-lg font-bold uppercase text-[#1C1028] dark:text-white">
                     Ostatnie publikacje
                   </p>
-                  <div className="mt-2 h-1 w-12 bg-[#5C2D91]" />
+                  <div className="mt-2 h-1 w-12 bg-[#4A1D6E]" />
                 </div>
                 <Link
                   href="/publikacje"
-                  className="text-sm font-semibold uppercase text-[#5C2D91] hover:underline dark:text-purple-400"
+                  className="text-sm font-semibold uppercase text-[#4A1D6E] hover:underline dark:text-purple-400"
                 >
                   Zobacz wszystkie →
                 </Link>
@@ -246,7 +246,7 @@ export default function Home() {
                           />
                         </div>
                       ) : (
-                        <div className="flex aspect-square items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#5C2D91]">
+                        <div className="flex aspect-square items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#4A1D6E]">
                           <Icon className="h-16 w-16 text-white" />
                         </div>
                       )}
@@ -259,7 +259,7 @@ export default function Home() {
                       <p className="text-sm text-[#4A3360] dark:text-neutral-400">
                         {pub.year}
                       </p>
-                      <p className="mt-3 text-sm font-semibold uppercase text-[#5C2D91] transition-transform group-hover:translate-x-1 dark:text-purple-400">
+                      <p className="mt-3 text-sm font-semibold uppercase text-[#4A1D6E] transition-transform group-hover:translate-x-1 dark:text-purple-400">
                         Czytaj więcej →
                       </p>
                     </Link>
@@ -272,16 +272,16 @@ export default function Home() {
       </section>
 
       {/* OBSZARY DZIAŁALNOŚCI */}
-      <section className="border-t border-[#5C2D91]/10 py-16 dark:border-white/10">
+      <section className="border-t border-[#4A1D6E]/10 py-16 dark:border-white/10">
         <div className="mx-auto max-w-6xl px-6">
-          <p className="mb-6 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
+          <p className="mb-6 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
             Obszary działalności
           </p>
           <div className="flex flex-wrap gap-3">
             {areas.map((area) => (
               <span
                 key={area}
-                className="rounded-full border border-[#5C2D91]/20 bg-white px-5 py-2.5 text-sm font-medium text-[#4A3360] dark:bg-neutral-900 dark:border-white/10 dark:text-neutral-300"
+                className="rounded-full border border-[#4A1D6E]/20 bg-white px-5 py-2.5 text-sm font-medium text-[#4A3360] dark:bg-neutral-900 dark:border-white/10 dark:text-neutral-300"
               >
                 {area}
               </span>
@@ -291,11 +291,11 @@ export default function Home() {
       </section>
 
       {/* O MNIE */}
-      <section id="o-mnie" className="border-t border-[#5C2D91]/10 py-20 dark:border-white/10">
+      <section id="o-mnie" className="border-t border-[#4A1D6E]/10 py-20 dark:border-white/10">
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
             <div>
-              <p className="mb-4 text-xs font-semibold tracking-[0.25em] uppercase text-[#5C2D91] dark:text-purple-400">
+              <p className="mb-4 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
                 O mnie
               </p>
               <h2 className="text-3xl font-semibold tracking-tight text-[#1C1028] dark:text-white">
@@ -303,14 +303,13 @@ export default function Home() {
               </h2>
               <div className="mt-6 space-y-4 text-[#4A3360] leading-relaxed dark:text-neutral-300">
                 <p>
-                  Jestem doktorantem Uniwersytetu Szczecińskiego oraz studentem psychologii.
-                  Przez lata łączyłem zainteresowania prawnicze, politologiczne i psychologiczne —
-                  badając Bałkany Zachodnie, separatyzm, bezpieczeństwo i wielokulturowość.
-                </p>
-                <p>
-                  Dziś moje zainteresowania naukowe skupiają się na kryminologii, wiktymologii
-                  i psychologii bezpieczeństwa. Równolegle szkolę się w psychoterapii
-                  w nurcie integracyjno-psychodynamicznym, w tym metodą EMDR w pracy z traumą.
+                  Jestem doktorantem w Instytucie Nauk o Polityce i Bezpieczeństwie
+                  Uniwersytetu Szczecińskiego oraz studentem psychologii. Od lat zajmuję się
+                  separatyzmem, bezpieczeństwem międzynarodowym i sytuacją na Bałkanach
+                  Zachodnich — to główny obszar moich badań, który rozwijam w pracy doktorskiej.
+                  Równolegle poszerzam swoje zainteresowania o kryminologię, wiktymologię
+                  i psychologię bezpieczeństwa, a także szkolę się w psychoterapii w nurcie
+                  integracyjno-psychodynamicznym, w tym metodą EMDR w pracy z traumą.
                 </p>
                 <p>
                   Łączę różne dziedziny wiedzy i doświadczenia, aby lepiej rozumieć człowieka,
@@ -319,7 +318,7 @@ export default function Home() {
               </div>
               <Link
                 href="/#o-mnie"
-                className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[#5C2D91] hover:underline dark:text-purple-400"
+                className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[#4A1D6E] hover:underline dark:text-purple-400"
               >
                 Więcej o mnie →
               </Link>
@@ -327,17 +326,17 @@ export default function Home() {
 
             <div className="space-y-4">
               {[
-                { label: "Wykształcenie", value: "Prawo (mgr), Bezpieczeństwo wewnętrzne (lic.), Psychologia (w toku) — Uniwersytet Szczeciński" },
-                { label: "Doktorat", value: "Instytut Politologii i Europeistyki, Uniwersytet Szczeciński" },
-                { label: "Specjalizacja badawcza", value: "Bałkany Zachodnie, separatyzm, bezpieczeństwo, wiktymologia, kryminologia" },
+                { label: "Wykształcenie", value: "Prawo (mgr), Bezpieczeństwo wewnętrzne (lic.) — Uniwersytet Szczeciński · Psychologia (3. rok, w toku)" },
+                { label: "Doktorat", value: "Instytut Nauk o Polityce i Bezpieczeństwie, Uniwersytet Szczeciński" },
+                { label: "Specjalizacja badawcza", value: "Bałkany Zachodnie, separatyzm, bezpieczeństwo międzynarodowe — dodatkowo: wiktymologia, kryminologia" },
                 { label: "Języki", value: "Polski (ojczysty) · Angielski (biegle) · Włoski (płynnie)" },
                 { label: "Psychoterapia", value: "Szkolenie w nurcie integracyjno-psychodynamicznym z metodą EMDR (od września 2026)" },
               ].map((item) => (
                 <div
                   key={item.label}
-                  className="rounded-xl border border-[#5C2D91]/15 bg-white p-5 dark:bg-neutral-900 dark:border-white/10"
+                  className="rounded-xl border border-[#4A1D6E]/15 bg-white p-5 dark:bg-neutral-900 dark:border-white/10"
                 >
-                  <p className="text-xs font-semibold tracking-widest uppercase text-[#5C2D91] dark:text-purple-400">
+                  <p className="text-xs font-semibold tracking-widest uppercase text-[#4A1D6E] dark:text-purple-400">
                     {item.label}
                   </p>
                   <p className="mt-2 text-sm text-[#4A3360] dark:text-neutral-300">{item.value}</p>
