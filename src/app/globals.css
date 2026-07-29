@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-pm-purple: #5C2D91;
+  --color-pm-purple: #4A1D6E;
   --color-pm-purple-mid: #7B4DB8;
   --color-pm-purple-light: #9B70D0;
   --color-pm-purple-pale: #EDE6F8;
@@ -13,4 +13,14 @@
 
 html {
   scroll-padding-top: 5rem;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
 }
