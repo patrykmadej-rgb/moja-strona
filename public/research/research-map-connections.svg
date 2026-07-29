@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" fill="none">
+  <g stroke="#6B3A91" stroke-width="2" stroke-linecap="round" opacity=".7">
+    <path id="line-balkans" d="M450 260C365 195 285 155 166 143"/>
+    <path id="line-security" d="M450 260C540 190 624 143 742 126"/>
+    <path id="line-profiling" d="M450 260C345 272 260 298 142 327"/>
+    <path id="line-victimology" d="M450 260C458 338 485 388 548 440"/>
+    <path id="line-clinical" d="M450 260C560 275 648 300 755 326"/>
+  </g>
+  <g stroke="#C39A3B" stroke-width="1.5" opacity=".65" stroke-dasharray="5 9">
+    <path d="M166 143C302 70 581 60 742 126"/>
+    <path d="M142 327C290 455 402 482 548 440"/>
+    <path d="M548 440C650 420 716 385 755 326"/>
+  </g>
+  <g fill="#C39A3B">
+    <circle cx="333" cy="205" r="4"/><circle cx="568" cy="190" r="4"/>
+    <circle cx="350" cy="286" r="4"/><circle cx="500" cy="350" r="4"/>
+    <circle cx="620" cy="286" r="4"/>
+  </g>
+</svg>

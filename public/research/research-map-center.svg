@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220">
+  <defs>
+    <radialGradient id="g" cx="35%" cy="28%">
+      <stop offset="0" stop-color="#5E2B82"/>
+      <stop offset="1" stop-color="#281337"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#291237" flood-opacity=".2"/>
+    </filter>
+  </defs>
+  <circle cx="110" cy="110" r="89" fill="url(#g)" stroke="#C39A3B" stroke-width="4" filter="url(#shadow)"/>
+  <circle cx="110" cy="110" r="98" fill="none" stroke="#6B3A91" stroke-width="2" opacity=".28"/>
+  <g fill="#FFF9F1" text-anchor="middle" font-family="Manrope,Arial,sans-serif" font-weight="700">
+    <text x="110" y="88" font-size="17">CZŁOWIEK</text>
+    <text x="110" y="114" font-size="17">· SYSTEM ·</text>
+    <text x="110" y="140" font-size="17">BEZPIECZEŃSTWO</text>
+  </g>
+</svg>

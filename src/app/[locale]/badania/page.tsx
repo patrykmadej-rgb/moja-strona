@@ -1,74 +1,77 @@
+import fs from "node:fs";
+import path from "node:path";
 import type { Metadata } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
 import { siteConfig } from "@/lib/site-config";
+import { researchAxes, currentWork, localizeAxis, localizeCurrentWorkItem } from "@/lib/research";
+import ResearchInteractive from "@/components/research/ResearchInteractive";
+import ExploreAxesButton from "@/components/research/ExploreAxesButton";
 
-export const metadata: Metadata = {
-  title: `Badania — ${siteConfig.name}`,
-  description: "Projekty badawcze z obszaru kryminologii, wiktymologii i psychologii bezpieczeństwa.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("ResearchPage");
+  return {
+    title: `${t("metaTitle")} — ${siteConfig.name}`,
+    description: t("metaDescription"),
+  };
+}
 
-const researchAreas = [
-  {
-    title: "Wiktymologia i klasyfikacja ofiar",
-    description:
-      "Badania nad mechanizmami wiktymizacji, wielowymiarowymi modelami klasyfikacji ofiar przestępstw oraz czynnikami ryzyka.",
-  },
-  {
-    title: "Profilowanie kryminalne i psychologia sprawcy",
-    description:
-      "Analiza zachowań przestępczych, wykorzystanie testów psychologicznych w profilowaniu kryminalnym, osobowość sprawcy.",
-  },
-  {
-    title: "Trauma i procesy zdrowienia",
-    description:
-      "Psychologiczne aspekty traumy pourazowej, wiktymizacji seksualnej oraz zaburzeń lękowych w kontekście kryminalnym.",
-  },
-  {
-    title: "Bezpieczeństwo i separatyzm",
-    description:
-      "Bałkany Zachodnie, kwestie separatyzmu i tożsamości narodowej, wielokulturowość i bezpieczeństwo wewnętrzne.",
-  },
-];
+export default async function BadaniaPage() {
+  const t = await getTranslations("ResearchPage");
+  const locale = await getLocale();
 
-export default function BadaniaPage() {
-  return (
-    <div className="mx-auto max-w-5xl px-6 py-20">
-      <p className="mb-4 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
-        Badania
+  const localizedAxes = researchAxes.map((axis) => localizeAxis(axis, locale));
+  const localizedWork = currentWork.map((item) => localizeCurrentWorkItem(item, locale));
+
+  const hasBackgroundImage = fs.existsSync(
+    path.join(process.cwd(), "public/research/research-map-background.png"),
+  );
+
+  const labels = {
+    mapAriaLabel: t("mapAriaLabel"),
+    mapNodeOpenDetails: t("mapNodeOpenDetails"),
+    mapCenterLabel: t("mapCenterLabel"),
+    mapMobileHint: t("mapMobileHint"),
+    axesEyebrow: t("axesEyebrow"),
+    axesHeading: t("axesHeading"),
+    axesIntro: t("axesIntro"),
+    expand: t("expand"),
+    selected: t("selected"),
+    questionsHeading: t("questionsHeading"),
+    tagsHeading: t("tagsHeading"),
+    seeRelatedProjects: t("seeRelatedProjects"),
+    currentWorkEyebrow: t("currentWorkEyebrow"),
+    currentWorkHeading: t("currentWorkHeading"),
+    currentWorkIntro: t("currentWorkIntro"),
+    filterAll: t("filterAll"),
+    carouselPrev: t("carouselPrev"),
+    carouselNext: t("carouselNext"),
+    noResults: t("noResults"),
+  };
+
+  const heroLeft = (
+    <div>
+      <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
+        {t("eyebrow")}
       </p>
-      <h1 className="text-4xl font-semibold tracking-tight text-[#1C1028] dark:text-white">
-        Badania nad człowiekiem,<br />traumą i przestępczością.
+      <h1 className="mt-4 text-4xl font-semibold tracking-tight text-[#1C1028] lg:text-5xl dark:text-white">
+        {t("h1")}
       </h1>
-      <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
-        Łączę perspektywę psychologiczną, kryminologiczną i prawną, aby lepiej rozumieć
-        mechanizmy wiktymizacji, zachowań przestępczych i funkcjonowania człowieka
-        w sytuacji traumy.
+      <p className="mt-5 max-w-md text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
+        {t("intro")}
       </p>
+      <ExploreAxesButton label={t("ctaExplore")} />
+    </div>
+  );
 
-      <div className="mt-16 grid gap-6 sm:grid-cols-2">
-        {researchAreas.map((area) => (
-          <div
-            key={area.title}
-            className="rounded-2xl border border-[#4A1D6E]/15 bg-white p-7 dark:bg-neutral-900 dark:border-white/10"
-          >
-            <h2 className="font-semibold text-[#1C1028] dark:text-white">{area.title}</h2>
-            <p className="mt-3 text-sm leading-relaxed text-[#4A3360] dark:text-neutral-300">
-              {area.description}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-16 rounded-2xl border border-[#4A1D6E]/15 bg-[#EDE6F8] p-8 dark:bg-[#4A1D6E]/10 dark:border-purple-400/20">
-        <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
-          Afiliacja
-        </p>
-        <p className="mt-3 text-[#1C1028] dark:text-white font-medium">
-          Instytut Nauk o Polityce i Bezpieczeństwie
-        </p>
-        <p className="mt-1 text-sm text-[#4A3360] dark:text-neutral-300">
-          Uniwersytet Szczeciński
-        </p>
-      </div>
+  return (
+    <div className="research-page">
+      <ResearchInteractive
+        heroLeft={heroLeft}
+        axes={localizedAxes}
+        currentWork={localizedWork}
+        hasBackgroundImage={hasBackgroundImage}
+        labels={labels}
+      />
     </div>
   );
 }

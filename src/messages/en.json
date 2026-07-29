@@ -152,5 +152,33 @@
     "inProgress": "Forthcoming",
     "inPreparation": "In preparation",
     "expectedDate": "Expected publication: {date}"
+  },
+  "ResearchPage": {
+    "metaTitle": "Badania",
+    "metaDescription": "Program badawczy: człowiek, system, bezpieczeństwo — Bałkany Zachodnie, psychologia bezpieczeństwa, profilowanie kryminalne, wiktymologia i psychologia kliniczna.",
+    "eyebrow": "Badania",
+    "h1": "Człowiek. System. Bezpieczeństwo.",
+    "intro": "Łączę psychologię, kryminologię, wiktymologię i nauki o bezpieczeństwie, badając człowieka w relacji z traumą, przestępczością, instytucjami i konfliktem.",
+    "ctaExplore": "Poznaj moje obszary",
+    "mapAriaLabel": "Interaktywna mapa obszarów badawczych",
+    "mapNodeOpenDetails": "zobacz szczegóły",
+    "mapCenterLabel": "Człowiek · System · Bezpieczeństwo",
+    "mapMobileHint": "Dotknij węzła, aby rozwinąć szczegóły obszaru.",
+    "axesEyebrow": "Osie badawcze",
+    "axesHeading": "Pięć powiązanych kierunków",
+    "axesIntro": "Każda oś jest samodzielna, ale razem tworzą jeden program badawczy — od człowieka, przez relacje i zachowanie, po instytucje i bezpieczeństwo.",
+    "expand": "Rozwiń",
+    "selected": "Wybrany obszar",
+    "questionsHeading": "Pytania badawcze",
+    "tagsHeading": "Tematy",
+    "seeRelatedProjects": "Zobacz powiązane projekty →",
+    "currentWorkEyebrow": "W toku",
+    "currentWorkHeading": "Aktualnie pracuję nad",
+    "currentWorkIntro": "Tematy w różnych fazach analizy i pisania — jeszcze nie gotowe publikacje.",
+    "filterAll": "Wszystkie",
+    "carouselPrev": "Poprzednie projekty",
+    "carouselNext": "Następne projekty",
+    "inPreparation": "W opracowaniu",
+    "noResults": "Brak tematów w tej kategorii."
   }
 }

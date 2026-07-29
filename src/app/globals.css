@@ -31,3 +31,96 @@ html {
 * {
   border-radius: 0 !important;
 }
+
+/* ============================================================
+   /badania — paleta i tokeny DODATKOWE, zawężone do .research-page.
+   Nie zastępują głównych kolorów marki, to tylko akcent tej podstrony
+   (mapa badań, karty osi), wzorowany na public/_reference/research-page-mockup.png.
+   ============================================================ */
+.research-page {
+  --research-ivory: #f7f3ed;
+  --research-paper: #fffdfa;
+  --research-plum-900: #281337;
+  --research-plum-800: #3b1851;
+  --research-plum-700: #4f1f6f;
+  --research-violet: #6b3a91;
+  --research-amethyst: #9b78b7;
+  --research-lavender: #e9def2;
+  --research-lavender-soft: #f4eef8;
+  --research-gold: #c39a3b;
+  --research-line: rgba(79, 31, 111, 0.16);
+  --research-shadow: 0 18px 50px rgba(40, 19, 55, 0.1);
+  --research-radius-lg: 22px;
+  --research-radius-md: 16px;
+  --research-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Wyjątek od globalnej zasady "kwadratowych" rogów, celowy i ograniczony do tej
+   jednej podstrony: mapa badań i karty osi używają zaokrągleń zgodnie ze
+   wzorcem wizualnym. Restatujemy jawnie te same wartości, które dałyby klasy
+   Tailwind, tylko z wyższą swoistością niż globalne `* { border-radius: 0 }`. */
+.research-page .rounded-full {
+  border-radius: 9999px !important;
+}
+.research-page .rounded-research-lg {
+  border-radius: var(--research-radius-lg) !important;
+}
+.research-page .rounded-research-md {
+  border-radius: var(--research-radius-md) !important;
+}
+
+@keyframes research-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.018);
+  }
+}
+
+@keyframes research-dot-glow {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes research-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.research-page [data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 550ms var(--research-ease),
+    transform 550ms var(--research-ease);
+}
+.research-page [data-reveal="in"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .research-page * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .research-page [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
