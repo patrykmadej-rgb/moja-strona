@@ -38,6 +38,23 @@ const ABOUT_NETWORK_POINTS_SM: { x: number; y: number; color: string; glow?: boo
   { x: 45, y: 94, color: "#E8D9B5" },
 ];
 
+// "Czułki" wychodzące poza obszar siatki kart, z rogów/krawędzi węzłów granicznych —
+// żeby sieć wizualnie wykraczała poza kafelki. Wymaga overflow-visible na <svg>,
+// bo współrzędne celowo wychodzą poza viewBox.
+const ABOUT_NETWORK_TENDRILS_LG: { x1: number; y1: number; x2: number; y2: number; color: string }[] = [
+  { x1: 70, y1: 8, x2: 24, y2: -24, color: NETWORK_PURPLE },
+  { x1: 140, y1: 8, x2: 186, y2: -24, color: "#E8D9B5" },
+  { x1: 70, y1: 92, x2: 24, y2: 124, color: "#E8D9B5" },
+  { x1: 140, y1: 92, x2: 186, y2: 124, color: NETWORK_PURPLE },
+];
+
+const ABOUT_NETWORK_TENDRILS_SM: { x1: number; y1: number; x2: number; y2: number; color: string }[] = [
+  { x1: 45, y1: 6, x2: 14, y2: -20, color: NETWORK_PURPLE },
+  { x1: 45, y1: 6, x2: 76, y2: -20, color: "#E8D9B5" },
+  { x1: 45, y1: 94, x2: 14, y2: 120, color: "#E8D9B5" },
+  { x1: 45, y1: 94, x2: 76, y2: 120, color: NETWORK_PURPLE },
+];
+
 const pillars: { key: string; href: string; Icon: LucideIcon }[] = [
   { key: "badania", href: "/badania", Icon: Search },
   { key: "publikacje", href: "/publikacje", Icon: FileText },
@@ -406,7 +423,7 @@ export default async function Home() {
                 {/* Subtelna dekoracyjna "sieć" w miejscach styku kart — organiczne krzywe,
                     poświata i pulsowanie, w stylu efektu hover z navbara. */}
                 <svg
-                  className="pointer-events-none absolute inset-0 z-0 hidden h-full w-full lg:block"
+                  className="pointer-events-none absolute inset-0 z-0 hidden h-full w-full overflow-visible lg:block"
                   viewBox="0 0 210 100"
                   preserveAspectRatio="xMidYMid slice"
                   fill="none"
@@ -414,41 +431,64 @@ export default async function Home() {
                 >
                   <defs>
                     <filter id="about-network-glow-lg" x="-200%" y="-200%" width="500%" height="500%">
-                      <feGaussianBlur stdDeviation="2.5" />
+                      <feGaussianBlur stdDeviation="3" />
                     </filter>
                   </defs>
                   <path
                     d="M70,8 Q74,29 70,50 Q66,71 70,92"
                     stroke={NETWORK_PURPLE}
-                    strokeOpacity="0.35"
-                    strokeWidth="0.6"
+                    strokeOpacity="0.55"
+                    strokeWidth="1"
                     strokeLinecap="round"
                   />
                   <path
                     d="M140,8 Q136,29 140,50 Q144,71 140,92"
                     stroke={NETWORK_WARM_DEEP}
-                    strokeOpacity="0.35"
-                    strokeWidth="0.6"
+                    strokeOpacity="0.55"
+                    strokeWidth="1"
                     strokeLinecap="round"
                   />
                   <path
                     d="M70,50 Q105,42 140,50"
                     stroke={NETWORK_PURPLE_DEEP}
-                    strokeOpacity="0.3"
-                    strokeWidth="0.6"
+                    strokeOpacity="0.5"
+                    strokeWidth="1"
                     strokeLinecap="round"
                   />
+                  {ABOUT_NETWORK_TENDRILS_LG.map((t, i) => (
+                    <g key={i}>
+                      <line
+                        x1={t.x1}
+                        y1={t.y1}
+                        x2={t.x2}
+                        y2={t.y2}
+                        stroke={t.color}
+                        strokeOpacity="0.4"
+                        strokeWidth="0.8"
+                        strokeLinecap="round"
+                      />
+                      <circle
+                        cx={t.x2}
+                        cy={t.y2}
+                        r="1.6"
+                        fill={t.color}
+                        opacity="0.55"
+                        className="animate-[pulse-dot_3s_ease-in-out_infinite]"
+                        style={{ animationDelay: `${i * 0.4}s` }}
+                      />
+                    </g>
+                  ))}
                   {ABOUT_NETWORK_POINTS_LG.map((p, i) => (
                     <g key={i}>
                       {p.glow && (
-                        <circle cx={p.x} cy={p.y} r="6" fill={p.color} opacity="0.28" filter="url(#about-network-glow-lg)" />
+                        <circle cx={p.x} cy={p.y} r="7.5" fill={p.color} opacity="0.4" filter="url(#about-network-glow-lg)" />
                       )}
                       <circle
                         cx={p.x}
                         cy={p.y}
-                        r={p.glow ? "2.2" : "1.6"}
+                        r={p.glow ? "3" : "2.2"}
                         fill={p.color}
-                        opacity="0.7"
+                        opacity="0.85"
                         className="animate-[pulse-dot_3s_ease-in-out_infinite]"
                         style={{ animationDelay: `${i * 0.35}s` }}
                       />
@@ -456,7 +496,7 @@ export default async function Home() {
                   ))}
                 </svg>
                 <svg
-                  className="pointer-events-none absolute inset-0 z-0 h-full w-full lg:hidden"
+                  className="pointer-events-none absolute inset-0 z-0 h-full w-full overflow-visible lg:hidden"
                   viewBox="0 0 90 100"
                   preserveAspectRatio="xMidYMid slice"
                   fill="none"
@@ -464,27 +504,50 @@ export default async function Home() {
                 >
                   <defs>
                     <filter id="about-network-glow-sm" x="-200%" y="-200%" width="500%" height="500%">
-                      <feGaussianBlur stdDeviation="2" />
+                      <feGaussianBlur stdDeviation="2.4" />
                     </filter>
                   </defs>
                   <path
                     d="M45,6 Q49,19.65 45,33.3 Q41,50 45,66.6 Q49,80.3 45,94"
                     stroke={NETWORK_PURPLE}
-                    strokeOpacity="0.35"
-                    strokeWidth="0.6"
+                    strokeOpacity="0.55"
+                    strokeWidth="1"
                     strokeLinecap="round"
                   />
+                  {ABOUT_NETWORK_TENDRILS_SM.map((t, i) => (
+                    <g key={i}>
+                      <line
+                        x1={t.x1}
+                        y1={t.y1}
+                        x2={t.x2}
+                        y2={t.y2}
+                        stroke={t.color}
+                        strokeOpacity="0.4"
+                        strokeWidth="0.7"
+                        strokeLinecap="round"
+                      />
+                      <circle
+                        cx={t.x2}
+                        cy={t.y2}
+                        r="1.3"
+                        fill={t.color}
+                        opacity="0.55"
+                        className="animate-[pulse-dot_3s_ease-in-out_infinite]"
+                        style={{ animationDelay: `${i * 0.4}s` }}
+                      />
+                    </g>
+                  ))}
                   {ABOUT_NETWORK_POINTS_SM.map((p, i) => (
                     <g key={i}>
                       {p.glow && (
-                        <circle cx={p.x} cy={p.y} r="4.5" fill={p.color} opacity="0.28" filter="url(#about-network-glow-sm)" />
+                        <circle cx={p.x} cy={p.y} r="5.5" fill={p.color} opacity="0.4" filter="url(#about-network-glow-sm)" />
                       )}
                       <circle
                         cx={p.x}
                         cy={p.y}
-                        r={p.glow ? "1.7" : "1.2"}
+                        r={p.glow ? "2.3" : "1.6"}
                         fill={p.color}
-                        opacity="0.7"
+                        opacity="0.85"
                         className="animate-[pulse-dot_3s_ease-in-out_infinite]"
                         style={{ animationDelay: `${i * 0.35}s` }}
                       />
