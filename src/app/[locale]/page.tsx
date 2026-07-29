@@ -300,9 +300,7 @@ export default async function Home() {
                 {recentPublications.map((pub) => {
                   const Icon = publicationIcons[pub.slug] ?? FileText;
                   const thumb = pub.coverImageThumb ?? pub.coverImage;
-                  const meta = [pub.type, pub.year ?? (pub.status === "w-trakcie" ? tStatus("inPreparation") : "")]
-                    .filter(Boolean)
-                    .join(" · ");
+                  const yearLabel = pub.year ?? (pub.status === "w-trakcie" ? tStatus("inPreparation") : "");
                   return (
                     <Link
                       key={pub.slug}
@@ -310,7 +308,7 @@ export default async function Home() {
                       className="group flex items-start gap-4"
                     >
                       {thumb ? (
-                        <div className="relative aspect-square w-20 shrink-0 overflow-hidden rounded-xl sm:w-24">
+                        <div className="relative aspect-square w-16 shrink-0 overflow-hidden rounded-xl">
                           <Image
                             src={thumb}
                             alt={pub.title}
@@ -319,19 +317,22 @@ export default async function Home() {
                           />
                         </div>
                       ) : (
-                        <div className="flex aspect-square w-20 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#4A1D6E] sm:w-24">
-                          <Icon className="h-8 w-8 text-white" />
+                        <div className="flex aspect-square w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#4A1D6E]">
+                          <Icon className="h-6 w-6 text-white" />
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
                         {pub.status === "w-trakcie" && (
                           <PublicationStatusBadge className="mb-1.5" />
                         )}
-                        <p className="line-clamp-2 text-base font-bold text-[#1C1028] dark:text-white">
+                        <p className="line-clamp-3 text-base font-bold text-[#1C1028] dark:text-white">
                           {pub.title}
                         </p>
-                        <p className="mt-1 text-sm text-[#4A3360] dark:text-neutral-400">
-                          {meta}
+                        <p className="mt-1.5 text-sm text-[#4A3360] dark:text-neutral-400">
+                          {pub.type}
+                        </p>
+                        <p className="text-sm text-[#4A3360] dark:text-neutral-400">
+                          {yearLabel}
                         </p>
                         {pub.coAuthors && pub.coAuthors.length > 0 && (
                           <p className="mt-0.5 text-sm text-[#4A3360] dark:text-neutral-400">
