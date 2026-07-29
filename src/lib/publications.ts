@@ -72,6 +72,8 @@ export const publications: Publication[] = [
       { label: "CEEOL", href: "https://www.ceeol.com/search/article-detail?id=563178" },
     ],
     pdfUrl: "/publikacje/languages-tool-nationalists-2016.pdf",
+    coverImage: "/publications/languages-tool-nationalists-2016.png",
+    coverImageThumb: "/publications/languages-tool-nationalists-2016-miniatura.png",
   },
   {
     slug: "recenzja-olszewski-spotkania-2015",
