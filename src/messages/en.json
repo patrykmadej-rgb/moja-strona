@@ -53,8 +53,8 @@
     "eyebrow": "About me",
     "heading1": "Bridging perspectives.",
     "heading2": "Understanding the person.",
-    "paragraph1": "I am a doctoral candidate at the Institute of Political and Security Studies, University of Szczecin, and a psychology student. For years I have focused on separatism, international security and the situation in the Western Balkans — the main area of my research, which I develop in my doctoral work. In parallel, I am expanding into criminology, victimology and the psychology of security, and training in integrative-psychodynamic psychotherapy, including EMDR for trauma work.",
-    "paragraph2": "I bring together different fields of knowledge and experience to better understand people — their decisions, behaviour and the contexts in which they act.",
+    "paragraph1": "I am a doctoral candidate at the Institute of Political and Security Studies, University of Szczecin, and a psychology student. My main research focus is separatism, international security and the Western Balkans, alongside a growing interest in criminology and victimology.",
+    "paragraph2": "I am also training in integrative-psychodynamic psychotherapy, including EMDR, bringing different perspectives together to better understand people, their decisions and the contexts they act in.",
     "moreLink": "More about me →",
     "cards": {
       "wyksztalcenie": {
@@ -65,9 +65,9 @@
         "label": "Doctorate",
         "value": "Institute of Political and Security Studies, University of Szczecin"
       },
-      "specjalizacja": {
-        "label": "Research focus",
-        "value": "Western Balkans, separatism, international security — plus: victimology, criminology"
+      "badania": {
+        "label": "Research",
+        "value": "Western Balkans, separatism, international security, plus victimology and criminology"
       },
       "jezyki": {
         "label": "Languages",
@@ -76,6 +76,10 @@
       "psychoterapiaCard": {
         "label": "Psychotherapy",
         "value": "Integrative-psychodynamic training with EMDR (from September 2026)"
+      },
+      "obszaryLaczace": {
+        "label": "Areas I bring together",
+        "value": "Law · Psychology · Security · Research · Psychotherapy · Knowledge · Practice"
       }
     }
   },

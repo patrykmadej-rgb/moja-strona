@@ -1,9 +1,20 @@
 import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
-import { Search, FileText, Share2, Brain, PenTool, Shield, Globe, Landmark } from "lucide-react";
+import {
+  Search,
+  FileText,
+  Share2,
+  Brain,
+  PenTool,
+  Shield,
+  Globe,
+  Landmark,
+  GraduationCap,
+  BarChart3,
+} from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { publications, getPublicationSortYear } from "@/lib/publications";
+import { getFeaturedPublications } from "@/lib/publications";
 import PublicationStatusBadge from "@/components/PublicationStatusBadge";
 
 const pillars: { key: string; href: string; Icon: LucideIcon }[] = [
@@ -20,9 +31,7 @@ const publicationIcons: Record<string, LucideIcon> = {
   "recenzja-grosse-pokryzysowa-europa-2018": Landmark,
 };
 
-const recentPublications = [...publications]
-  .sort((a, b) => getPublicationSortYear(b) - getPublicationSortYear(a))
-  .slice(0, 3);
+const recentPublications = getFeaturedPublications();
 
 const areas = [
   "Psychologia zachowań",
@@ -36,13 +45,45 @@ const areas = [
   "AI i analiza danych",
 ];
 
-const aboutCardKeys = [
-  "wyksztalcenie",
-  "doktorat",
-  "specjalizacja",
-  "jezyki",
-  "psychoterapiaCard",
-] as const;
+const aboutCards: {
+  key: string;
+  Icon: LucideIcon;
+  variant: "default" | "dark" | "light";
+}[] = [
+  { key: "wyksztalcenie", Icon: GraduationCap, variant: "default" },
+  { key: "doktorat", Icon: Shield, variant: "dark" },
+  { key: "badania", Icon: BarChart3, variant: "default" },
+  { key: "psychoterapiaCard", Icon: Brain, variant: "default" },
+  { key: "jezyki", Icon: Globe, variant: "default" },
+  { key: "obszaryLaczace", Icon: Share2, variant: "light" },
+];
+
+const ABOUT_CARD_VARIANT_CLASSES: Record<
+  "default" | "dark" | "light",
+  { card: string; iconWrap: string; icon: string; label: string; value: string }
+> = {
+  default: {
+    card: "bg-white dark:bg-neutral-900",
+    iconWrap: "bg-[#EDE6F8] dark:bg-purple-900/30",
+    icon: "text-[#5C2D91] dark:text-purple-300",
+    label: "text-[#1C1028] dark:text-white",
+    value: "text-[#4A3360] dark:text-neutral-400",
+  },
+  dark: {
+    card: "bg-[#4A1D6E]",
+    iconWrap: "bg-white/15",
+    icon: "text-white",
+    label: "text-white",
+    value: "text-white/80",
+  },
+  light: {
+    card: "bg-[#EDE6F8] dark:bg-purple-900/20",
+    iconWrap: "bg-white/70 dark:bg-white/10",
+    icon: "text-[#5C2D91] dark:text-purple-200",
+    label: "text-[#1C1028] dark:text-white",
+    value: "text-[#4A3360] dark:text-neutral-400",
+  },
+};
 
 export default async function Home() {
   const tNav = await getTranslations("Nav");
@@ -290,13 +331,33 @@ export default async function Home() {
       {/* O MNIE */}
       <section id="o-mnie" className="border-t border-[#4A1D6E]/10 py-20 dark:border-white/10">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
+          <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2">
+            {/* ZDJĘCIE */}
+            <div className="relative aspect-square overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5 dark:ring-white/10">
+              <Image
+                src="/o-mnie-portret.png"
+                alt="Patryk Madej"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute bottom-6 left-6 rounded-xl bg-[#F5F1EC] px-4 py-3 shadow-lg dark:bg-neutral-900">
+                <p className="font-bold text-[#1C1028] dark:text-white">Patryk Madej</p>
+                <p className="mt-0.5 text-xs font-medium tracking-wide uppercase text-[#4A3360] dark:text-neutral-400">
+                  Badacz · Psycholog · Prawnik
+                </p>
+              </div>
+            </div>
+
+            {/* TREŚĆ */}
             <div>
-              <p className="mb-4 text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
-                {tAbout("eyebrow")}
-              </p>
-              <h2 className="text-3xl font-semibold tracking-tight text-[#1C1028] dark:text-white">
-                {tAbout("heading1")}<br />{tAbout("heading2")}
+              <div className="flex items-center gap-3">
+                <span className="h-4 w-1 bg-[#5C2D91]" />
+                <p className="text-sm font-semibold tracking-wide uppercase text-[#5C2D91]">
+                  {tAbout("eyebrow")}
+                </p>
+              </div>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight text-[#1C1028] lg:text-4xl dark:text-white">
+                {tAbout("heading1")} {tAbout("heading2")}
               </h2>
               <div className="mt-6 space-y-4 text-[#4A3360] leading-relaxed dark:text-neutral-300">
                 <p>{tAbout("paragraph1")}</p>
@@ -304,26 +365,73 @@ export default async function Home() {
               </div>
               <Link
                 href="/#o-mnie"
-                className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[#4A1D6E] hover:underline dark:text-purple-400"
+                className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#4A1D6E] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
               >
                 {tAbout("moreLink")}
               </Link>
-            </div>
 
-            <div className="space-y-4">
-              {aboutCardKeys.map((key) => (
-                <div
-                  key={key}
-                  className="rounded-xl border border-[#4A1D6E]/15 bg-white p-5 dark:bg-neutral-900 dark:border-white/10"
+              {/* SIATKA FAKTÓW */}
+              <div className="relative mt-10 grid grid-cols-2 gap-4 lg:grid-cols-3">
+                {/* Bardzo subtelna dekoracyjna "sieć" łącząca karty w miejscach ich styku. */}
+                <svg
+                  className="pointer-events-none absolute inset-0 z-0 hidden h-full w-full lg:block"
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                  fill="none"
+                  aria-hidden="true"
                 >
-                  <p className="text-xs font-semibold tracking-widest uppercase text-[#4A1D6E] dark:text-purple-400">
-                    {tAbout(`cards.${key}.label`)}
-                  </p>
-                  <p className="mt-2 text-sm text-[#4A3360] dark:text-neutral-300">
-                    {tAbout(`cards.${key}.value`)}
-                  </p>
-                </div>
-              ))}
+                  <line x1="33.33" y1="6" x2="33.33" y2="94" stroke="#4A1D6E" strokeOpacity="0.12" strokeWidth="0.4" />
+                  <line x1="66.66" y1="6" x2="66.66" y2="94" stroke="#4A1D6E" strokeOpacity="0.12" strokeWidth="0.4" />
+                  <line x1="4" y1="50" x2="96" y2="50" stroke="#4A1D6E" strokeOpacity="0.12" strokeWidth="0.4" />
+                  {[
+                    [33.33, 6],
+                    [66.66, 6],
+                    [33.33, 50],
+                    [66.66, 50],
+                    [33.33, 94],
+                    [66.66, 94],
+                  ].map(([x, y], di) => (
+                    <circle key={di} cx={x} cy={y} r="0.9" fill="#4A1D6E" opacity="0.18" />
+                  ))}
+                </svg>
+                <svg
+                  className="pointer-events-none absolute inset-0 z-0 h-full w-full lg:hidden"
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <line x1="50" y1="4" x2="50" y2="96" stroke="#4A1D6E" strokeOpacity="0.12" strokeWidth="0.4" />
+                  <line x1="6" y1="33.33" x2="94" y2="33.33" stroke="#4A1D6E" strokeOpacity="0.12" strokeWidth="0.4" />
+                  <line x1="6" y1="66.66" x2="94" y2="66.66" stroke="#4A1D6E" strokeOpacity="0.12" strokeWidth="0.4" />
+                  {[
+                    [50, 33.33],
+                    [50, 66.66],
+                  ].map(([x, y], di) => (
+                    <circle key={di} cx={x} cy={y} r="0.9" fill="#4A1D6E" opacity="0.18" />
+                  ))}
+                </svg>
+
+                {aboutCards.map(({ key, Icon, variant }) => {
+                  const styles = ABOUT_CARD_VARIANT_CLASSES[variant];
+                  return (
+                    <div
+                      key={key}
+                      className={`relative z-10 rounded-xl p-4 shadow-sm ${styles.card}`}
+                    >
+                      <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${styles.iconWrap}`}>
+                        <Icon className={`h-4 w-4 ${styles.icon}`} />
+                      </div>
+                      <p className={`mt-3 text-xs font-bold tracking-wide uppercase ${styles.label}`}>
+                        {tAbout(`cards.${key}.label`)}
+                      </p>
+                      <p className={`mt-1.5 text-xs leading-snug ${styles.value}`}>
+                        {tAbout(`cards.${key}.value`)}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>

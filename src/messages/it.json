@@ -53,8 +53,8 @@
     "eyebrow": "Chi sono",
     "heading1": "Unire prospettive.",
     "heading2": "Comprendere la persona.",
-    "paragraph1": "Sono dottorando presso l'Istituto di Scienze Politiche e della Sicurezza dell'Università di Stettino e studente di psicologia. Da anni mi occupo di separatismo, sicurezza internazionale e della situazione nei Balcani occidentali — il principale ambito delle mie ricerche, che sviluppo nella tesi di dottorato. Parallelamente amplio i miei interessi verso la criminologia, la vittimologia e la psicologia della sicurezza, e mi sto formando in psicoterapia a orientamento integrativo-psicodinamico, incluso il metodo EMDR nel lavoro con il trauma.",
-    "paragraph2": "Unisco diversi ambiti del sapere e dell'esperienza per comprendere meglio la persona, le sue decisioni, i suoi comportamenti e i contesti in cui agisce.",
+    "paragraph1": "Sono dottorando presso l'Istituto di Scienze Politiche e della Sicurezza dell'Università di Stettino e studente di psicologia. Il mio principale ambito di ricerca è il separatismo, la sicurezza internazionale e i Balcani occidentali, accanto a un interesse crescente per criminologia e vittimologia.",
+    "paragraph2": "Mi sto inoltre formando in psicoterapia a orientamento integrativo-psicodinamico, incluso il metodo EMDR, unendo prospettive diverse per comprendere meglio le persone, le loro decisioni e i contesti in cui agiscono.",
     "moreLink": "Scopri di più su di me →",
     "cards": {
       "wyksztalcenie": {
@@ -65,9 +65,9 @@
         "label": "Dottorato",
         "value": "Istituto di Scienze Politiche e della Sicurezza, Università di Stettino"
       },
-      "specjalizacja": {
-        "label": "Ambito di ricerca",
-        "value": "Balcani occidentali, separatismo, sicurezza internazionale — inoltre: vittimologia, criminologia"
+      "badania": {
+        "label": "Ricerca",
+        "value": "Balcani occidentali, separatismo, sicurezza internazionale, oltre a vittimologia e criminologia"
       },
       "jezyki": {
         "label": "Lingue",
@@ -76,6 +76,10 @@
       "psychoterapiaCard": {
         "label": "Psicoterapia",
         "value": "Formazione a orientamento integrativo-psicodinamico con metodo EMDR (da settembre 2026)"
+      },
+      "obszaryLaczace": {
+        "label": "Ambiti che unisco",
+        "value": "Diritto · Psicologia · Sicurezza · Ricerca · Psicoterapia · Conoscenza · Pratica"
       }
     }
   },

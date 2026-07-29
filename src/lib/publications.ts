@@ -201,3 +201,68 @@ export const publications: Publication[] = [
 export function getPublicationBySlug(slug: string): Publication | undefined {
   return publications.find((p) => p.slug === slug);
 }
+
+const POLISH_MONTHS: Record<string, number> = {
+  styczen: 1,
+  styczeń: 1,
+  luty: 2,
+  marzec: 3,
+  kwiecien: 4,
+  kwiecień: 4,
+  maj: 5,
+  czerwiec: 6,
+  lipiec: 7,
+  sierpien: 8,
+  sierpień: 8,
+  wrzesien: 9,
+  wrzesień: 9,
+  pazdziernik: 10,
+  październik: 10,
+  listopad: 11,
+  grudzien: 12,
+  grudzień: 12,
+};
+
+/** Wyciąga porównywalną wartość (rok*100+miesiąc) z tekstu typu "luty 2027". Zwraca null, gdy nie da się rozpoznać. */
+function parseExpectedPublicationDate(value?: string): number | null {
+  if (!value) return null;
+  const lower = value.toLowerCase();
+  const yearMatch = lower.match(/\d{4}/);
+  if (!yearMatch) return null;
+  const year = Number(yearMatch[0]);
+  const monthWord = lower.match(/[a-ząćęłńóśźż]+/)?.[0];
+  const month = (monthWord && POLISH_MONTHS[monthWord]) || 0;
+  return year * 100 + month;
+}
+
+/**
+ * Wybiera 3 publikacje do sekcji "Ostatnie publikacje" na stronie głównej:
+ * - dwie najnowsze publikacje opublikowane (lub bez pola status), posortowane malejąco po roku,
+ * - na trzecie miejsce: najbardziej aktualna publikacja "w-trakcie" (jeśli taka istnieje),
+ *   a w przeciwnym razie trzecia najnowsza publikacja opublikowana.
+ */
+export function getFeaturedPublications(pubs: Publication[] = publications): Publication[] {
+  const isPublished = (p: Publication) => p.status === undefined || p.status === "opublikowana";
+
+  const published = pubs
+    .filter(isPublished)
+    .sort((a, b) => (b.year ?? -Infinity) - (a.year ?? -Infinity));
+
+  const inProgress = pubs.filter((p) => p.status === "w-trakcie");
+
+  const featured = published.slice(0, 2);
+
+  if (inProgress.length > 0) {
+    const [mostCurrent] = [...inProgress].sort((a, b) => {
+      const dateA = parseExpectedPublicationDate(a.expectedPublicationDate);
+      const dateB = parseExpectedPublicationDate(b.expectedPublicationDate);
+      if (dateA !== null && dateB !== null && dateA !== dateB) return dateB - dateA;
+      return pubs.indexOf(b) - pubs.indexOf(a);
+    });
+    featured.push(mostCurrent);
+  } else if (published[2]) {
+    featured.push(published[2]);
+  }
+
+  return featured;
+}

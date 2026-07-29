@@ -53,8 +53,8 @@
     "eyebrow": "O mnie",
     "heading1": "Połączenie perspektyw.",
     "heading2": "Zrozumienie człowieka.",
-    "paragraph1": "Jestem doktorantem w Instytucie Nauk o Polityce i Bezpieczeństwie Uniwersytetu Szczecińskiego oraz studentem psychologii. Od lat zajmuję się separatyzmem, bezpieczeństwem międzynarodowym i sytuacją na Bałkanach Zachodnich — to główny obszar moich badań, który rozwijam w pracy doktorskiej. Równolegle poszerzam swoje zainteresowania o kryminologię, wiktymologię i psychologię bezpieczeństwa, a także szkolę się w psychoterapii w nurcie integracyjno-psychodynamicznym, w tym metodą EMDR w pracy z traumą.",
-    "paragraph2": "Łączę różne dziedziny wiedzy i doświadczenia, aby lepiej rozumieć człowieka, jego decyzje, zachowania oraz konteksty, w których funkcjonuje.",
+    "paragraph1": "Jestem doktorantem w Instytucie Nauk o Polityce i Bezpieczeństwie Uniwersytetu Szczecińskiego oraz studentem psychologii. Głównym obszarem moich badań jest separatyzm, bezpieczeństwo międzynarodowe i Bałkany Zachodnie, a dodatkowo rozwijam się w kryminologii i wiktymologii.",
+    "paragraph2": "Szkolę się też w psychoterapii integracyjno-psychodynamicznej, w tym metodą EMDR, łącząc różne perspektywy, by lepiej rozumieć człowieka, jego decyzje i konteksty, w których funkcjonuje.",
     "moreLink": "Więcej o mnie →",
     "cards": {
       "wyksztalcenie": {
@@ -65,9 +65,9 @@
         "label": "Doktorat",
         "value": "Instytut Nauk o Polityce i Bezpieczeństwie, Uniwersytet Szczeciński"
       },
-      "specjalizacja": {
-        "label": "Specjalizacja badawcza",
-        "value": "Bałkany Zachodnie, separatyzm, bezpieczeństwo międzynarodowe — dodatkowo: wiktymologia, kryminologia"
+      "badania": {
+        "label": "Badania",
+        "value": "Bałkany Zachodnie, separatyzm, bezpieczeństwo międzynarodowe oraz wiktymologia i kryminologia"
       },
       "jezyki": {
         "label": "Języki",
@@ -76,6 +76,10 @@
       "psychoterapiaCard": {
         "label": "Psychoterapia",
         "value": "Szkolenie w nurcie integracyjno-psychodynamicznym z metodą EMDR (od września 2026)"
+      },
+      "obszaryLaczace": {
+        "label": "Obszary, które łączę",
+        "value": "Prawo · Psychologia · Bezpieczeństwo · Badania naukowe · Psychoterapia · Rozwój wiedzy · Praktyka"
       }
     }
   },
