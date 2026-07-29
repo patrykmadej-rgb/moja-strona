@@ -371,29 +371,18 @@ export default async function Home() {
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2">
             {/* ZDJĘCIE */}
-            <div className="relative isolate">
+            <div className="relative aspect-square overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5 dark:ring-white/10">
               <Image
-                src="/o-mnie-dekoracja.png"
-                alt=""
-                width={1254}
-                height={1254}
-                aria-hidden="true"
-                className="absolute -z-10 max-w-none object-cover pointer-events-none"
-                style={{ width: "118%", height: "118%", inset: "-9%" }}
+                src="/o-mnie-portret.png"
+                alt="Patryk Madej"
+                fill
+                className="object-cover"
               />
-              <div className="relative aspect-square overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5 dark:ring-white/10">
-                <Image
-                  src="/o-mnie-portret.png"
-                  alt="Patryk Madej"
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute bottom-6 left-6 rounded-xl bg-[#F5F1EC] px-4 py-3 shadow-lg dark:bg-neutral-900">
-                  <p className="font-bold text-[#1C1028] dark:text-white">Patryk Madej</p>
-                  <p className="mt-0.5 text-xs font-medium tracking-wide uppercase text-[#4A3360] dark:text-neutral-400">
-                    Badacz · Student psychologii · Prawnik
-                  </p>
-                </div>
+              <div className="absolute bottom-6 left-6 rounded-xl bg-[#F5F1EC] px-4 py-3 shadow-lg dark:bg-neutral-900">
+                <p className="font-bold text-[#1C1028] dark:text-white">Patryk Madej</p>
+                <p className="mt-0.5 text-xs font-medium tracking-wide uppercase text-[#4A3360] dark:text-neutral-400">
+                  Badacz · Student psychologii · Prawnik
+                </p>
               </div>
             </div>
 
