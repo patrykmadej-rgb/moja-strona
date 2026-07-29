@@ -16,15 +16,22 @@ const navLinks = [
   { href: "/wiedza", key: "wiedza" },
 ];
 
-// Warianty rozmieszczenia kropek/linii "konstelacji", przypisywane rotacyjnie do kolejnych linków
+// Kolory kropek/linii efektu "konstelacji" — mieszanka fioletu marki i ciepłego kremowo-złotego akcentu
+const CONSTELLATION_PURPLE = "#8B5CB8";
+const CONSTELLATION_WARM = "#E8D9B5";
+const CONSTELLATION_GRADIENT_FROM = "#6B3AA0";
+const CONSTELLATION_GRADIENT_TO = "#E8D9B5";
+
+// Warianty rozmieszczenia kropek/linii "konstelacji", przypisywane rotacyjnie do kolejnych linków.
+// Każdy wariant ma dokładnie jedną kropkę "central" (cieplejszy, większy "punkt świetlny" z poświatą).
 const constellationVariants = [
   {
     dots: [
-      [10, 8],
-      [30, 32],
-      [55, 6],
-      [75, 28],
-      [92, 14],
+      { x: 10, y: 8, warm: false },
+      { x: 30, y: 32, warm: true, central: true },
+      { x: 55, y: 6, warm: false },
+      { x: 75, y: 28, warm: false },
+      { x: 92, y: 14, warm: true },
     ],
     lines: [
       [10, 8, 30, 32],
@@ -36,10 +43,10 @@ const constellationVariants = [
   },
   {
     dots: [
-      [14, 30],
-      [38, 6],
-      [62, 26],
-      [88, 8],
+      { x: 14, y: 30, warm: false },
+      { x: 38, y: 6, warm: true, central: true },
+      { x: 62, y: 26, warm: false },
+      { x: 88, y: 8, warm: true },
     ],
     lines: [
       [14, 30, 38, 6],
@@ -50,9 +57,9 @@ const constellationVariants = [
   },
   {
     dots: [
-      [18, 10],
-      [50, 30],
-      [82, 12],
+      { x: 18, y: 10, warm: false },
+      { x: 50, y: 30, warm: true, central: true },
+      { x: 82, y: 12, warm: false },
     ],
     lines: [
       [18, 10, 50, 30],
@@ -103,6 +110,15 @@ export default async function Navbar() {
                   fill="none"
                   aria-hidden="true"
                 >
+                  <defs>
+                    <linearGradient id={`constellation-grad-${link.key}`} x1="0" y1="0" x2="100" y2="40" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stopColor={CONSTELLATION_GRADIENT_FROM} />
+                      <stop offset="100%" stopColor={CONSTELLATION_GRADIENT_TO} />
+                    </linearGradient>
+                    <filter id={`constellation-glow-${link.key}`} x="-100%" y="-100%" width="300%" height="300%">
+                      <feGaussianBlur stdDeviation="1.6" />
+                    </filter>
+                  </defs>
                   {variant.lines.map(([x1, y1, x2, y2], li) => (
                     <line
                       key={li}
@@ -110,18 +126,32 @@ export default async function Navbar() {
                       y1={y1}
                       x2={x2}
                       y2={y2}
-                      stroke="#6B3AA0"
+                      stroke={`url(#constellation-grad-${link.key})`}
                       strokeWidth="1.5"
                       opacity="0.65"
                     />
                   ))}
-                  {variant.dots.map(([cx, cy], di) => (
+                  {variant.dots.map(
+                    (dot, di) =>
+                      dot.central && (
+                        <circle
+                          key={`glow-${di}`}
+                          cx={dot.x}
+                          cy={dot.y}
+                          r="6"
+                          fill={CONSTELLATION_WARM}
+                          opacity="0.35"
+                          filter={`url(#constellation-glow-${link.key})`}
+                        />
+                      ),
+                  )}
+                  {variant.dots.map((dot, di) => (
                     <circle
                       key={di}
-                      cx={cx}
-                      cy={cy}
-                      r="2.5"
-                      fill="#6B3AA0"
+                      cx={dot.x}
+                      cy={dot.y}
+                      r={dot.central ? "3.5" : "2.5"}
+                      fill={dot.warm ? CONSTELLATION_WARM : CONSTELLATION_PURPLE}
                       opacity="0.6"
                       className="group-hover:animate-[pulse-dot_1.5s_ease-in-out_infinite]"
                       style={{ animationDelay: `${di * 0.2}s` }}
@@ -135,7 +165,7 @@ export default async function Navbar() {
         </div>
 
         {/* Przełącznik języka + przycisk KONTAKT / Panel */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-6">
           <LanguageSwitcher />
           {user ? (
             <div className="flex items-center gap-3">
