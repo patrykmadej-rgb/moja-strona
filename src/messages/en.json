@@ -142,7 +142,8 @@
     "english": "This publication is in English."
   },
   "PublicationDetail": {
-    "backToAll": "← All publications"
+    "backToAll": "← All publications",
+    "coAuthors": "Co-authors"
   },
   "PublicationStatus": {
     "inProgress": "Forthcoming",

@@ -142,7 +142,8 @@
     "english": "Ta publikacja jest w języku angielskim."
   },
   "PublicationDetail": {
-    "backToAll": "← Wszystkie publikacje"
+    "backToAll": "← Wszystkie publikacje",
+    "coAuthors": "Współautorzy"
   },
   "PublicationStatus": {
     "inProgress": "W trakcie publikacji",

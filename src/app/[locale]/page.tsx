@@ -51,6 +51,7 @@ export default async function Home() {
   const tQuote = await getTranslations("QuotePublications");
   const tAbout = await getTranslations("AboutMe");
   const tStatus = await getTranslations("PublicationStatus");
+  const tDetail = await getTranslations("PublicationDetail");
 
   return (
     <div>
@@ -250,6 +251,11 @@ export default async function Home() {
                       <p className="text-sm text-[#4A3360] dark:text-neutral-400">
                         {pub.year ?? (pub.status === "w-trakcie" ? tStatus("inPreparation") : "")}
                       </p>
+                      {pub.coAuthors && pub.coAuthors.length > 0 && (
+                        <p className="text-sm text-[#4A3360] dark:text-neutral-400">
+                          {tDetail("coAuthors")}: {pub.coAuthors.join(", ")}
+                        </p>
+                      )}
                       <p className="mt-2 text-sm font-semibold uppercase text-[#4A1D6E] transition-transform group-hover:translate-x-1 dark:text-purple-400">
                         {tQuote("readMore")}
                       </p>

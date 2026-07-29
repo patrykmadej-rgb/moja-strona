@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 
 export default async function PublikacjePage() {
   const tStatus = await getTranslations("PublicationStatus");
+  const tDetail = await getTranslations("PublicationDetail");
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-20">
@@ -47,6 +48,11 @@ export default async function PublikacjePage() {
                   <p className="mt-1 text-sm text-[#4A3360] dark:text-neutral-400">
                     {pub.venue} · {pub.year ?? (pub.status === "w-trakcie" ? tStatus("inPreparation") : "")}
                   </p>
+                  {pub.coAuthors && pub.coAuthors.length > 0 && (
+                    <p className="mt-0.5 text-sm text-[#4A3360] dark:text-neutral-400">
+                      {tDetail("coAuthors")}: {pub.coAuthors.join(", ")}
+                    </p>
+                  )}
                 </div>
                 <span className="mt-1 shrink-0 text-[#4A1D6E] opacity-0 group-hover:opacity-100 transition-opacity dark:text-purple-400">
                   →
