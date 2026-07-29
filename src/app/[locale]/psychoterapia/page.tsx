@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import { siteConfig } from "@/lib/site-config";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,19 +25,19 @@ export default async function PsychoterapiaPage() {
       {/* HERO */}
       <section className="relative">
         {/* Desktop / tablet: pełne tło na całą szerokość ekranu, tekst nałożony */}
-        <div className="relative left-[calc(-50vw+50%)] hidden w-screen lg:block lg:min-h-[480px]">
+        <div className="relative left-[calc(-50vw+50%)] hidden w-screen lg:block lg:min-h-[560px]">
           <Image
             src="/psychoterapia-hero.png"
             alt="Ilustracja przedstawiająca terapeutę i klientkę siedzących naprzeciw siebie, połączonych fioletową siecią neuronową"
             fill
             priority
-            className="z-0 object-cover object-top"
+            className="z-0 object-cover object-center"
           />
-          {/* Podkładka pod tekstem — jasny (kremowy) gradient od lewej, żeby ciemny tekst
-              zachował kontrast niezależnie od jasności grafiki w tym miejscu (tak jak na hero
-              strony głównej). */}
-          <div className="absolute inset-0 z-[5] bg-gradient-to-r from-[#F5F1EC] from-5% via-[#F5F1EC]/75 via-40% to-transparent to-70% dark:from-neutral-950 dark:via-neutral-950/75" />
-          <div className="relative z-10 flex lg:min-h-[480px] items-center">
+          {/* Podkładka pod tekstem — jasny (kremowy) gradient tylko w strefie, gdzie faktycznie
+              nakłada się tekst (lewa ~połowa), szybko zanikający, żeby reszta sceny (druga
+              postać + sieć neuronowa) została w pełni widoczna. */}
+          <div className="absolute inset-0 z-[5] bg-gradient-to-r from-[#F5F1EC] from-0% via-[#F5F1EC]/70 via-25% to-transparent to-48% dark:from-neutral-950 dark:via-neutral-950/70" />
+          <div className="relative z-10 flex lg:min-h-[560px] items-center">
             <div className="max-w-xl pl-16 py-16">
               <p
                 className="mb-4 text-xs font-semibold tracking-[0.15em] uppercase text-[#4A1D6E] dark:text-purple-400"
@@ -58,14 +57,6 @@ export default async function PsychoterapiaPage() {
               >
                 {t("intro")}
               </p>
-              <div className="mt-8">
-                <Link
-                  href="/kontakt"
-                  className="inline-block rounded-full bg-[#4A1D6E] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
-                >
-                  {t("ctaKontakt")}
-                </Link>
-              </div>
             </div>
           </div>
         </div>
@@ -81,14 +72,6 @@ export default async function PsychoterapiaPage() {
           <p className="mt-5 text-lg leading-relaxed text-[#4A3360] dark:text-neutral-300">
             {t("intro")}
           </p>
-          <div className="mt-8">
-            <Link
-              href="/kontakt"
-              className="inline-block rounded-full bg-[#4A1D6E] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
-            >
-              {t("ctaKontakt")}
-            </Link>
-          </div>
           <div className="mt-10">
             <Image
               src="/psychoterapia-hero.png"

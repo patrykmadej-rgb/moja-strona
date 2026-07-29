@@ -55,17 +55,19 @@ const ABOUT_NETWORK_BRANCHES_SM: { x1: number; y1: number; x2: number; y2: numbe
 // żeby sieć wizualnie wykraczała poza kafelki. Wymaga overflow-visible na <svg>,
 // bo współrzędne celowo wychodzą poza viewBox. Długości i kąty celowo różne
 // (nie lustrzane), żeby uniknąć sztywnej symetrii.
+// Górne czułki celowo krótsze niż dolne — powyżej siatki jest przycisk "Więcej o mnie"
+// (mt-5, niewielki odstęp), więc sieć nie może sięgać zbyt wysoko, żeby na niego nie nachodzić.
 const ABOUT_NETWORK_TENDRILS_LG: { x1: number; y1: number; x2: number; y2: number; color: string }[] = [
-  { x1: 68, y1: 9, x2: 18, y2: -27, color: NETWORK_PURPLE },
-  { x1: 143, y1: 5, x2: 193, y2: -13, color: "#E8D9B5" },
+  { x1: 68, y1: 9, x2: 26, y2: -10, color: NETWORK_PURPLE },
+  { x1: 143, y1: 5, x2: 178, y2: -6, color: "#E8D9B5" },
   { x1: 73, y1: 89, x2: 15, y2: 114, color: "#E8D9B5" },
   { x1: 136, y1: 95, x2: 188, y2: 128, color: NETWORK_PURPLE },
   { x1: 158, y1: 74, x2: 204, y2: 92, color: NETWORK_PURPLE_DEEP },
 ];
 
 const ABOUT_NETWORK_TENDRILS_SM: { x1: number; y1: number; x2: number; y2: number; color: string }[] = [
-  { x1: 42, y1: 5, x2: 11, y2: -21, color: NETWORK_PURPLE },
-  { x1: 42, y1: 5, x2: 80, y2: -12, color: "#E8D9B5" },
+  { x1: 42, y1: 5, x2: 20, y2: -8, color: NETWORK_PURPLE },
+  { x1: 42, y1: 5, x2: 68, y2: -5, color: "#E8D9B5" },
   { x1: 47, y1: 96, x2: 9, y2: 118, color: "#E8D9B5" },
   { x1: 47, y1: 96, x2: 82, y2: 111, color: NETWORK_PURPLE },
 ];
@@ -98,37 +100,21 @@ const areas = [
   "AI i analiza danych",
 ];
 
-const aboutCards: {
-  key: string;
-  Icon: LucideIcon;
-  variant: "default" | "light";
-}[] = [
-  { key: "wyksztalcenie", Icon: GraduationCap, variant: "default" },
-  { key: "doktorat", Icon: Shield, variant: "light" },
-  { key: "badania", Icon: BarChart3, variant: "default" },
-  { key: "psychoterapiaCard", Icon: Brain, variant: "default" },
-  { key: "jezyki", Icon: Globe, variant: "default" },
-  { key: "obszaryLaczace", Icon: Share2, variant: "light" },
+const aboutCards: { key: string; Icon: LucideIcon }[] = [
+  { key: "wyksztalcenie", Icon: GraduationCap },
+  { key: "doktorat", Icon: Shield },
+  { key: "badania", Icon: BarChart3 },
+  { key: "psychoterapiaCard", Icon: Brain },
+  { key: "jezyki", Icon: Globe },
+  { key: "obszaryLaczace", Icon: Share2 },
 ];
 
-const ABOUT_CARD_VARIANT_CLASSES: Record<
-  "default" | "light",
-  { card: string; iconWrap: string; icon: string; label: string; value: string }
-> = {
-  default: {
-    card: "bg-white dark:bg-neutral-900",
-    iconWrap: "bg-[#EDE6F8] dark:bg-purple-900/30",
-    icon: "text-[#5C2D91] dark:text-purple-300",
-    label: "text-[#1C1028] dark:text-white",
-    value: "text-[#4A3360] dark:text-neutral-400",
-  },
-  light: {
-    card: "bg-[#EDE6F8] dark:bg-purple-900/20",
-    iconWrap: "bg-white/70 dark:bg-white/10",
-    icon: "text-[#5C2D91] dark:text-purple-200",
-    label: "text-[#1C1028] dark:text-white",
-    value: "text-[#4A3360] dark:text-neutral-400",
-  },
+const ABOUT_CARD_CLASSES = {
+  card: "bg-white dark:bg-neutral-900",
+  iconWrap: "bg-[#EDE6F8] dark:bg-purple-900/30",
+  icon: "text-[#5C2D91] dark:text-purple-300",
+  label: "text-[#1C1028] dark:text-white",
+  value: "text-[#4A3360] dark:text-neutral-400",
 };
 
 export default async function Home() {
@@ -160,7 +146,7 @@ export default async function Home() {
           <div className="relative z-10 flex lg:min-h-[600px] items-center">
             <div className="max-w-xl pl-16 pb-12">
               <p
-                className="mb-5 text-xs font-semibold tracking-[0.15em] uppercase text-[#4A1D6E] dark:text-purple-400"
+                className="mb-5 text-[11px] font-semibold tracking-[0.1em] uppercase text-[#4A1D6E] dark:text-purple-400"
                 style={{ textShadow: "0 1px 12px rgba(245,241,236,0.9)" }}
               >
                 {tNav("tagline")}
@@ -196,7 +182,7 @@ export default async function Home() {
 
         {/* Mobile: prosty układ pionowy, bez nakładki */}
         <div className="px-6 py-16 lg:hidden">
-          <p className="mb-5 text-xs font-semibold tracking-[0.15em] uppercase text-[#4A1D6E] dark:text-purple-400">
+          <p className="mb-5 text-[8px] font-semibold tracking-[0.03em] uppercase text-[#4A1D6E] sm:text-[10px] sm:tracking-[0.08em] md:text-[11px] md:tracking-[0.1em] dark:text-purple-400">
             {tNav("tagline")}
           </p>
           <h1 className="text-5xl leading-tight font-bold tracking-tight text-[#1C1028] dark:text-white">
@@ -314,48 +300,48 @@ export default async function Home() {
                 {recentPublications.map((pub) => {
                   const Icon = publicationIcons[pub.slug] ?? FileText;
                   const thumb = pub.coverImageThumb ?? pub.coverImage;
+                  const meta = [pub.type, pub.year ?? (pub.status === "w-trakcie" ? tStatus("inPreparation") : "")]
+                    .filter(Boolean)
+                    .join(" · ");
                   return (
                     <Link
                       key={pub.slug}
                       href={`/publikacje/${pub.slug}`}
-                      className="group"
+                      className="group flex items-start gap-4"
                     >
-                      <div className="relative">
-                        {thumb ? (
-                          <div className="relative aspect-square overflow-hidden rounded-xl">
-                            <Image
-                              src={thumb}
-                              alt={pub.title}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                        ) : (
-                          <div className="flex aspect-square items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#4A1D6E]">
-                            <Icon className="h-16 w-16 text-white" />
-                          </div>
-                        )}
-                        {pub.status === "w-trakcie" && (
-                          <PublicationStatusBadge className="absolute top-2 right-2 shadow-sm" />
-                        )}
-                      </div>
-                      <p className="mt-2 line-clamp-2 text-base font-bold text-[#1C1028] dark:text-white">
-                        {pub.title}
-                      </p>
-                      <p className="mt-1 text-sm text-[#4A3360] dark:text-neutral-400">
-                        {pub.type}
-                      </p>
-                      <p className="text-sm text-[#4A3360] dark:text-neutral-400">
-                        {pub.year ?? (pub.status === "w-trakcie" ? tStatus("inPreparation") : "")}
-                      </p>
-                      {pub.coAuthors && pub.coAuthors.length > 0 && (
-                        <p className="text-sm text-[#4A3360] dark:text-neutral-400">
-                          {tDetail("coAuthors")}: {pub.coAuthors.join(", ")}
-                        </p>
+                      {thumb ? (
+                        <div className="relative aspect-square w-20 shrink-0 overflow-hidden rounded-xl sm:w-24">
+                          <Image
+                            src={thumb}
+                            alt={pub.title}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex aspect-square w-20 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#4A1D6E] sm:w-24">
+                          <Icon className="h-8 w-8 text-white" />
+                        </div>
                       )}
-                      <p className="mt-2 text-sm font-semibold uppercase text-[#4A1D6E] transition-transform group-hover:translate-x-1 dark:text-purple-400">
-                        {tQuote("readMore")}
-                      </p>
+                      <div className="min-w-0 flex-1">
+                        {pub.status === "w-trakcie" && (
+                          <PublicationStatusBadge className="mb-1.5" />
+                        )}
+                        <p className="line-clamp-2 text-base font-bold text-[#1C1028] dark:text-white">
+                          {pub.title}
+                        </p>
+                        <p className="mt-1 text-sm text-[#4A3360] dark:text-neutral-400">
+                          {meta}
+                        </p>
+                        {pub.coAuthors && pub.coAuthors.length > 0 && (
+                          <p className="mt-0.5 text-sm text-[#4A3360] dark:text-neutral-400">
+                            {tDetail("coAuthors")}: {pub.coAuthors.join(", ")}
+                          </p>
+                        )}
+                        <p className="mt-2 text-sm font-semibold uppercase text-[#4A1D6E] transition-transform group-hover:translate-x-1 dark:text-purple-400">
+                          {tQuote("readMore")}
+                        </p>
+                      </div>
                     </Link>
                   );
                 })}
@@ -401,7 +387,7 @@ export default async function Home() {
               </p>
               <Link
                 href="/#o-mnie"
-                className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#4A1D6E] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
+                className="relative z-20 mt-5 inline-flex items-center gap-2 rounded-full bg-[#4A1D6E] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
               >
                 {tAbout("moreLink")}
               </Link>
@@ -573,8 +559,8 @@ export default async function Home() {
                   ))}
                 </svg>
 
-                {aboutCards.map(({ key, Icon, variant }) => {
-                  const styles = ABOUT_CARD_VARIANT_CLASSES[variant];
+                {aboutCards.map(({ key, Icon }) => {
+                  const styles = ABOUT_CARD_CLASSES;
                   return (
                     <div
                       key={key}
