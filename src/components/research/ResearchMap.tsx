@@ -101,7 +101,7 @@ export default function ResearchMap({
         ref={ref}
         role="group"
         aria-label={labels.mapAriaLabel}
-        className="relative mx-auto hidden aspect-[900/520] w-full max-w-[560px] min-[720px]:block lg:max-w-none"
+        className="@container relative mx-auto hidden aspect-[900/520] w-full min-[720px]:block"
       >
         {/* Warstwa 1: tło — bez twardej ramki/karty; maska radialna rozmywa krawędzie
             tak, żeby akwarela organicznie wtapiała się w tło strony (fallback
@@ -120,7 +120,7 @@ export default function ResearchMap({
               fill
               priority
               loading="eager"
-              sizes="(min-width: 1024px) 560px, (min-width: 720px) 560px, 100vw"
+              sizes="(min-width: 720px) 45vw, 100vw"
               aria-hidden="true"
               className="object-cover"
             />
@@ -231,8 +231,10 @@ export default function ResearchMap({
               className="group absolute flex flex-col items-center gap-1 rounded-research-md p-1.5 text-center outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2 focus-visible:ring-[var(--research-gold)]"
             >
               <span
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--research-paper)]"
+                className="flex items-center justify-center rounded-full bg-[var(--research-paper)]"
                 style={{
+                  width: "clamp(30px, 8cqw, 52px)",
+                  height: "clamp(30px, 8cqw, 52px)",
                   border: "1.5px solid",
                   borderColor: isFocused ? "var(--research-gold)" : "var(--research-amethyst)",
                   boxShadow: isFocused ? "0 0 0 5px rgba(195,154,59,.12)" : undefined,
@@ -240,9 +242,12 @@ export default function ResearchMap({
                   transition: "border-color 250ms var(--research-ease), box-shadow 250ms var(--research-ease), color 250ms var(--research-ease)",
                 }}
               >
-                <Icon className="h-4 w-4" />
+                <Icon style={{ width: "clamp(15px, 4cqw, 26px)", height: "clamp(15px, 4cqw, 26px)" }} />
               </span>
-              <span className="max-w-[6.5rem] text-[10px] leading-tight font-semibold text-[var(--research-plum-800)] dark:text-white">
+              <span
+                className="max-w-[9rem] leading-tight font-semibold text-[var(--research-plum-800)] dark:text-white"
+                style={{ fontSize: "clamp(10px, 2.2cqw, 13px)" }}
+              >
                 {axis.shortTitle}
               </span>
             </button>

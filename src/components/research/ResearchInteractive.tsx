@@ -82,18 +82,20 @@ export default function ResearchInteractive({ heroLeft, axes, currentWork, hasBa
 
   return (
     <>
-      <section className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-6 pt-14 pb-8 min-[720px]:grid-cols-2 min-[720px]:pt-20">
-        {heroLeft}
-        <ResearchMap
-          axes={axes}
-          activeAxis={activeAxis}
-          hoveredAxis={hoveredAxis}
-          onSelect={selectAxis}
-          onHover={setHoveredAxis}
-          onSeeRelated={seeRelated}
-          labels={labels}
-          hasBackgroundImage={hasBackgroundImage}
-        />
+      <section className="mx-auto flex max-w-6xl flex-col items-center gap-10 px-6 pt-14 pb-8 min-[720px]:flex-row min-[720px]:items-center min-[720px]:gap-8 min-[720px]:pt-20">
+        <div className="w-full shrink-0 min-[720px]:max-w-[360px]">{heroLeft}</div>
+        <div className="w-full min-[720px]:flex-1">
+          <ResearchMap
+            axes={axes}
+            activeAxis={activeAxis}
+            hoveredAxis={hoveredAxis}
+            onSelect={selectAxis}
+            onHover={setHoveredAxis}
+            onSeeRelated={seeRelated}
+            labels={labels}
+            hasBackgroundImage={hasBackgroundImage}
+          />
+        </div>
       </section>
 
       <ResearchAxisCards

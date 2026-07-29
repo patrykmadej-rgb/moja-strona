@@ -107,11 +107,13 @@ function AxisCard({
         </span>
       </div>
 
-      <p className={`mt-4 text-lg font-bold ${isActive && isDeepVariant ? "text-white" : "text-[#1C1028] dark:text-white"}`}>
+      <p
+        className={`mt-4 line-clamp-3 text-base font-bold leading-snug ${isActive && isDeepVariant ? "text-white" : "text-[#1C1028] dark:text-white"}`}
+      >
         {axis.title}
       </p>
       <p
-        className={`mt-2 line-clamp-4 text-sm leading-relaxed ${
+        className={`mt-2 line-clamp-3 text-sm leading-relaxed ${
           isActive && isDeepVariant ? "text-white/75" : "text-[#4A3360] dark:text-neutral-300"
         }`}
       >
@@ -187,7 +189,11 @@ export default function ResearchAxisCards({
             key={axis.id}
             axis={axis}
             index={index}
-            isActive={activeAxis === axis.id}
+            // Zanim użytkownik cokolwiek wybierze (activeAxis === null), pierwsza
+            // karta (01 — Bałkany) ma domyślnie wygląd .is-active, zgodnie z
+            // mockupem — czysto wizualnie, nie otwiera panelu ani nie podświetla
+            // węzła mapy (te trzymają się prawdziwego activeAxis, patrz niżej).
+            isActive={activeAxis !== null ? activeAxis === axis.id : index === 0}
             isFocused={(hoveredAxis ?? activeAxis) === axis.id}
             onSelect={() => onSelect(axis.id)}
             onHover={(v) => onHover(v ? axis.id : null)}
