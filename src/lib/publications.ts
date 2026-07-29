@@ -10,6 +10,7 @@ export type Publication = {
   href?: string;
   pdfUrl?: string;
   externalLinks?: { label: string; href: string }[];
+  coverImage?: string;
 };
 
 export const publications: Publication[] = [

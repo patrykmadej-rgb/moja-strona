@@ -151,32 +151,121 @@ export default function Home() {
 
       {/* PIĘĆ FILARÓW */}
       <section className="relative">
-        <div className="relative left-[calc(-50vw+50%)] w-screen bg-[#EAE5DE] py-12 dark:bg-neutral-900">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+        <div className="relative left-[calc(-50vw+50%)] w-screen bg-[#EAE5DE] py-10 dark:bg-neutral-900">
+          <div className="grid grid-cols-2 gap-y-8 md:grid-cols-3 lg:grid-cols-5">
             {pillars.map((pillar, i) => (
               <Link
                 key={pillar.href}
                 href={pillar.href}
-                className={`group px-6 transition-opacity hover:opacity-80 md:px-8 ${
+                className={`group flex flex-row items-start gap-4 px-6 py-0 transition-opacity hover:opacity-80 md:px-8 ${
                   i < pillars.length - 1
                     ? "lg:border-r lg:border-black/10 dark:lg:border-white/10"
                     : ""
                 }`}
               >
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#2E1A42]">
-                  <pillar.Icon className="h-6 w-6 text-white" />
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#2E1A42]">
+                  <pillar.Icon className="h-5 w-5 text-white" />
                 </div>
-                <p className="mt-4 text-sm font-bold tracking-wide uppercase text-[#1C1028] dark:text-white">
-                  {pillar.label}
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-[#4A3360] dark:text-neutral-300">
-                  {pillar.description}
-                </p>
-                <p className="mt-4 text-[#5C2D91] transition-transform group-hover:translate-x-1 dark:text-purple-400">
-                  →
-                </p>
+                <div className="flex-1 text-left">
+                  <p className="text-sm font-bold tracking-wide uppercase text-[#1C1028] dark:text-white">
+                    {pillar.label}
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-[#4A3360] dark:text-neutral-300">
+                    {pillar.description}
+                  </p>
+                  <p className="mt-4 text-[#5C2D91] transition-transform group-hover:translate-x-1 dark:text-purple-400">
+                    →
+                  </p>
+                </div>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CYTAT + OSTATNIE PUBLIKACJE */}
+      <section className="border-t border-[#5C2D91]/10 bg-[#F5F1EC] py-16 dark:border-white/10 dark:bg-neutral-950">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_2fr]">
+            {/* CYTAT */}
+            <div>
+              <p className="text-6xl leading-none text-[#5C2D91] dark:text-purple-400">
+                &ldquo;
+              </p>
+              <p className="mt-2 text-xl leading-relaxed italic text-[#1C1028] lg:text-2xl dark:text-white">
+                Zrozumieć człowieka w jego historii, kontekście i relacjach – to pierwszy krok do realnej zmiany.
+              </p>
+              <div className="mt-6">
+                <Image
+                  src="/podpis.png"
+                  alt="Patryk Madej"
+                  width={160}
+                  height={40}
+                  className="h-8 w-auto object-contain"
+                />
+                <p className="mt-2 text-sm tracking-widest uppercase text-[#4A3360] dark:text-neutral-400">
+                  Patryk Madej
+                </p>
+              </div>
+            </div>
+
+            {/* OSTATNIE PUBLIKACJE */}
+            <div>
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-lg font-bold uppercase text-[#1C1028] dark:text-white">
+                    Ostatnie publikacje
+                  </p>
+                  <div className="mt-2 h-1 w-12 bg-[#5C2D91]" />
+                </div>
+                <Link
+                  href="/publikacje"
+                  className="text-sm font-semibold uppercase text-[#5C2D91] hover:underline dark:text-purple-400"
+                >
+                  Zobacz wszystkie →
+                </Link>
+              </div>
+
+              <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+                {recentPublications.map((pub) => {
+                  const Icon = publicationIcons[pub.slug] ?? FileText;
+                  return (
+                    <Link
+                      key={pub.slug}
+                      href={`/publikacje/${pub.slug}`}
+                      className="group"
+                    >
+                      {pub.coverImage ? (
+                        <div className="relative aspect-square overflow-hidden rounded-xl">
+                          <Image
+                            src={pub.coverImage}
+                            alt={pub.title}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex aspect-square items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#5C2D91]">
+                          <Icon className="h-16 w-16 text-white" />
+                        </div>
+                      )}
+                      <p className="mt-3 line-clamp-2 text-base font-bold text-[#1C1028] dark:text-white">
+                        {pub.title}
+                      </p>
+                      <p className="mt-1 text-sm text-[#4A3360] dark:text-neutral-400">
+                        {pub.type}
+                      </p>
+                      <p className="text-sm text-[#4A3360] dark:text-neutral-400">
+                        {pub.year}
+                      </p>
+                      <p className="mt-3 text-sm font-semibold uppercase text-[#5C2D91] transition-transform group-hover:translate-x-1 dark:text-purple-400">
+                        Czytaj więcej →
+                      </p>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -253,82 +342,6 @@ export default function Home() {
                   <p className="mt-2 text-sm text-[#4A3360] dark:text-neutral-300">{item.value}</p>
                 </div>
               ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CYTAT + OSTATNIE PUBLIKACJE */}
-      <section className="border-t border-[#5C2D91]/10 bg-[#F5F1EC] py-16 dark:border-white/10 dark:bg-neutral-950">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_2fr]">
-            {/* CYTAT */}
-            <div>
-              <p className="text-6xl leading-none text-[#5C2D91] dark:text-purple-400">
-                &ldquo;
-              </p>
-              <p className="mt-2 text-xl leading-relaxed italic text-[#1C1028] lg:text-2xl dark:text-white">
-                Zrozumieć człowieka w jego historii, kontekście i relacjach – to pierwszy krok do realnej zmiany.
-              </p>
-              <div className="mt-6">
-                <Image
-                  src="/podpis.png"
-                  alt="Patryk Madej"
-                  width={160}
-                  height={40}
-                  className="h-8 w-auto object-contain"
-                />
-                <p className="mt-2 text-sm tracking-widest uppercase text-[#4A3360] dark:text-neutral-400">
-                  Patryk Madej
-                </p>
-              </div>
-            </div>
-
-            {/* OSTATNIE PUBLIKACJE */}
-            <div>
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-lg font-bold uppercase text-[#1C1028] dark:text-white">
-                    Ostatnie publikacje
-                  </p>
-                  <div className="mt-2 h-1 w-12 bg-[#5C2D91]" />
-                </div>
-                <Link
-                  href="/publikacje"
-                  className="text-sm font-semibold uppercase text-[#5C2D91] hover:underline dark:text-purple-400"
-                >
-                  Zobacz wszystkie →
-                </Link>
-              </div>
-
-              <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-                {recentPublications.map((pub) => {
-                  const Icon = publicationIcons[pub.slug] ?? FileText;
-                  return (
-                    <Link
-                      key={pub.slug}
-                      href={`/publikacje/${pub.slug}`}
-                      className="group"
-                    >
-                      <div className="flex aspect-square items-center justify-center rounded-xl bg-gradient-to-br from-[#2E1A42] to-[#5C2D91]">
-                        <Icon className="h-16 w-16 text-white" />
-                      </div>
-                      <p className="mt-3 line-clamp-2 text-base font-bold text-[#1C1028] dark:text-white">
-                        {pub.title}
-                      </p>
-                      <p className="mt-1 text-sm text-[#4A3360] dark:text-neutral-400">
-                        {pub.type}
-                      </p>
-                      <p className="text-sm text-[#4A3360] dark:text-neutral-400">
-                        {pub.year}
-                      </p>
-                      <p className="mt-3 text-sm font-semibold uppercase text-[#5C2D91] transition-transform group-hover:translate-x-1 dark:text-purple-400">
-                        Czytaj więcej →
-                      </p>
-                    </Link>
-                  );
-                })}
-              </div>
             </div>
           </div>
         </div>
