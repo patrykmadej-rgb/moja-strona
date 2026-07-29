@@ -61,6 +61,11 @@ export const publications: Publication[] = [
     abstractEn:
       "The article examines the political significance of language in contemporary Europe and the tension between national tendencies and the integration-oriented policy of the European Union. Using language requirements in citizenship procedures as an example, it demonstrates that language may serve both as an instrument of social integration and as a barrier restricting access to full citizenship rights. The second area of analysis concerns the European Union's multilingualism, founded on the principle of equal treatment of the official languages of its Member States. The article discusses the practical consequences of this model, including problems caused by discrepancies between different language versions of EU law. By comparing national language policies with the approach adopted by European institutions, the article presents language as an important dimension of disputes concerning identity, sovereignty, equality and the future shape of European integration.",
     tags: ["język", "nacjonalizm", "globalizacja", "Europa"],
+    externalLinks: [
+      { label: "CEJSH", href: "https://cejsh.icm.edu.pl/cejsh/element/bwmeta1.element.ojs-doi-10_15804_rop201606" },
+      { label: "CEEOL", href: "https://www.ceeol.com/search/article-detail?id=563178" },
+    ],
+    pdfUrl: "/publikacje/languages-tool-nationalists-2016.pdf",
   },
   {
     slug: "recenzja-olszewski-spotkania-2015",
