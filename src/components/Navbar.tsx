@@ -73,7 +73,7 @@ export default async function Navbar() {
           ) : (
             <Link
               href="/kontakt"
-              className="flex items-center gap-2 rounded-lg bg-[#5C2D91] px-5 py-2.5 text-xs font-semibold tracking-widest uppercase text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
+              className="flex items-center gap-2 rounded-none bg-[#5C2D91] px-5 py-2.5 text-xs font-semibold tracking-widest uppercase text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
             >
               Kontakt
               <Mail className="h-4 w-4" />
