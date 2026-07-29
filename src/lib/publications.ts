@@ -35,6 +35,8 @@ export const publications: Publication[] = [
     type: "Rozdział w monografii",
     abstractPl: "",
     tags: ["separatyzm", "Cypr", "regionalizm"],
+    coverImage: "/publications/separatyzm-cypryjski-2019.png",
+    coverImageThumb: "/publications/separatyzm-cypryjski-2019-miniatura.png",
   },
   {
     slug: "recenzja-grosse-pokryzysowa-europa-2018",
