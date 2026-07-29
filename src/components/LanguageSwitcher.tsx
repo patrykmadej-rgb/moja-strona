@@ -91,7 +91,11 @@ export default function LanguageSwitcher() {
 
         return (
           <span key={l} className="flex items-center gap-1">
-            <span className="group relative inline-block">
+            {/* isolate + transform wymuszają na Safari, żeby ten span był jednoznacznym
+                "containing block" dla absolutnie pozycjonowanego SVG poniżej — inaczej
+                w połączeniu z position:sticky + backdrop-blur na <header> (WebKit) potrafi
+                pozycjonować SVG względem okna przeglądarki zamiast tego rodzica. */}
+            <span className="group relative isolate inline-block [transform:translateZ(0)]">
               <svg
                 className={`pointer-events-none absolute ${insetClass} z-0 scale-75 opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100`}
                 viewBox="0 0 100 100"
