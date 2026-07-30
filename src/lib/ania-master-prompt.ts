@@ -8,7 +8,6 @@ VISUAL STYLE — FOLLOW EXACTLY:
 - Background: warm cream-to-champagne gradient, soft and perfectly clean — NO visible grain, NO pixelation, NO moiré pattern, NO compression artifacts, ultra-smooth, high resolution
 - A thin gold horizontal line sits in the lower third of the frame, like the edge of a table, separating "stage" from background
 - Blurred gold coins in soft bokeh focus, upper-right corner of the frame
-- Optional subtle sparkle/star accent in a lower corner
 
 TYPOGRAPHY — FOLLOW EXACTLY:
 - Headline: bold serif font, aligned upper-left, dark navy-almost-black color (never pure black)
