@@ -10,7 +10,9 @@ import VersionsTab from "@/components/lab/VersionsTab";
 import SourcesTab from "@/components/lab/SourcesTab";
 import ScheduleTab from "@/components/lab/ScheduleTab";
 import NotesTab from "@/components/lab/NotesTab";
+import FilesTab from "@/components/lab/FilesTab";
 import { formatDate } from "@/lib/lab/format";
+import type { ArticleFile } from "@/lib/article-files";
 import type { Article, ArticleEvent, ArticleNote, ArticleSource, ArticleVersion } from "@/lib/lab/types";
 
 type TabKey = "przeglad" | "wersje" | "zrodla" | "harmonogram" | "notatki" | "pliki";
@@ -21,7 +23,7 @@ const TABS: { key: TabKey; label: string; enabled: boolean }[] = [
   { key: "zrodla", label: "Źródła", enabled: true },
   { key: "harmonogram", label: "Harmonogram", enabled: true },
   { key: "notatki", label: "Notatki", enabled: true },
-  { key: "pliki", label: "Pliki", enabled: false },
+  { key: "pliki", label: "Pliki", enabled: true },
 ];
 
 export default function ArticleWorkspace({
@@ -30,12 +32,14 @@ export default function ArticleWorkspace({
   sources,
   events,
   notes,
+  files,
 }: {
   article: Article;
   versions: (ArticleVersion & { signedUrl: string | null })[];
   sources: ArticleSource[];
   events: ArticleEvent[];
   notes: ArticleNote[];
+  files: ArticleFile[];
 }) {
   const [tab, setTab] = useState<TabKey>("przeglad");
   const [editing, setEditing] = useState(false);
@@ -123,11 +127,7 @@ export default function ArticleWorkspace({
             {tab === "zrodla" && <SourcesTab articleId={article.id} sources={sources} />}
             {tab === "harmonogram" && <ScheduleTab articleId={article.id} events={events} />}
             {tab === "notatki" && <NotesTab articleId={article.id} notes={notes} />}
-            {tab === "pliki" && (
-              <div className="border border-[#4A1D6E]/15 bg-white px-6 py-14 text-center">
-                <p className="text-sm text-[#4A3360]">Ta funkcja pojawi się wkrótce.</p>
-              </div>
-            )}
+            {tab === "pliki" && <FilesTab articleId={article.id} files={files} />}
           </div>
         </>
       )}
