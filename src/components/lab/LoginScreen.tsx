@@ -3,6 +3,7 @@
 import { useFormStatus } from "react-dom";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { loginLab } from "@/app/lab/actions";
 
 function SubmitButton() {
@@ -24,16 +25,24 @@ export default function LoginScreen() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#F5F1EC] px-6">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-md">
+        <Link
+          href="/"
+          className="mb-6 inline-block text-xs text-[#4A3360] hover:underline"
+        >
+          ← Wróć na patrykmadej.com
+        </Link>
         <Image
           src="/lab/lab-logo.png"
           alt="Pm.lab"
           width={1536}
           height={1024}
           priority
-          className="mx-auto h-auto w-full max-w-[300px]"
+          className="mx-auto h-auto w-full max-w-[400px]"
         />
-        <p className="mt-1 text-xs text-[#4A3360]">Panel prywatny — dostęp tylko dla właściciela.</p>
+        <p className="mt-1 text-center text-xs text-[#4A3360]">
+          Panel prywatny — dostęp tylko dla właściciela.
+        </p>
 
         <form action={loginLab} className="mt-8 flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
