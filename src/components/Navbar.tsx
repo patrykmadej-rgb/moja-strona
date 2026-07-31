@@ -87,9 +87,9 @@ export default async function Navbar() {
         <Image
           src="/lab/lab-flask-icon.png"
           alt=""
-          width={51}
-          height={49}
-          className="h-[49px] w-auto"
+          width={35}
+          height={34}
+          className="h-[34px] w-auto"
         />
       </NextLink>
       <nav className="mx-auto flex max-w-6xl items-center justify-between py-4 pl-6 pr-24">
