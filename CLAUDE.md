@@ -298,10 +298,16 @@ i Manrope (reszta interfejsu), zaimportowane lokalnie tylko w
 - [ ] **Uruchomić migrację `supabase/migrations/001_lab_schema.sql`** i
       utworzyć prywatny bucket `article-versions` — bez tego `/lab` nie
       zadziała w pełni (patrz dokładne kroki na końcu, w podsumowaniu zadania)
-- [ ] **Zweryfikować logowanie na produkcji** — sprawdzić, czy Supabase działa
-      pod domeną patrykmadej.com (nie tylko na localhost i .vercel.app)
-- [ ] **Sprawdzić domenę** — czy `https://patrykmadej.com` już się otwiera
-      (może być kwestia propagacji DNS lub certyfikatu SSL)
+- [x] **Zweryfikować logowanie na produkcji** — potwierdzone działające na
+      patrykmadej.com. Wcześniej występował błąd 404 "Invalid path specified
+      in request URL" — przyczyną była zmienna `NEXT_PUBLIC_SUPABASE_URL`
+      w Vercel Environment Variables ustawiona na "REST API URL"
+      (`.../rest/v1/`) zamiast na sam adres projektu (`https://xxxx.supabase.co`,
+      bez ścieżki). Jeśli błąd 404 przy logowaniu wróci, sprawdź tę zmienną
+      w pierwszej kolejności — i pamiętaj, że zmiany `NEXT_PUBLIC_*` w Vercelu
+      wymagają ręcznego Redeploy, samo zapisanie nie wystarczy (są "wypiekane"
+      w build).
+- [x] **Sprawdzić domenę** — `https://patrykmadej.com` działa
 
 ### Treść
 
