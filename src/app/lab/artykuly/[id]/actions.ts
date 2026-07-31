@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { ARTICLE_STATUSES, READING_STATUSES } from "@/lib/lab/types";
+import { ARTICLE_STATUSES, READING_STATUSES, EVENT_TYPES, type EventType } from "@/lib/lab/types";
 
 const VERSIONS_BUCKET = "article-versions";
 
@@ -193,6 +193,96 @@ export async function deleteSource(formData: FormData) {
   const sourceId = String(formData.get("id") ?? "");
 
   const { error } = await supabase.from("article_sources").delete().eq("id", sourceId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/artykuly/${articleId}`);
+}
+
+function requireEventType(formData: FormData): EventType {
+  const event_type = String(formData.get("event_type") ?? "milestone");
+  if (!EVENT_TYPES.includes(event_type as EventType)) {
+    throw new Error("Nieprawidłowy typ wydarzenia.");
+  }
+  return event_type as EventType;
+}
+
+export async function addEvent(formData: FormData) {
+  const supabase = await createClient();
+  const articleId = requireArticleId(formData);
+
+  const title = String(formData.get("title") ?? "").trim();
+  if (!title) throw new Error("Tytuł jest wymagany.");
+
+  const event_type = requireEventType(formData);
+
+  const event_date = String(formData.get("event_date") ?? "").trim();
+  if (!event_date) throw new Error("Data jest wymagana.");
+
+  const { error } = await supabase.from("article_events").insert({
+    article_id: articleId,
+    title,
+    event_type,
+    event_date,
+    is_completed: formData.get("is_completed") === "on",
+    notes: String(formData.get("notes") ?? "").trim() || null,
+  });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/artykuly/${articleId}`);
+}
+
+export async function updateEvent(formData: FormData) {
+  const supabase = await createClient();
+  const articleId = requireArticleId(formData);
+  const eventId = String(formData.get("id") ?? "");
+
+  const title = String(formData.get("title") ?? "").trim();
+  if (!title) throw new Error("Tytuł jest wymagany.");
+
+  const event_type = requireEventType(formData);
+
+  const event_date = String(formData.get("event_date") ?? "").trim();
+  if (!event_date) throw new Error("Data jest wymagana.");
+
+  const { error } = await supabase
+    .from("article_events")
+    .update({
+      title,
+      event_type,
+      event_date,
+      is_completed: formData.get("is_completed") === "on",
+      notes: String(formData.get("notes") ?? "").trim() || null,
+    })
+    .eq("id", eventId);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/artykuly/${articleId}`);
+}
+
+export async function deleteEvent(formData: FormData) {
+  const supabase = await createClient();
+  const articleId = requireArticleId(formData);
+  const eventId = String(formData.get("id") ?? "");
+
+  const { error } = await supabase.from("article_events").delete().eq("id", eventId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/artykuly/${articleId}`);
+}
+
+export async function toggleEventCompleted(
+  articleId: string,
+  eventId: string,
+  isCompleted: boolean,
+) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("article_events")
+    .update({ is_completed: isCompleted })
+    .eq("id", eventId);
+
   if (error) throw new Error(error.message);
 
   revalidatePath(`/lab/artykuly/${articleId}`);

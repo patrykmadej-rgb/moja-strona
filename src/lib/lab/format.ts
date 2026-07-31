@@ -16,6 +16,37 @@ export function formatDateTime(iso: string): string {
   });
 }
 
+// Kolumny typu `date` w Postgresie zwracają "YYYY-MM-DD" bez informacji
+// o strefie czasowej — `new Date(str)` interpretuje to jako UTC-północ,
+// co przy formatowaniu w strefach "za UTC" (np. Ameryki) potrafi cofnąć
+// wyświetlaną datę o jeden dzień. Parsujemy ręcznie jako datę lokalną.
+function parseDateOnly(dateOnly: string): Date {
+  const [year, month, day] = dateOnly.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+export function formatDateOnly(dateOnly: string): string {
+  return parseDateOnly(dateOnly).toLocaleDateString("pl-PL", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
+export function formatShortDate(dateOnly: string): string {
+  return parseDateOnly(dateOnly).toLocaleDateString("pl-PL", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
+export function todayDateString(): string {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${now.getFullYear()}-${month}-${day}`;
+}
+
 export function formatBytes(bytes: number | null): string {
   if (!bytes) return "—";
   if (bytes < 1024) return `${bytes} B`;

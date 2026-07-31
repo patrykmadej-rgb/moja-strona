@@ -80,3 +80,43 @@ export type ArticleSource = {
   notes: string | null;
   created_at: string;
 };
+
+export const EVENT_TYPES = [
+  "milestone",
+  "deadline",
+  "spotkanie",
+  "przypomnienie",
+  "inne",
+] as const;
+
+export type EventType = (typeof EVENT_TYPES)[number];
+
+export const EVENT_TYPE_LABELS: Record<EventType, string> = {
+  milestone: "Kamień milowy",
+  deadline: "Deadline",
+  spotkanie: "Spotkanie",
+  przypomnienie: "Przypomnienie",
+  inne: "Inne",
+};
+
+export const EVENT_TITLE_SUGGESTIONS = [
+  "Rozpoczęcie pracy",
+  "Zakończenie konspektu",
+  "Pierwsza wersja",
+  "Wysłanie do redakcji",
+  "Otrzymana recenzja",
+  "Złożone poprawki",
+  "Przyjęcie",
+  "Publikacja",
+];
+
+export type ArticleEvent = {
+  id: string;
+  article_id: string;
+  title: string;
+  event_type: EventType;
+  event_date: string;
+  is_completed: boolean;
+  notes: string | null;
+  created_at: string;
+};
