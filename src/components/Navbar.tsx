@@ -78,7 +78,21 @@ export default async function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#4A1D6E]/10 bg-[#F5F1EC]/90 backdrop-blur dark:border-white/10 dark:bg-neutral-950/90">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <NextLink
+        href="/lab"
+        title="Lab"
+        aria-label="Lab"
+        className="absolute top-1/2 right-4 -translate-y-1/2"
+      >
+        <Image
+          src="/lab/lab-flask-icon.png"
+          alt=""
+          width={51}
+          height={49}
+          className="h-[49px] w-auto"
+        />
+      </NextLink>
+      <nav className="mx-auto flex max-w-6xl items-center justify-between py-4 pl-6 pr-24">
         {/* Logo */}
         <Link
           href="/"
@@ -193,15 +207,6 @@ export default async function Navbar() {
               <Mail className="h-4 w-4" />
             </Link>
           )}
-          <NextLink href="/lab" title="Lab" aria-label="Lab" className="shrink-0">
-            <Image
-              src="/lab/lab-flask-icon.png"
-              alt=""
-              width={60}
-              height={58}
-              className="h-[58px] w-auto"
-            />
-          </NextLink>
         </div>
       </nav>
     </header>
