@@ -49,7 +49,7 @@ export default function ArticleWorkspace({
           </div>
         ) : (
           <>
-            <ArticleHeader article={article} onEdit={() => setEditing(true)} />
+            <ArticleHeader article={article} onEdit={() => setEditing(true)} onNavigateTab={setTab} />
 
             <div className="mt-2">
               <ArticleTabs tab={tab} onChange={setTab} />

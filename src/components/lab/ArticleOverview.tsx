@@ -3,7 +3,6 @@ import ArticleProgressCard from "@/components/lab/ArticleProgressCard";
 import ArticleMetricsCard from "@/components/lab/ArticleMetricsCard";
 import ArticleTimelineCard from "@/components/lab/ArticleTimelineCard";
 import LatestVersionCard from "@/components/lab/LatestVersionCard";
-import QuickActionsCard from "@/components/lab/QuickActionsCard";
 import type { Article, ArticleEvent, ArticleVersion } from "@/lib/lab/types";
 import type { TabKey } from "@/components/lab/ArticleTabs";
 
@@ -34,19 +33,11 @@ export default function ArticleOverview({
 
       <ArticleTimelineCard events={events} onNavigateTab={() => onNavigateTab("harmonogram")} />
 
-      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <LatestVersionCard
-          articleId={article.id}
-          latestVersion={latestVersion}
-          onNavigateTab={() => onNavigateTab("wersje")}
-        />
-        <QuickActionsCard
-          onNavigateVersions={() => onNavigateTab("wersje")}
-          onNavigateSources={() => onNavigateTab("zrodla")}
-          onNavigateTasks={() => onNavigateTab("zadania")}
-          onNavigateNotes={() => onNavigateTab("notatki")}
-        />
-      </div>
+      <LatestVersionCard
+        articleId={article.id}
+        latestVersion={latestVersion}
+        onNavigateTab={() => onNavigateTab("wersje")}
+      />
     </div>
   );
 }
