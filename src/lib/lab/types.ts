@@ -120,3 +120,13 @@ export type ArticleEvent = {
   notes: string | null;
   created_at: string;
 };
+
+export type ArticleNote = {
+  id: string;
+  article_id: string;
+  content: string;
+  is_pinned: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+};

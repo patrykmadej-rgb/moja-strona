@@ -272,6 +272,69 @@ export async function deleteEvent(formData: FormData) {
   revalidatePath(`/lab/artykuly/${articleId}`);
 }
 
+export async function addNote(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Brak autoryzacji.");
+
+  const articleId = requireArticleId(formData);
+  const content = String(formData.get("content") ?? "").trim();
+  if (!content) throw new Error("Treść notatki jest wymagana.");
+
+  const { error } = await supabase.from("article_notes").insert({
+    article_id: articleId,
+    content,
+    created_by: user.id,
+  });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/artykuly/${articleId}`);
+}
+
+export async function updateNote(formData: FormData) {
+  const supabase = await createClient();
+  const articleId = requireArticleId(formData);
+  const noteId = String(formData.get("id") ?? "");
+
+  const content = String(formData.get("content") ?? "").trim();
+  if (!content) throw new Error("Treść notatki jest wymagana.");
+
+  const { error } = await supabase
+    .from("article_notes")
+    .update({ content, updated_at: new Date().toISOString() })
+    .eq("id", noteId);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/artykuly/${articleId}`);
+}
+
+export async function deleteNote(formData: FormData) {
+  const supabase = await createClient();
+  const articleId = requireArticleId(formData);
+  const noteId = String(formData.get("id") ?? "");
+
+  const { error } = await supabase.from("article_notes").delete().eq("id", noteId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/artykuly/${articleId}`);
+}
+
+export async function toggleNotePinned(articleId: string, noteId: string, isPinned: boolean) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("article_notes")
+    .update({ is_pinned: isPinned })
+    .eq("id", noteId);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/artykuly/${articleId}`);
+}
+
 export async function toggleEventCompleted(
   articleId: string,
   eventId: string,
