@@ -11,7 +11,16 @@ export async function loginLab(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    redirect(`/lab?error=${encodeURIComponent("Nieprawidłowy e-mail lub hasło.")}`);
+    // TYMCZASOWE DEBUGOWANIE — pokazuje surowy błąd Supabase zamiast
+    // generycznego komunikatu, żeby zdiagnozować "niepoprawne hasło" mimo
+    // poprawnych danych. Do usunięcia po zdiagnozowaniu.
+    console.error("[lab login] Supabase signInWithPassword error:", {
+      message: error.message,
+      status: error.status,
+      code: error.code,
+      name: error.name,
+    });
+    redirect(`/lab?error=${encodeURIComponent(`DEBUG: ${error.message} (status: ${error.status}, code: ${error.code})`)}`);
   }
 
   redirect("/lab/artykuly");
