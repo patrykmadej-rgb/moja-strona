@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { useFormStatus } from "react-dom";
-import { createIdea } from "@/app/panel/pomysly/actions";
+import { createIdea } from "@/app/(site)/panel/pomysly/actions";
 
 const inputClass =
   "rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700";

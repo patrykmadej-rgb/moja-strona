@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { toggleTripPaid } from "@/app/panel/zjazdy/actions";
+import { toggleTripPaid } from "@/app/(site)/panel/zjazdy/actions";
 
 export default function PaidToggle({ id, paid }: { id: string; paid: boolean }) {
   const [isPending, startTransition] = useTransition();

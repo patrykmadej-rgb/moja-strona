@@ -5,7 +5,7 @@ import { getLocale, getMessages } from "next-intl/server";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { siteConfig } from "@/lib/site-config";
-import "./globals.css";
+import "../globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

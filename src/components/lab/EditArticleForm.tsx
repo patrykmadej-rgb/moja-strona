@@ -1,0 +1,187 @@
+"use client";
+
+import { useFormStatus } from "react-dom";
+import { updateArticle } from "@/app/lab/artykuly/[id]/actions";
+import { ARTICLE_STATUSES, ARTICLE_STATUS_LABELS, type Article } from "@/lib/lab/types";
+
+const inputClass =
+  "border border-[#4A1D6E]/25 bg-white px-3 py-2 text-sm text-[#1C1028] outline-none focus:border-[#4A1D6E]";
+const labelClass = "text-sm font-medium text-[#1C1028]";
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="bg-[#4A1D6E] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#4A2073] disabled:opacity-50"
+    >
+      {pending ? "Zapisywanie…" : "Zapisz zmiany"}
+    </button>
+  );
+}
+
+export default function EditArticleForm({
+  article,
+  onCancel,
+}: {
+  article: Article;
+  onCancel: () => void;
+}) {
+  return (
+    <form
+      action={async (formData) => {
+        await updateArticle(formData);
+        onCancel();
+      }}
+      className="flex flex-col gap-4 border border-[#4A1D6E]/15 bg-white p-6"
+    >
+      <input type="hidden" name="article_id" value={article.id} />
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="title" className={labelClass}>
+          Tytuł *
+        </label>
+        <input id="title" name="title" required defaultValue={article.title} className={inputClass} />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="language" className={labelClass}>
+            Język
+          </label>
+          <input
+            id="language"
+            name="language"
+            defaultValue={article.language ?? ""}
+            className={inputClass}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="discipline" className={labelClass}>
+            Dyscyplina
+          </label>
+          <input
+            id="discipline"
+            name="discipline"
+            defaultValue={article.discipline ?? ""}
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="target_journal" className={labelClass}>
+          Docelowe czasopismo
+        </label>
+        <input
+          id="target_journal"
+          name="target_journal"
+          defaultValue={article.target_journal ?? ""}
+          className={inputClass}
+        />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="keywords" className={labelClass}>
+          Słowa kluczowe (oddzielone przecinkami)
+        </label>
+        <input
+          id="keywords"
+          name="keywords"
+          defaultValue={article.keywords.join(", ")}
+          className={inputClass}
+        />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="abstract" className={labelClass}>
+          Abstrakt
+        </label>
+        <textarea
+          id="abstract"
+          name="abstract"
+          rows={5}
+          defaultValue={article.abstract ?? ""}
+          className={inputClass}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="status" className={labelClass}>
+            Status
+          </label>
+          <select id="status" name="status" defaultValue={article.status} className={inputClass}>
+            {ARTICLE_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {ARTICLE_STATUS_LABELS[s]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="progress_percent" className={labelClass}>
+            Postęp (%)
+          </label>
+          <input
+            id="progress_percent"
+            name="progress_percent"
+            type="number"
+            min={0}
+            max={100}
+            defaultValue={article.progress_percent}
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="next_step" className={labelClass}>
+            Następny krok
+          </label>
+          <input
+            id="next_step"
+            name="next_step"
+            defaultValue={article.next_step ?? ""}
+            className={inputClass}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="deadline" className={labelClass}>
+            Deadline
+          </label>
+          <input
+            id="deadline"
+            name="deadline"
+            type="date"
+            defaultValue={article.deadline ?? ""}
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      <label className="flex items-center gap-2 text-sm text-[#1C1028]">
+        <input
+          type="checkbox"
+          name="is_private"
+          defaultChecked={article.is_private}
+          className="h-4 w-4"
+        />
+        Utajniony projekt
+      </label>
+
+      <div className="flex gap-3">
+        <SubmitButton />
+        <button
+          type="button"
+          onClick={onCancel}
+          className="border border-[#4A1D6E]/25 px-5 py-2.5 text-sm font-medium text-[#4A3360] hover:border-[#4A1D6E]/50"
+        >
+          Anuluj
+        </button>
+      </div>
+    </form>
+  );
+}

@@ -19,6 +19,14 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // /lab (panel logowania + zarządzania artykułami) też jest poza next-intl,
+  // bez prefiksu językowego. Odświeżamy tylko sesję Supabase — bramkę dostępu
+  // (zalogowany/niezalogowany) obsługuje sam src/app/lab/layout.tsx, więc tu
+  // celowo nie przekierowujemy na /login jak dla /panel.
+  if (pathname.startsWith("/lab")) {
+    return updateSession(request);
+  }
+
   return intlMiddleware(request);
 }
 
