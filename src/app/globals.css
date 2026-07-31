@@ -124,3 +124,22 @@ html {
     transform: none !important;
   }
 }
+
+/* ============================================================
+   /lab/artykuly/[id] — widok szczegółów artykułu, zawężony do
+   .lab-article-page. Ten dashboard celowo używa zaokrąglonych kart/
+   plakietek/przycisków (styl "premium SaaS"), więc podobnie jak
+   .research-page wymaga jawnego wyjątku od globalnej zasady
+   `* { border-radius: 0 }`. Trzy skale promienia użyte na tej
+   podstronie: karty (14px), przyciski/pola/ikony (10px), plakietki/
+   pasek postępu (pełny pill).
+   ============================================================ */
+.lab-article-page .rounded-full {
+  border-radius: 9999px !important;
+}
+.lab-article-page .rounded-\[14px\] {
+  border-radius: 14px !important;
+}
+.lab-article-page .rounded-\[10px\] {
+  border-radius: 10px !important;
+}

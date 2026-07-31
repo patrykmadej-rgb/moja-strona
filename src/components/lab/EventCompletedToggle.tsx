@@ -15,7 +15,7 @@ export default function EventCompletedToggle({
   const [isPending, startTransition] = useTransition();
 
   return (
-    <label className="flex items-center gap-1.5 text-xs text-[#4A3360]">
+    <label className="flex items-center gap-1.5 text-xs text-[#706878]">
       <input
         type="checkbox"
         defaultChecked={isCompleted}

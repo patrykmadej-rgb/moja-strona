@@ -27,8 +27,8 @@ export default function NotePinnedToggle({
       title={isPinned ? "Odepnij notatkę" : "Przypnij notatkę"}
       className={
         isPinned
-          ? "shrink-0 text-[#4A1D6E] disabled:opacity-50"
-          : "shrink-0 text-[#4A3360]/50 hover:text-[#4A1D6E] disabled:opacity-50"
+          ? "shrink-0 text-[#5b2a86] disabled:opacity-50"
+          : "shrink-0 text-[#706878]/50 hover:text-[#5b2a86] disabled:opacity-50"
       }
     >
       {isPinned ? (

@@ -33,7 +33,9 @@ export default function Sidebar() {
         <IconFileText className="h-5 w-5" stroke={1.75} />
       </Link>
 
-      <div className="mt-1 flex flex-col items-center gap-1">
+      <div className="mt-2 h-px w-8 bg-white/10" />
+
+      <div className="mt-2 flex flex-col items-center gap-1">
         {placeholderIcons.map(({ icon: Icon, label }) => (
           <span
             key={label}
@@ -46,7 +48,9 @@ export default function Sidebar() {
         ))}
       </div>
 
-      <form action={signOutLab} className="mt-auto">
+      <div className="mt-auto mb-2 h-px w-8 bg-white/10" />
+
+      <form action={signOutLab}>
         <button
           type="submit"
           title="Wyloguj"

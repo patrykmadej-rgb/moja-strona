@@ -12,7 +12,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="self-start bg-[#4A1D6E] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4A2073] disabled:opacity-50"
+      className="self-start rounded-[10px] bg-[#5b2a86] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#32134f] disabled:opacity-50"
     >
       {pending ? "Wgrywanie…" : "Dodaj nową wersję"}
     </button>
@@ -30,8 +30,8 @@ export default function VersionsTab({
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="border border-[#4A1D6E]/15 bg-white p-6">
-        <h2 className="text-sm font-semibold text-[#1C1028]">Dodaj nową wersję</h2>
+      <section className="rounded-[14px] border border-[#e8e2ec] bg-white/95 p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+        <h2 className="text-sm font-semibold text-[#201a2b]">Dodaj nową wersję</h2>
         <form
           ref={formRef}
           action={async (formData) => {
@@ -42,7 +42,7 @@ export default function VersionsTab({
         >
           <input type="hidden" name="article_id" value={articleId} />
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="file" className="text-sm font-medium text-[#1C1028]">
+            <label htmlFor="file" className="text-sm font-medium text-[#201a2b]">
               Plik (docx/pdf)
             </label>
             <input
@@ -55,13 +55,13 @@ export default function VersionsTab({
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="notes" className="text-sm font-medium text-[#1C1028]">
+            <label htmlFor="notes" className="text-sm font-medium text-[#201a2b]">
               Notatki (opcjonalnie)
             </label>
             <input
               id="notes"
               name="notes"
-              className="border border-[#4A1D6E]/25 bg-white px-3 py-2 text-sm text-[#1C1028] outline-none focus:border-[#4A1D6E]"
+              className="rounded-[10px] border border-[#e8e2ec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]"
             />
           </div>
           <SubmitButton />
@@ -70,21 +70,25 @@ export default function VersionsTab({
 
       <section>
         {versions.length === 0 ? (
-          <div className="border border-[#4A1D6E]/15 bg-white px-6 py-10 text-center">
-            <p className="text-sm text-[#4A3360]">Brak wgranych wersji.</p>
+          <div className="rounded-[14px] border border-[#e8e2ec] bg-white/95 px-6 py-10 text-center shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+            <p className="text-sm text-[#706878]">Brak wgranych wersji.</p>
           </div>
         ) : (
-          <ul>
-            {versions.map((v) => (
+          <ul className="rounded-[14px] border border-[#e8e2ec] bg-white/95 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+            {versions.map((v, i) => (
               <li
                 key={v.id}
-                className="flex items-center justify-between gap-4 border-b-[0.5px] border-[#4A1D6E]/20 py-4"
+                className={
+                  i === versions.length - 1
+                    ? "flex items-center justify-between gap-4 px-6 py-4"
+                    : "flex items-center justify-between gap-4 border-b border-[#e8e2ec] px-6 py-4"
+                }
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-[#1C1028]">
+                  <p className="truncate text-sm font-medium text-[#201a2b]">
                     v{v.version_number} · {v.file_name}
                   </p>
-                  <p className="mt-0.5 truncate text-xs text-[#4A3360]">
+                  <p className="mt-0.5 truncate text-xs text-[#706878]">
                     {formatBytes(v.file_size_bytes)} · {formatDateTime(v.uploaded_at)}
                     {v.notes ? ` · ${v.notes}` : ""}
                   </p>
@@ -93,7 +97,7 @@ export default function VersionsTab({
                   {v.signedUrl && (
                     <a
                       href={v.signedUrl}
-                      className="border border-[#4A1D6E]/25 px-3 py-1.5 text-sm text-[#4A1D6E] hover:border-[#4A1D6E]/50"
+                      className="rounded-[10px] border border-[#e8e2ec] px-3 py-1.5 text-sm text-[#201a2b] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] hover:text-[#32134f]"
                     >
                       Pobierz
                     </a>

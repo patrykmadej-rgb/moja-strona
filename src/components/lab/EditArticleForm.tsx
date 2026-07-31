@@ -5,8 +5,8 @@ import { updateArticle } from "@/app/lab/artykuly/[id]/actions";
 import { ARTICLE_STATUSES, ARTICLE_STATUS_LABELS, type Article } from "@/lib/lab/types";
 
 const inputClass =
-  "border border-[#4A1D6E]/25 bg-white px-3 py-2 text-sm text-[#1C1028] outline-none focus:border-[#4A1D6E]";
-const labelClass = "text-sm font-medium text-[#1C1028]";
+  "rounded-[10px] border border-[#e8e2ec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
+const labelClass = "text-sm font-medium text-[#201a2b]";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -14,7 +14,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="bg-[#4A1D6E] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#4A2073] disabled:opacity-50"
+      className="rounded-[10px] bg-[#5b2a86] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#32134f] disabled:opacity-50"
     >
       {pending ? "Zapisywanie…" : "Zapisz zmiany"}
     </button>
@@ -34,7 +34,7 @@ export default function EditArticleForm({
         await updateArticle(formData);
         onCancel();
       }}
-      className="flex flex-col gap-4 border border-[#4A1D6E]/15 bg-white p-6"
+      className="flex flex-col gap-4"
     >
       <input type="hidden" name="article_id" value={article.id} />
 
@@ -162,7 +162,7 @@ export default function EditArticleForm({
         </div>
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-[#1C1028]">
+      <label className="flex items-center gap-2 text-sm text-[#201a2b]">
         <input
           type="checkbox"
           name="is_private"
@@ -177,7 +177,7 @@ export default function EditArticleForm({
         <button
           type="button"
           onClick={onCancel}
-          className="border border-[#4A1D6E]/25 px-5 py-2.5 text-sm font-medium text-[#4A3360] hover:border-[#4A1D6E]/50"
+          className="rounded-[10px] border border-[#e8e2ec] px-5 py-2.5 text-sm font-medium text-[#706878] hover:border-[#d9cde5]"
         >
           Anuluj
         </button>

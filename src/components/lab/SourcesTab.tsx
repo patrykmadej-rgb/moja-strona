@@ -11,25 +11,25 @@ import {
 } from "@/lib/lab/types";
 
 const inputClass =
-  "border border-[#4A1D6E]/25 bg-white px-3 py-2 text-sm text-[#1C1028] outline-none focus:border-[#4A1D6E]";
+  "rounded-[10px] border border-[#e8e2ec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
 
 function ReadingStatusTag({ status }: { status: ReadingStatus }) {
   if (status === "przeczytane") {
     return (
-      <span className="inline-flex items-center bg-[#4A1D6E] px-2 py-0.5 text-xs text-white">
+      <span className="inline-flex items-center rounded-full bg-[#5b2a86] px-2.5 py-0.5 text-xs text-white">
         {READING_STATUS_LABELS[status]}
       </span>
     );
   }
   if (status === "w_trakcie") {
     return (
-      <span className="inline-flex items-center bg-[#EDE6F8] px-2 py-0.5 text-xs text-[#4A1D6E]">
+      <span className="inline-flex items-center rounded-full bg-[#f1eafd] px-2.5 py-0.5 text-xs text-[#5b2a86]">
         {READING_STATUS_LABELS[status]}
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center border border-[#4A3360]/30 px-2 py-0.5 text-xs text-[#4A3360]">
+    <span className="inline-flex items-center rounded-full border border-[#706878]/30 px-2.5 py-0.5 text-xs text-[#706878]">
       {READING_STATUS_LABELS[status]}
     </span>
   );
@@ -41,7 +41,7 @@ function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: st
     <button
       type="submit"
       disabled={pending}
-      className="self-start bg-[#4A1D6E] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4A2073] disabled:opacity-50"
+      className="self-start rounded-[10px] bg-[#5b2a86] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#32134f] disabled:opacity-50"
     >
       {pending ? pendingLabel : label}
     </button>
@@ -53,11 +53,11 @@ function SourceFields({ source }: { source?: ArticleSource }) {
     <>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-[#1C1028]">Autor</label>
+          <label className="text-sm font-medium text-[#201a2b]">Autor</label>
           <input name="author" defaultValue={source?.author ?? ""} className={inputClass} />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-[#1C1028]">Rok</label>
+          <label className="text-sm font-medium text-[#201a2b]">Rok</label>
           <input
             name="year"
             type="number"
@@ -67,12 +67,12 @@ function SourceFields({ source }: { source?: ArticleSource }) {
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-[#1C1028]">Tytuł</label>
+        <label className="text-sm font-medium text-[#201a2b]">Tytuł</label>
         <input name="title" defaultValue={source?.title ?? ""} className={inputClass} />
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-[#1C1028]">Czasopismo / wydawnictwo</label>
+          <label className="text-sm font-medium text-[#201a2b]">Czasopismo / wydawnictwo</label>
           <input
             name="publisher_or_journal"
             defaultValue={source?.publisher_or_journal ?? ""}
@@ -80,22 +80,22 @@ function SourceFields({ source }: { source?: ArticleSource }) {
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-[#1C1028]">Typ źródła</label>
+          <label className="text-sm font-medium text-[#201a2b]">Typ źródła</label>
           <input name="source_type" defaultValue={source?.source_type ?? ""} className={inputClass} />
         </div>
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-[#1C1028]">DOI</label>
+          <label className="text-sm font-medium text-[#201a2b]">DOI</label>
           <input name="doi" defaultValue={source?.doi ?? ""} className={inputClass} />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-[#1C1028]">URL</label>
+          <label className="text-sm font-medium text-[#201a2b]">URL</label>
           <input name="url" defaultValue={source?.url ?? ""} className={inputClass} />
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-[#1C1028]">Status przeczytania</label>
+        <label className="text-sm font-medium text-[#201a2b]">Status przeczytania</label>
         <select
           name="reading_status"
           defaultValue={source?.reading_status ?? "do_przeczytania"}
@@ -109,7 +109,7 @@ function SourceFields({ source }: { source?: ArticleSource }) {
         </select>
       </div>
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-[#1C1028]">Notatki</label>
+        <label className="text-sm font-medium text-[#201a2b]">Notatki</label>
         <textarea name="notes" rows={2} defaultValue={source?.notes ?? ""} className={inputClass} />
       </div>
     </>
@@ -128,8 +128,8 @@ export default function SourcesTab({
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="border border-[#4A1D6E]/15 bg-white p-6">
-        <h2 className="text-sm font-semibold text-[#1C1028]">Dodaj źródło</h2>
+      <section className="rounded-[14px] border border-[#e8e2ec] bg-white/95 p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+        <h2 className="text-sm font-semibold text-[#201a2b]">Dodaj źródło</h2>
         <form
           ref={formRef}
           action={async (formData) => {
@@ -146,14 +146,18 @@ export default function SourcesTab({
 
       <section>
         {sources.length === 0 ? (
-          <div className="border border-[#4A1D6E]/15 bg-white px-6 py-10 text-center">
-            <p className="text-sm text-[#4A3360]">Brak dodanych źródeł.</p>
+          <div className="rounded-[14px] border border-[#e8e2ec] bg-white/95 px-6 py-10 text-center shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+            <p className="text-sm text-[#706878]">Brak dodanych źródeł.</p>
           </div>
         ) : (
-          <ul>
-            {sources.map((s) =>
-              editingId === s.id ? (
-                <li key={s.id} className="border-b-[0.5px] border-[#4A1D6E]/20 py-4">
+          <ul className="rounded-[14px] border border-[#e8e2ec] bg-white/95 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+            {sources.map((s, i) => {
+              const isLast = i === sources.length - 1;
+              return editingId === s.id ? (
+                <li
+                  key={s.id}
+                  className={isLast ? "px-6 py-4" : "border-b border-[#e8e2ec] px-6 py-4"}
+                >
                   <form
                     action={async (formData) => {
                       await updateSource(formData);
@@ -169,7 +173,7 @@ export default function SourcesTab({
                       <button
                         type="button"
                         onClick={() => setEditingId(null)}
-                        className="border border-[#4A1D6E]/25 px-4 py-2 text-sm text-[#4A3360] hover:border-[#4A1D6E]/50"
+                        className="rounded-[10px] border border-[#e8e2ec] px-4 py-2 text-sm text-[#706878] hover:border-[#d9cde5]"
                       >
                         Anuluj
                       </button>
@@ -179,23 +183,27 @@ export default function SourcesTab({
               ) : (
                 <li
                   key={s.id}
-                  className="flex items-center justify-between gap-4 border-b-[0.5px] border-[#4A1D6E]/20 py-4"
+                  className={
+                    isLast
+                      ? "flex items-center justify-between gap-4 px-6 py-4"
+                      : "flex items-center justify-between gap-4 border-b border-[#e8e2ec] px-6 py-4"
+                  }
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-[#1C1028]">
+                    <p className="truncate text-sm font-medium text-[#201a2b]">
                       {s.title || "Bez tytułu"}
                     </p>
-                    <p className="mt-0.5 truncate text-xs text-[#4A3360]">
+                    <p className="mt-0.5 truncate text-xs text-[#706878]">
                       {[s.author, s.year, s.publisher_or_journal].filter(Boolean).join(" · ") || "—"}
                     </p>
-                    {s.notes && <p className="mt-1 text-xs text-[#4A3360]">{s.notes}</p>}
+                    {s.notes && <p className="mt-1 text-xs text-[#706878]">{s.notes}</p>}
                   </div>
                   <ReadingStatusTag status={s.reading_status} />
                   <div className="flex shrink-0 items-center gap-3">
                     <button
                       type="button"
                       onClick={() => setEditingId(s.id)}
-                      className="text-sm text-[#4A1D6E] hover:underline"
+                      className="text-sm text-[#5b2a86] hover:underline"
                     >
                       Edytuj
                     </button>
@@ -213,8 +221,8 @@ export default function SourcesTab({
                     </form>
                   </div>
                 </li>
-              ),
-            )}
+              );
+            })}
           </ul>
         )}
       </section>

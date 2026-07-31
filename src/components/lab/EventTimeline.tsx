@@ -14,17 +14,17 @@ export default function EventTimeline({ events }: { events: ArticleEvent[] }) {
       <div className="flex items-start">
         {sorted.map((event, i) => (
           <div key={event.id} className="flex items-start">
-            {i > 0 && <div className="mt-[7px] h-px w-8 shrink-0 bg-[#4A1D6E]/25" />}
+            {i > 0 && <div className="mt-[7px] h-px w-8 shrink-0 bg-[#5b2a86]/25" />}
             <div className="flex w-24 shrink-0 flex-col items-center gap-1.5 text-center">
               {event.is_completed ? (
-                <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center bg-[#4A1D6E]">
+                <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-[#5b2a86]">
                   <IconCheck className="h-2.5 w-2.5 text-white" stroke={3} />
                 </div>
               ) : (
-                <div className="h-3.5 w-3.5 shrink-0 border border-[#4A1D6E]/50 bg-white" />
+                <div className="h-3.5 w-3.5 shrink-0 rounded-full border border-[#5b2a86]/50 bg-white" />
               )}
-              <span className="text-[11px] text-[#4A3360]">{formatShortDate(event.event_date)}</span>
-              <span className="text-xs text-[#1C1028]" title={event.title}>
+              <span className="text-[11px] text-[#706878]">{formatShortDate(event.event_date)}</span>
+              <span className="text-xs text-[#201a2b]" title={event.title}>
                 {truncateTitle(event.title)}
               </span>
             </div>

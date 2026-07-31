@@ -17,7 +17,7 @@ import { deleteFile, getDownloadUrl, uploadFile, type ArticleFile } from "@/lib/
 import { formatBytes, formatDateTime } from "@/lib/lab/format";
 
 function FileIcon({ fileType }: { fileType: string | null }) {
-  const className = "h-5 w-5 text-[#4A1D6E]";
+  const className = "h-5 w-5 text-[#5b2a86]";
   if (fileType?.startsWith("image/")) return <IconPhoto className={className} stroke={1.75} />;
   if (fileType === "application/pdf") return <IconFileTypePdf className={className} stroke={1.75} />;
   if (fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
@@ -98,16 +98,16 @@ export default function FilesTab({
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="border border-[#4A1D6E]/15 bg-[#F5F1EC] p-6">
+      <section className="rounded-[14px] border border-[#e8e2ec] bg-white/95 p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="font-[family-name:var(--font-cormorant)] text-lg font-semibold text-[#4A1D6E]">
+          <h2 className="font-[family-name:var(--font-cormorant)] text-lg font-semibold text-[#5b2a86]">
             Pliki
           </h2>
           <button
             type="button"
             disabled={isUploading}
             onClick={() => fileInputRef.current?.click()}
-            className="flex shrink-0 items-center gap-2 bg-[#4A1D6E] px-4 py-2 text-sm font-normal text-[#F5F1EC] transition-colors hover:bg-[#4A2073] disabled:opacity-50"
+            className="flex shrink-0 items-center gap-2 rounded-[10px] bg-[#5b2a86] px-4 py-2 text-sm font-normal text-[#f7f4ef] transition-colors hover:bg-[#32134f] disabled:opacity-50"
           >
             {isUploading && <IconLoader2 className="h-4 w-4 animate-spin" stroke={1.75} />}
             {isUploading ? "Wgrywanie…" : "Dodaj plik"}
@@ -137,15 +137,15 @@ export default function FilesTab({
           tabIndex={0}
           className={
             isDraggingOver
-              ? "mt-4 flex cursor-pointer flex-col items-center gap-2 border-2 border-dashed border-[#4A1D6E] bg-[#EDE6F8] px-6 py-10 text-center"
-              : "mt-4 flex cursor-pointer flex-col items-center gap-2 border-2 border-dashed border-[#B4A8C4] bg-[#EDE6F8] px-6 py-10 text-center"
+              ? "mt-4 flex cursor-pointer flex-col items-center gap-2 rounded-[14px] border-2 border-dashed border-[#5b2a86] bg-[#f1eafd] px-6 py-10 text-center"
+              : "mt-4 flex cursor-pointer flex-col items-center gap-2 rounded-[14px] border-2 border-dashed border-[#B4A8C4] bg-[#f1eafd] px-6 py-10 text-center"
           }
         >
-          <IconCloudUpload className="h-8 w-8 text-[#4A3360]" stroke={1.5} />
-          <p className="text-sm text-[#4A3360]">
+          <IconCloudUpload className="h-8 w-8 text-[#706878]" stroke={1.5} />
+          <p className="text-sm text-[#706878]">
             Przeciągnij plik tutaj lub kliknij, aby wybrać
           </p>
-          <p className="text-xs text-[#4A3360]/70">PDF, Word, Excel, PowerPoint, obraz lub CSV — maks. 20 MB</p>
+          <p className="text-xs text-[#706878]/70">PDF, Word, Excel, PowerPoint, obraz lub CSV — maks. 20 MB</p>
         </div>
 
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
@@ -153,23 +153,27 @@ export default function FilesTab({
 
       <section>
         {files.length === 0 ? (
-          <div className="border border-[#4A1D6E]/15 bg-white px-6 py-10 text-center">
-            <p className="text-sm text-[#4A3360]">Brak plików.</p>
+          <div className="rounded-[14px] border border-[#e8e2ec] bg-white/95 px-6 py-10 text-center shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+            <p className="text-sm text-[#706878]">Brak plików.</p>
           </div>
         ) : (
-          <ul>
-            {files.map((file) => (
+          <ul className="rounded-[14px] border border-[#e8e2ec] bg-white/95 px-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+            {files.map((file, i) => (
               <li
                 key={file.id}
-                className="flex items-center justify-between gap-4 border-b-[0.5px] border-[#4A1D6E]/20 py-4"
+                className={
+                  i === files.length - 1
+                    ? "flex items-center justify-between gap-4 py-4"
+                    : "flex items-center justify-between gap-4 border-b border-[#e8e2ec] py-4"
+                }
               >
                 <div className="flex min-w-0 flex-1 items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#EDE6F8]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#f1eafd]">
                     <FileIcon fileType={file.file_type} />
                   </div>
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-[#1C1028]">{file.file_name}</p>
-                    <p className="mt-0.5 truncate text-xs text-[#4A3360]">
+                    <p className="truncate text-sm font-medium text-[#201a2b]">{file.file_name}</p>
+                    <p className="mt-0.5 truncate text-xs text-[#706878]">
                       {formatDateTime(file.created_at)} · {formatBytes(file.file_size)}
                     </p>
                   </div>
@@ -179,7 +183,7 @@ export default function FilesTab({
                     type="button"
                     onClick={() => handleDownload(file)}
                     title="Pobierz"
-                    className="text-[#4A1D6E] hover:opacity-70"
+                    className="text-[#5b2a86] hover:opacity-70"
                   >
                     <IconDownload className="h-4.5 w-4.5" stroke={1.75} />
                   </button>
