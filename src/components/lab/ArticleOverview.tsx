@@ -22,22 +22,35 @@ export default function ArticleOverview({
   onNavigateTab: (tab: TabKey) => void;
 }) {
   return (
-    <div className="flex flex-col gap-5">
-      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div>
+      {/* Poniżej 1000px: jedna kolumna, kolejność Informacje -> Status -> Metryki -> Wersja -> Oś czasu. */}
+      <div className="flex flex-col gap-5 min-[1000px]:hidden">
         <ArticleBasicInfoCard article={article} />
-        <div className="flex flex-col gap-5">
-          <ArticleProgressCard article={article} />
-          <ArticleMetricsCard versionsCount={versionsCount} sourcesCount={sourcesCount} />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <ArticleProgressCard article={article} />
+        <ArticleMetricsCard versionsCount={versionsCount} sourcesCount={sourcesCount} />
         <LatestVersionCard
           articleId={article.id}
           latestVersion={latestVersion}
           onNavigateTab={() => onNavigateTab("wersje")}
         />
         <ArticleTimelineCard events={events} onNavigateTab={() => onNavigateTab("harmonogram")} />
+      </div>
+
+      {/* Od 1000px: dwie niezależne pionowe kolumny — prawa nie wpływa na wysokość lewej. */}
+      <div className="hidden min-[1000px]:grid min-[1000px]:grid-cols-[minmax(0,1fr)_320px] min-[1000px]:items-start min-[1000px]:gap-5">
+        <div className="flex min-w-0 flex-col gap-5">
+          <ArticleBasicInfoCard article={article} />
+          <LatestVersionCard
+            articleId={article.id}
+            latestVersion={latestVersion}
+            onNavigateTab={() => onNavigateTab("wersje")}
+          />
+        </div>
+        <div className="flex min-w-0 flex-col gap-5">
+          <ArticleProgressCard article={article} />
+          <ArticleMetricsCard versionsCount={versionsCount} sourcesCount={sourcesCount} />
+          <ArticleTimelineCard events={events} onNavigateTab={() => onNavigateTab("harmonogram")} />
+        </div>
       </div>
     </div>
   );
