@@ -168,14 +168,6 @@ export default async function Navbar() {
         {/* Przycisk KONTAKT / Panel + przełącznik języka */}
         <div className="flex items-center gap-6">
           <LanguageSwitcher />
-          <NextLink
-            href="/lab"
-            title="Lab"
-            aria-label="Lab"
-            className="text-[#4A3360] transition-colors hover:text-[#1C1028] dark:text-neutral-400 dark:hover:text-white"
-          >
-            <IconFlask className="h-4 w-4" stroke={1.75} />
-          </NextLink>
           {user ? (
             <div className="flex items-center gap-3">
               <NextLink
@@ -202,6 +194,14 @@ export default async function Navbar() {
               <Mail className="h-4 w-4" />
             </Link>
           )}
+          <NextLink
+            href="/lab"
+            title="Lab"
+            aria-label="Lab"
+            className="text-[#4A3360] transition-colors hover:text-[#1C1028] dark:text-neutral-400 dark:hover:text-white"
+          >
+            <IconFlask className="h-4 w-4" stroke={1.75} />
+          </NextLink>
         </div>
       </nav>
     </header>

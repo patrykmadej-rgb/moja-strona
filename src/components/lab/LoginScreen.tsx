@@ -2,6 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { loginLab } from "@/app/lab/actions";
 
 function SubmitButton() {
@@ -24,11 +25,14 @@ export default function LoginScreen() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#F5F1EC] px-6">
       <div className="w-full max-w-sm">
-        <h1
-          className="font-[family-name:var(--font-cormorant)] text-[28px] text-[#1C1028]"
-        >
-          /lab
-        </h1>
+        <Image
+          src="/lab/lab-logo.png"
+          alt="Pm.lab"
+          width={1536}
+          height={1024}
+          priority
+          className="mx-auto h-auto w-full max-w-[300px]"
+        />
         <p className="mt-1 text-xs text-[#4A3360]">Panel prywatny — dostęp tylko dla właściciela.</p>
 
         <form action={loginLab} className="mt-8 flex flex-col gap-4">
