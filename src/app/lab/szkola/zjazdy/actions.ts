@@ -19,6 +19,7 @@ export async function createSession(formData: FormData) {
   if (!start_date) throw new Error("Data rozpoczęcia jest wymagana.");
 
   const sessionNumberRaw = String(formData.get("session_number") ?? "").trim();
+  const plannedBudgetRaw = String(formData.get("planned_budget") ?? "").trim();
 
   const { data: session, error } = await supabase
     .from("school_sessions")
@@ -33,6 +34,8 @@ export async function createSession(formData: FormData) {
       lead_trainer: String(formData.get("lead_trainer") ?? "").trim() || null,
       training_year: String(formData.get("training_year") ?? "").trim() || null,
       notes: String(formData.get("notes") ?? "").trim() || null,
+      planned_budget: plannedBudgetRaw ? Number(plannedBudgetRaw) : null,
+      planned_budget_currency: String(formData.get("planned_budget_currency") ?? "PLN"),
       created_by: user.id,
     })
     .select()

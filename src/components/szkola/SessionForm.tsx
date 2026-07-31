@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormStatus } from "react-dom";
-import { SESSION_STATUSES, SESSION_STATUS_LABELS, type SchoolSession } from "@/lib/szkola/types";
+import { CURRENCIES, SESSION_STATUSES, SESSION_STATUS_LABELS, type SchoolSession } from "@/lib/szkola/types";
 
 const inputClass =
   "rounded-[10px] border border-[#e8e2ec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
@@ -162,6 +162,40 @@ export default function SessionForm({
           </select>
         </div>
       )}
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_100px]">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="planned_budget" className={labelClass}>
+            Planowany budżet
+          </label>
+          <input
+            id="planned_budget"
+            name="planned_budget"
+            type="number"
+            min={0}
+            step="0.01"
+            defaultValue={session?.planned_budget ?? ""}
+            className={inputClass}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="planned_budget_currency" className={labelClass}>
+            Waluta
+          </label>
+          <select
+            id="planned_budget_currency"
+            name="planned_budget_currency"
+            defaultValue={session?.planned_budget_currency ?? "PLN"}
+            className={inputClass}
+          >
+            {CURRENCIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="notes" className={labelClass}>

@@ -1,27 +1,55 @@
-import { CalendarClock, Plane, FolderOpen, Bed, Receipt, Files, StickyNote } from "lucide-react";
+import { CalendarClock, FolderOpen, Files, StickyNote } from "lucide-react";
 import PreparationChecklistCard from "@/components/szkola/PreparationChecklistCard";
 import SessionPlaceholderCard from "@/components/szkola/SessionPlaceholderCard";
-import type { SchoolSession, SessionTask } from "@/lib/szkola/types";
+import TravelSummaryCard from "@/components/szkola/TravelSummaryCard";
+import AccommodationSummaryCard from "@/components/szkola/AccommodationSummaryCard";
+import BudgetCard from "@/components/szkola/BudgetCard";
+import UpcomingDeadlinesCard from "@/components/szkola/UpcomingDeadlinesCard";
+import SessionWarningsCard from "@/components/szkola/SessionWarningsCard";
+import { getSessionWarnings } from "@/lib/szkola/warnings";
+import type {
+  Accommodation,
+  Expense,
+  SchoolPayment,
+  SchoolSession,
+  SessionTask,
+  TravelSegment,
+} from "@/lib/szkola/types";
+import type { SessionTabKey } from "@/components/szkola/SessionTabs";
 
 export default function SessionOverview({
   session,
   tasks,
+  segments,
+  accommodations,
+  payments,
+  expenses,
+  onNavigateTab,
 }: {
   session: SchoolSession;
   tasks: SessionTask[];
+  segments: TravelSegment[];
+  accommodations: Accommodation[];
+  payments: SchoolPayment[];
+  expenses: Expense[];
+  onNavigateTab: (tab: SessionTabKey) => void;
 }) {
+  const warnings = getSessionWarnings({
+    session,
+    segments,
+    accommodations,
+    payments,
+    scheduleItems: [],
+  });
+
   const mainColumn = (
     <>
       <PreparationChecklistCard sessionId={session.id} tasks={tasks} />
+      <TravelSummaryCard segments={segments} onNavigateTab={() => onNavigateTab("podroz")} />
       <SessionPlaceholderCard
         icon={CalendarClock}
         title="Plan zajęć"
         description="Harmonogram dni i punktów programu pojawi się tutaj w kolejnym etapie modułu."
-      />
-      <SessionPlaceholderCard
-        icon={Plane}
-        title="Podróż"
-        description="Odcinki podróży (loty, pociągi, transfery) będzie można dodawać w kolejnym etapie."
       />
       <SessionPlaceholderCard
         icon={FolderOpen}
@@ -33,21 +61,9 @@ export default function SessionOverview({
 
   const sidebarColumn = (
     <>
-      <SessionPlaceholderCard
-        icon={CalendarClock}
-        title="Najbliższe terminy"
-        description="Terminy z checklisty i planu zajęć pojawią się tutaj automatycznie."
-      />
-      <SessionPlaceholderCard
-        icon={Bed}
-        title="Zakwaterowanie"
-        description="Rezerwacja noclegu, ceny i warunki anulowania — w przygotowaniu."
-      />
-      <SessionPlaceholderCard
-        icon={Receipt}
-        title="Budżet i wydatki"
-        description="Zestawienie płatności za szkołę i wydatków podróżnych — w przygotowaniu."
-      />
+      <UpcomingDeadlinesCard tasks={tasks} payments={payments} accommodations={accommodations} />
+      <AccommodationSummaryCard accommodations={accommodations} onNavigateTab={() => onNavigateTab("zakwaterowanie")} />
+      <BudgetCard session={session} payments={payments} expenses={expenses} />
       <SessionPlaceholderCard
         icon={Files}
         title="Dokumenty"
@@ -62,7 +78,9 @@ export default function SessionOverview({
   );
 
   return (
-    <div>
+    <div className="flex flex-col gap-5">
+      <SessionWarningsCard warnings={warnings} />
+
       <div className="flex flex-col gap-5 min-[1000px]:hidden">
         {mainColumn}
         {sidebarColumn}

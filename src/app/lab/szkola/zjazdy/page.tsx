@@ -4,7 +4,8 @@ import SzkolaNav from "@/components/szkola/SzkolaNav";
 import SessionsPageHeader from "@/components/szkola/SessionsPageHeader";
 import SessionsExplorer from "@/components/szkola/SessionsExplorer";
 import { getMissingTaskTitles, getPreparationPercent } from "@/lib/szkola/preparation";
-import type { SchoolSession, SessionTask } from "@/lib/szkola/types";
+import { sumByCurrency } from "@/lib/szkola/money";
+import type { Currency, SchoolSession, SessionTask } from "@/lib/szkola/types";
 import type { SessionListItem } from "@/components/szkola/SessionsExplorer";
 
 export const metadata: Metadata = {
@@ -19,22 +20,25 @@ export default async function ZjazdySzkolaPage() {
       supabase.from("school_sessions").select("*").order("start_date", { ascending: true }),
       supabase.from("session_tasks").select("*"),
       supabase.from("session_schedule_items").select("id, session_id"),
-      supabase.from("school_payments").select("session_id, amount"),
-      supabase.from("expenses").select("session_id, amount"),
+      supabase.from("school_payments").select("session_id, amount, currency"),
+      supabase.from("expenses").select("session_id, amount, currency"),
     ]);
 
   const sessions = (sessionsData as SchoolSession[] | null) ?? [];
   const allTasks = (tasksData as SessionTask[] | null) ?? [];
   const scheduleItems = (scheduleData as { id: string; session_id: string }[] | null) ?? [];
-  const payments = (paymentsData as { session_id: string | null; amount: number }[] | null) ?? [];
-  const expenses = (expensesData as { session_id: string | null; amount: number }[] | null) ?? [];
+  const payments =
+    (paymentsData as { session_id: string | null; amount: number; currency: Currency | null }[] | null) ?? [];
+  const expenses =
+    (expensesData as { session_id: string | null; amount: number; currency: Currency | null }[] | null) ?? [];
 
   const items: SessionListItem[] = sessions.map((session) => {
     const tasks = allTasks.filter((t) => t.session_id === session.id);
     const scheduleCount = scheduleItems.filter((s) => s.session_id === session.id).length;
-    const costSum =
-      payments.filter((p) => p.session_id === session.id).reduce((sum, p) => sum + Number(p.amount), 0) +
-      expenses.filter((e) => e.session_id === session.id).reduce((sum, e) => sum + Number(e.amount), 0);
+    const costSums = sumByCurrency([
+      ...payments.filter((p) => p.session_id === session.id),
+      ...expenses.filter((e) => e.session_id === session.id),
+    ]);
 
     return {
       ...session,
@@ -43,7 +47,7 @@ export default async function ZjazdySzkolaPage() {
       taskTotalCount: tasks.length,
       missingTaskTitles: getMissingTaskTitles(tasks),
       scheduleItemCount: scheduleCount,
-      totalCostAmount: costSum,
+      costSums,
     };
   });
 

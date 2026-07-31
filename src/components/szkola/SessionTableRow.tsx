@@ -7,6 +7,7 @@ import { Ellipsis } from "lucide-react";
 import SessionStatusBadge from "@/components/szkola/SessionStatusBadge";
 import { deleteSession } from "@/app/lab/szkola/zjazdy/actions";
 import { formatSessionDateRange } from "@/lib/szkola/format";
+import { formatCurrencySums } from "@/lib/szkola/money";
 import type { SessionListItem } from "@/components/szkola/SessionsExplorer";
 
 export const SESSION_TABLE_GRID_COLS =
@@ -155,8 +156,8 @@ export default function SessionTableRow({
         )}
       </div>
 
-      <div className="text-[11px] text-[#62596b]">
-        {session.totalCostAmount > 0 ? `${session.totalCostAmount.toFixed(0)} zł` : "—"}
+      <div className="truncate text-[11px] text-[#62596b]">
+        {Object.keys(session.costSums).length > 0 ? formatCurrencySums(session.costSums) : "—"}
       </div>
 
       <div>

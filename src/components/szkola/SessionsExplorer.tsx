@@ -8,7 +8,7 @@ import {
   SESSION_FILTER_LABELS,
   type SessionFilterKey,
 } from "@/lib/szkola/sessionFilters";
-import type { SchoolSession } from "@/lib/szkola/types";
+import type { Currency, SchoolSession } from "@/lib/szkola/types";
 
 export type SessionListItem = SchoolSession & {
   preparationPercent: number;
@@ -16,7 +16,7 @@ export type SessionListItem = SchoolSession & {
   taskTotalCount: number;
   missingTaskTitles: string[];
   scheduleItemCount: number;
-  totalCostAmount: number;
+  costSums: Partial<Record<Currency, number>>;
 };
 
 type SortKey = "date_asc" | "title_asc" | "preparation_asc";

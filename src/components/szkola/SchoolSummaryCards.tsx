@@ -1,5 +1,7 @@
 import { CalendarRange, Plane, WalletCards, CalendarClock } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { formatCurrencySums } from "@/lib/szkola/money";
+import type { Currency } from "@/lib/szkola/types";
 
 type SummaryCard = {
   key: string;
@@ -13,14 +15,14 @@ export default function SchoolSummaryCards({
   nextSessionLabel,
   preparedTripsCount,
   totalSessionsForTravel,
-  expensesThisYear,
+  expensesThisYearSums,
   calendarChangesCount,
   calendarConnected,
 }: {
   nextSessionLabel: string;
   preparedTripsCount: number;
   totalSessionsForTravel: number;
-  expensesThisYear: number;
+  expensesThisYearSums: Partial<Record<Currency, number>>;
   calendarChangesCount: number;
   calendarConnected: boolean;
 }) {
@@ -41,7 +43,7 @@ export default function SchoolSummaryCards({
     {
       key: "expenses",
       label: "Wydatki w tym roku",
-      value: `${expensesThisYear.toFixed(0)} zł`,
+      value: Object.keys(expensesThisYearSums).length > 0 ? formatCurrencySums(expensesThisYearSums) : "0 PLN",
       icon: WalletCards,
     },
     {

@@ -6,7 +6,8 @@ import SzkolaNav from "@/components/szkola/SzkolaNav";
 import NextSessionCard from "@/components/szkola/NextSessionCard";
 import SchoolSummaryCards from "@/components/szkola/SchoolSummaryCards";
 import { todayDateString } from "@/lib/lab/format";
-import type { SchoolSession, SessionTask } from "@/lib/szkola/types";
+import { sumByCurrency } from "@/lib/szkola/money";
+import type { Currency, SchoolSession, SessionTask } from "@/lib/szkola/types";
 
 export const metadata: Metadata = {
   title: "Szkoła psychoterapii",
@@ -31,8 +32,8 @@ export default async function SzkolaPulpitPage() {
       .gte("start_date", today)
       .order("start_date", { ascending: true }),
     supabase.from("travel_itineraries").select("session_id"),
-    supabase.from("school_payments").select("amount, paid_date, due_date"),
-    supabase.from("expenses").select("amount, expense_date"),
+    supabase.from("school_payments").select("amount, currency, paid_date, due_date"),
+    supabase.from("expenses").select("amount, currency, expense_date"),
     supabase.from("calendar_changes").select("id, acknowledged"),
   ]);
 
@@ -52,13 +53,12 @@ export default async function SzkolaPulpitPage() {
   const preparedTripsCount = new Set((itinerarySessionIds ?? []).map((r) => r.session_id)).size;
 
   const isThisYear = (dateStr: string | null) => !!dateStr && dateStr.startsWith(String(currentYear));
-  const expensesThisYear =
-    (payments ?? [])
-      .filter((p) => isThisYear(p.paid_date) || isThisYear(p.due_date))
-      .reduce((sum, p) => sum + Number(p.amount), 0) +
-    (expenses ?? [])
-      .filter((e) => isThisYear(e.expense_date))
-      .reduce((sum, e) => sum + Number(e.amount), 0);
+  const paymentsThisYear = (payments ?? []).filter((p) => isThisYear(p.paid_date) || isThisYear(p.due_date));
+  const expensesThisYear = (expenses ?? []).filter((e) => isThisYear(e.expense_date));
+  const expensesThisYearSums = sumByCurrency([
+    ...(paymentsThisYear as { amount: number; currency: Currency | null }[]),
+    ...(expensesThisYear as { amount: number; currency: Currency | null }[]),
+  ]);
 
   const calendarChangesCount = (calendarChanges ?? []).filter((c) => !c.acknowledged).length;
 
@@ -105,7 +105,7 @@ export default async function SzkolaPulpitPage() {
             }
             preparedTripsCount={preparedTripsCount}
             totalSessionsForTravel={sessions.length}
-            expensesThisYear={expensesThisYear}
+            expensesThisYearSums={expensesThisYearSums}
             calendarChangesCount={calendarChangesCount}
             calendarConnected={false}
           />
