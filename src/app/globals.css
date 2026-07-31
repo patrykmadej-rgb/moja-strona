@@ -169,3 +169,65 @@ html {
 .lab-articles-page .rounded-\[7px\] {
   border-radius: 7px !important;
 }
+
+/* ============================================================
+   /lab/szkola — moduł Szkoła psychoterapii, zawężony do
+   .lab-szkola-page. Ten sam mechanizm i powód co .lab-article-page
+   i .lab-articles-page powyżej.
+   ============================================================ */
+.lab-szkola-page .rounded-full {
+  border-radius: 9999px !important;
+}
+.lab-szkola-page .rounded-\[16px\] {
+  border-radius: 16px !important;
+}
+.lab-szkola-page .rounded-\[14px\] {
+  border-radius: 14px !important;
+}
+.lab-szkola-page .rounded-\[12px\] {
+  border-radius: 12px !important;
+}
+.lab-szkola-page .rounded-\[10px\] {
+  border-radius: 10px !important;
+}
+.lab-szkola-page .rounded-\[9px\] {
+  border-radius: 9px !important;
+}
+
+/* ============================================================
+   Wspólny sidebar /lab — dekoracyjna grafika (konstelacja) w dolnej
+   części. Plik dokładnie pod /lab/lab-bg-constellation.png (public/lab/),
+   nie kopiować/przenosić. Mask-image z wieloma przystankami i prefiksem
+   -webkit- nie da się sensownie wyrazić jako arbitrary-value Tailwind,
+   więc zwykła klasa CSS.
+   ============================================================ */
+.lab-sidebar-decoration {
+  position: absolute;
+  z-index: 1;
+  left: -16px;
+  right: -16px;
+  bottom: 72px;
+  height: 54%;
+  background-image: url("/lab/lab-bg-constellation.png");
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: contain;
+  opacity: 0.3;
+  pointer-events: none;
+  filter: saturate(0.88) contrast(0.95);
+
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 15%,
+    rgba(0, 0, 0, 0.85) 42%,
+    #000 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 15%,
+    rgba(0, 0, 0, 0.85) 42%,
+    #000 100%
+  );
+}

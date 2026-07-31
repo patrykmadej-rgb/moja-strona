@@ -7,7 +7,7 @@ export default function EmptyState({
   action,
   compact = false,
 }: {
-  icon: ComponentType<{ className?: string; stroke?: number }>;
+  icon: ComponentType<{ className?: string }>;
   title: string;
   subtitle?: string;
   action?: { label: string; onClick: () => void };
@@ -22,7 +22,7 @@ export default function EmptyState({
       }
     >
       <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#f1eafd] text-[#5b2a86]">
-        <Icon className="h-5 w-5" stroke={1.6} />
+        <Icon className="h-5 w-5" />
       </div>
       <p className="mt-1 text-sm font-medium text-[#201a2b]">{title}</p>
       {subtitle && <p className="max-w-xs text-xs text-[#706878]">{subtitle}</p>}

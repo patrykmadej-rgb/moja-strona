@@ -45,7 +45,7 @@ export default async function LabLayout({
       <body className="h-full font-[family-name:var(--font-manrope)] antialiased">
         {user ? (
           <div className="flex h-full min-h-screen bg-[#F5F1EC]">
-            <Sidebar />
+            <Sidebar email={user.email} />
             <div className="min-w-0 flex-1">{children}</div>
           </div>
         ) : (
