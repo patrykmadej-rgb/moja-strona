@@ -179,10 +179,10 @@ export default async function Navbar() {
           {user ? (
             <div className="flex items-center gap-3">
               <NextLink
-                href="/panel"
+                href="/lab"
                 className="text-sm font-medium text-[#4A1D6E] hover:underline dark:text-purple-300"
               >
-                Panel
+                Lab
               </NextLink>
               <form action={signOut}>
                 <button
