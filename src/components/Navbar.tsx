@@ -197,7 +197,7 @@ export default async function Navbar() {
             <Image
               src="/lab/lab-flask-icon.png"
               alt=""
-              width={53}
+              width={37}
               height={36}
               className="h-9 w-auto"
             />
