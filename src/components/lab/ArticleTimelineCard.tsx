@@ -38,7 +38,7 @@ export default function ArticleTimelineCard({
   const highlightEvents = pickHighlightEvents(events);
 
   return (
-    <section className="rounded-[16px] border border-[#e6deec] bg-white p-5 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+    <section className="flex min-h-[260px] flex-col rounded-[16px] border border-[#e6deec] bg-white p-5 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-sm font-semibold text-[#201a2b]">Oś czasu</h2>
         {events.length > 0 && (
@@ -53,12 +53,15 @@ export default function ArticleTimelineCard({
       </div>
 
       {events.length === 0 ? (
-        <EmptyState
-          icon={IconCalendar}
-          title="Nie dodano jeszcze wydarzeń"
-          subtitle="Utwórz pierwszy etap pracy nad artykułem"
-          action={{ label: "Dodaj wydarzenie", onClick: onNavigateTab }}
-        />
+        <div className="flex flex-1 items-center justify-center">
+          <EmptyState
+            icon={IconCalendar}
+            title="Nie dodano jeszcze wydarzeń"
+            subtitle="Utwórz pierwszy etap pracy nad artykułem"
+            action={{ label: "Dodaj wydarzenie", onClick: onNavigateTab }}
+            compact
+          />
+        </div>
       ) : (
         <div className="mt-4">
           <EventTimeline events={highlightEvents} />

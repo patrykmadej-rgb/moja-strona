@@ -31,13 +31,14 @@ export default function ArticleOverview({
         </div>
       </div>
 
-      <ArticleTimelineCard events={events} onNavigateTab={() => onNavigateTab("harmonogram")} />
-
-      <LatestVersionCard
-        articleId={article.id}
-        latestVersion={latestVersion}
-        onNavigateTab={() => onNavigateTab("wersje")}
-      />
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <LatestVersionCard
+          articleId={article.id}
+          latestVersion={latestVersion}
+          onNavigateTab={() => onNavigateTab("wersje")}
+        />
+        <ArticleTimelineCard events={events} onNavigateTab={() => onNavigateTab("harmonogram")} />
+      </div>
     </div>
   );
 }
