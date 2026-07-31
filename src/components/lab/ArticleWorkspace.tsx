@@ -51,7 +51,7 @@ export default function ArticleWorkspace({
           <>
             <ArticleHeader article={article} onEdit={() => setEditing(true)} onNavigateTab={setTab} />
 
-            <div className="mt-2">
+            <div className="mt-0">
               <ArticleTabs tab={tab} onChange={setTab} />
             </div>
 

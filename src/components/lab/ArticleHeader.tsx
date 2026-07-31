@@ -24,7 +24,7 @@ export default function ArticleHeader({
   const router = useRouter();
 
   return (
-    <div className="grid grid-cols-1 items-start gap-6 min-[900px]:grid-cols-[minmax(0,1fr)_auto] min-[900px]:gap-8">
+    <div className="grid grid-cols-1 items-start gap-6 min-[800px]:grid-cols-[minmax(0,1fr)_240px] min-[800px]:gap-7 min-[1100px]:grid-cols-[minmax(0,1fr)_270px]">
       <div className="min-w-0">
         <Link
           href="/lab/artykuly"
@@ -35,8 +35,12 @@ export default function ArticleHeader({
         </Link>
 
         <h1
-          className="mt-4 max-w-[950px] font-[family-name:var(--font-cormorant)] font-medium text-[#201a2b]"
-          style={{ fontSize: "clamp(34px, 3vw, 48px)", lineHeight: 1.08 }}
+          className="mt-4 max-w-[1000px] font-[family-name:var(--font-cormorant)] font-medium text-[#201a2b]"
+          style={{
+            fontSize: "clamp(38px, 3.2vw, 54px)",
+            lineHeight: 1.04,
+            letterSpacing: "-0.015em",
+          }}
         >
           {article.title}
         </h1>
@@ -56,7 +60,7 @@ export default function ArticleHeader({
         </p>
       </div>
 
-      <div className="flex shrink-0 flex-col items-end gap-3 pt-0.5">
+      <div className="flex w-full shrink-0 flex-col items-end gap-3 pt-0.5 min-[800px]:w-[240px] min-[1100px]:w-[270px]">
         <div className="flex flex-wrap items-center justify-end gap-1.5">
           <button
             type="button"

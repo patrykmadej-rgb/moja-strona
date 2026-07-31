@@ -7,7 +7,11 @@ const ABSTRACT_PREVIEW_LENGTH = 320;
 
 function FieldValue({ value }: { value: string | null }) {
   if (!value) {
-    return <dd className="mt-1 text-sm italic text-[#706878]">Nie określono</dd>;
+    return (
+      <dd className="mt-1 border-0 bg-transparent p-0 text-sm italic text-[#807786]">
+        Nie określono
+      </dd>
+    );
   }
   return <dd className="mt-1 text-sm text-[#201a2b]">{value}</dd>;
 }
@@ -22,7 +26,7 @@ export default function ArticleBasicInfoCard({ article }: { article: Article }) 
       : abstract;
 
   return (
-    <section className="rounded-[16px] border border-[#e6deec] bg-white p-5 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+    <section className="rounded-[16px] border border-[#e6deec] bg-white px-[22px] py-5 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
       <h2 className="text-sm font-semibold text-[#201a2b]">Informacje podstawowe</h2>
 
       <dl className="mt-4 grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
@@ -58,7 +62,9 @@ export default function ArticleBasicInfoCard({ article }: { article: Article }) 
             ))}
           </div>
         ) : (
-          <p className="mt-1 text-sm italic text-[#706878]">Nie dodano słów kluczowych</p>
+          <p className="mt-1 border-0 bg-transparent p-0 text-sm italic text-[#807786]">
+            Nie dodano słów kluczowych
+          </p>
         )}
       </div>
 
@@ -80,7 +86,9 @@ export default function ArticleBasicInfoCard({ article }: { article: Article }) 
             )}
           </>
         ) : (
-          <p className="mt-1.5 text-sm italic text-[#706878]">Nie dodano abstraktu</p>
+          <p className="mt-1.5 border-0 bg-transparent p-0 text-sm italic text-[#807786]">
+            Nie dodano abstraktu
+          </p>
         )}
       </div>
     </section>
