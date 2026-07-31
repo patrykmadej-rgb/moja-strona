@@ -183,12 +183,6 @@ export default async function Navbar() {
           <LanguageSwitcher />
           {user ? (
             <div className="flex items-center gap-3">
-              <NextLink
-                href="/lab"
-                className="text-sm font-medium text-[#4A1D6E] hover:underline dark:text-purple-300"
-              >
-                Lab
-              </NextLink>
               <form action={signOut}>
                 <button
                   type="submit"
