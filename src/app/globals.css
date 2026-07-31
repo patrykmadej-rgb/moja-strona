@@ -143,3 +143,29 @@ html {
 .lab-article-page .rounded-\[10px\] {
   border-radius: 10px !important;
 }
+
+/* ============================================================
+   /lab/artykuly — lista artykułów, zawężona do .lab-articles-page.
+   Ten sam powód i mechanizm co .lab-article-page powyżej: dashboard
+   używa zaokrągleń (karty, segmented control, badge statusów),
+   więc wymaga jawnego wyjątku od globalnej zasady
+   `* { border-radius: 0 }`.
+   ============================================================ */
+.lab-articles-page .rounded-full {
+  border-radius: 9999px !important;
+}
+.lab-articles-page .rounded-\[14px\] {
+  border-radius: 14px !important;
+}
+.lab-articles-page .rounded-\[12px\] {
+  border-radius: 12px !important;
+}
+.lab-articles-page .rounded-\[10px\] {
+  border-radius: 10px !important;
+}
+.lab-articles-page .rounded-\[9px\] {
+  border-radius: 9px !important;
+}
+.lab-articles-page .rounded-\[7px\] {
+  border-radius: 7px !important;
+}

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import ArticleHeader from "@/components/lab/ArticleHeader";
-import ArticleTabs, { type TabKey } from "@/components/lab/ArticleTabs";
+import ArticleTabs, { TABS, type TabKey } from "@/components/lab/ArticleTabs";
 import ArticleOverview from "@/components/lab/ArticleOverview";
 import EditArticleForm from "@/components/lab/EditArticleForm";
 import VersionsTab from "@/components/lab/VersionsTab";
@@ -30,8 +31,13 @@ export default function ArticleWorkspace({
   notes: ArticleNote[];
   files: ArticleFile[];
 }) {
-  const [tab, setTab] = useState<TabKey>("przeglad");
-  const [editing, setEditing] = useState(false);
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const isValidTab = (value: string | null): value is TabKey =>
+    TABS.some((t) => t.key === value);
+
+  const [tab, setTab] = useState<TabKey>(isValidTab(tabParam) ? tabParam : "przeglad");
+  const [editing, setEditing] = useState(searchParams.get("edit") === "1");
 
   const latestVersion = versions[0] ?? null;
 

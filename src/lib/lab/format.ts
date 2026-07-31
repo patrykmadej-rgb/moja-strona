@@ -16,6 +16,21 @@ export function formatDateTime(iso: string): string {
   });
 }
 
+export function formatDateMedium(iso: string): string {
+  return new Date(iso).toLocaleDateString("pl-PL", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+export function formatTimeOnly(iso: string): string {
+  return new Date(iso).toLocaleTimeString("pl-PL", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 // Kolumny typu `date` w Postgresie zwracają "YYYY-MM-DD" bez informacji
 // o strefie czasowej — `new Date(str)` interpretuje to jako UTC-północ,
 // co przy formatowaniu w strefach "za UTC" (np. Ameryki) potrafi cofnąć
