@@ -195,39 +195,74 @@ html {
 }
 
 /* ============================================================
-   Wspólny sidebar /lab — dekoracyjna grafika (konstelacja) w dolnej
-   części. Plik dokładnie pod /lab/lab-bg-constellation.png (public/lab/),
-   nie kopiować/przenosić. Mask-image z wieloma przystankami i prefiksem
-   -webkit- nie da się sensownie wyrazić jako arbitrary-value Tailwind,
-   więc zwykła klasa CSS.
+   Wspólny sidebar /lab — dekoracyjna grafika (konstelacja), osadzona
+   nisko i bardzo subtelnie w tle dolnej części. Plik dokładnie pod
+   /lab/lab-bg-constellation.png (public/lab/), nie kopiować/przenosić.
+   Podwójny mask-image (radialny + pionowy zanik) i prefiks -webkit-
+   nie dają się sensownie wyrazić jako arbitrary-value Tailwind, więc
+   zwykła klasa CSS. .lab-sidebar dostaje też skalę promieni (14/10/6px
+   + pełny pill) jako wyjątek od globalnej zasady ostrych kątów — ten
+   sam mechanizm co .lab-article-page itd.
    ============================================================ */
 .lab-sidebar-decoration {
   position: absolute;
   z-index: 1;
-  left: -16px;
-  right: -16px;
-  bottom: 72px;
-  height: 54%;
+  left: -8px;
+  right: -8px;
+  bottom: 52px;
+  height: 240px;
+
   background-image: url("/lab/lab-bg-constellation.png");
   background-repeat: no-repeat;
-  background-position: left bottom;
-  background-size: contain;
-  opacity: 0.3;
-  pointer-events: none;
-  filter: saturate(0.88) contrast(0.95);
+  background-position: center bottom;
+  background-size: 110% auto;
 
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(0, 0, 0, 0.2) 15%,
-    rgba(0, 0, 0, 0.85) 42%,
-    #000 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(0, 0, 0, 0.2) 15%,
-    rgba(0, 0, 0, 0.85) 42%,
-    #000 100%
-  );
+  opacity: 0.18;
+  pointer-events: none;
+
+  filter: saturate(0.85) brightness(0.95);
+
+  mask-image:
+    radial-gradient(
+      circle at 50% 85%,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.92) 42%,
+      rgba(0, 0, 0, 0.45) 68%,
+      transparent 100%
+    ),
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.85) 30%,
+      rgba(0, 0, 0, 0.35) 62%,
+      transparent 100%
+    );
+  -webkit-mask-image:
+    radial-gradient(
+      circle at 50% 85%,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.92) 42%,
+      rgba(0, 0, 0, 0.45) 68%,
+      transparent 100%
+    ),
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.85) 30%,
+      rgba(0, 0, 0, 0.35) 62%,
+      transparent 100%
+    );
+}
+
+.lab-sidebar .rounded-\[14px\] {
+  border-radius: 14px !important;
+}
+.lab-sidebar .rounded-\[10px\] {
+  border-radius: 10px !important;
+}
+.lab-sidebar .rounded-\[6px\] {
+  border-radius: 6px !important;
+}
+.lab-sidebar .rounded-full {
+  border-radius: 9999px !important;
 }
