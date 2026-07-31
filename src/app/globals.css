@@ -195,68 +195,196 @@ html {
 }
 
 /* ============================================================
-   Wspólny sidebar /lab — dekoracyjna grafika (konstelacja), osadzona
-   nisko i bardzo subtelnie w tle dolnej części. Plik dokładnie pod
-   /lab/lab-bg-constellation.png (public/lab/), nie kopiować/przenosić.
-   Podwójny mask-image (radialny + pionowy zanik) i prefiks -webkit-
-   nie dają się sensownie wyrazić jako arbitrary-value Tailwind, więc
-   zwykła klasa CSS. .lab-sidebar dostaje też skalę promieni (14/10/6px
-   + pełny pill) jako wyjątek od globalnej zasady ostrych kątów — ten
-   sam mechanizm co .lab-article-page itd.
+   Wspólny sidebar /lab.
+
+   Przyczyna dawnego "urywania się" tła: sidebar był zwykłym flex-
+   sibling elementem z `height: 100%`, zależnym od wysokości rodzica
+   (`html`/`body`/wrapper), a ta z kolei zależała od długości treści
+   strony. Przy długich podstronach tło sidebara kończyło się po
+   jednym viewporcie, a niżej było widać białe tło strony. Naprawa:
+   .lab-sidebar jest teraz `position: fixed` i sam ustala swoją
+   wysokość na 100dvh, niezależnie od DOM-u rodziców i długości
+   treści. Główna treść dostaje `margin-left` (.lab-main-content)
+   zamiast dzielić grid/flex z sidebarem.
+
+   Szerokość sidebara jako jedna zmienna CSS (--lab-sidebar-width),
+   używana zarówno przez .lab-sidebar, jak i .lab-main-content, żeby
+   nie trzeba było wpisywać liczby w kilku miejscach.
+
+   Grafika /lab/lab-bg-constellation.png (public/lab/, nie kopiować/
+   przenosić) jest prawdziwym elementem <img> (nie background-image),
+   celowo większym niż sam sidebar i przycinanym przez overflow:hidden
+   na .lab-sidebar. Warstwy: img (z-index 1) -> overlay czytelności
+   (::after, z-index 2) -> treść/ikony (z-index 3-4).
    ============================================================ */
-.lab-sidebar-decoration {
+:root {
+  --lab-sidebar-width: 96px;
+}
+
+@media (max-width: 899px) {
+  :root {
+    --lab-sidebar-width: 72px;
+  }
+}
+
+.lab-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--lab-sidebar-width);
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  z-index: 50;
+
+  background:
+    radial-gradient(circle at 25% 18%, rgba(105, 65, 142, 0.19) 0%, transparent 34%),
+    linear-gradient(180deg, #251332 0%, #1b0e27 52%, #13091d 100%);
+
+  border-right: 1px solid rgba(255, 255, 255, 0.055);
+}
+
+.lab-sidebar::after {
+  content: "";
   position: absolute;
-  z-index: 1;
-  left: -8px;
-  right: -8px;
-  bottom: 52px;
-  height: 240px;
-
-  background-image: url("/lab/lab-bg-constellation.png");
-  background-repeat: no-repeat;
-  background-position: center bottom;
-  background-size: 110% auto;
-
-  opacity: 0.18;
+  z-index: 2;
+  inset: 0;
   pointer-events: none;
 
-  filter: saturate(0.85) brightness(0.95);
-
-  mask-image:
-    radial-gradient(
-      circle at 50% 85%,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.92) 42%,
-      rgba(0, 0, 0, 0.45) 68%,
-      transparent 100%
-    ),
-    linear-gradient(
-      to top,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.85) 30%,
-      rgba(0, 0, 0, 0.35) 62%,
-      transparent 100%
-    );
-  -webkit-mask-image:
-    radial-gradient(
-      circle at 50% 85%,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.92) 42%,
-      rgba(0, 0, 0, 0.45) 68%,
-      transparent 100%
-    ),
-    linear-gradient(
-      to top,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.85) 30%,
-      rgba(0, 0, 0, 0.35) 62%,
-      transparent 100%
-    );
+  background: linear-gradient(
+    180deg,
+    rgba(19, 9, 29, 0.18) 0%,
+    rgba(19, 9, 29, 0.08) 48%,
+    rgba(19, 9, 29, 0.24) 100%
+  );
 }
 
-.lab-sidebar .rounded-\[14px\] {
+.lab-sidebar-content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 16px 0 14px;
+}
+
+.lab-main-content {
+  min-height: 100vh;
+  margin-left: var(--lab-sidebar-width);
+}
+
+.lab-sidebar-constellation {
+  position: absolute;
+  z-index: 1;
+  left: -54px;
+  bottom: 64px;
+
+  width: 215px;
+  height: auto;
+  max-width: none;
+
+  opacity: 0.42;
+  pointer-events: none;
+  user-select: none;
+
+  object-fit: contain;
+  object-position: left bottom;
+
+  filter: saturate(1.02) brightness(0.95) contrast(1.05);
+
+  -webkit-mask-image: linear-gradient(
+    to top,
+    #000 0%,
+    rgba(0, 0, 0, 0.96) 58%,
+    rgba(0, 0, 0, 0.42) 82%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to top,
+    #000 0%,
+    rgba(0, 0, 0, 0.96) 58%,
+    rgba(0, 0, 0, 0.42) 82%,
+    transparent 100%
+  );
+}
+
+@media (max-width: 899px) {
+  .lab-sidebar-constellation {
+    width: 165px;
+    left: -48px;
+    opacity: 0.34;
+  }
+
+  /* Przy 72px szerokości nav-item (48px) siedzi bliżej lewej krawędzi;
+     -18px wypadłoby poza .lab-sidebar i zostałby ucięty przez
+     overflow: hidden. */
+  .lab-nav-item.active::before {
+    left: -9px;
+  }
+}
+
+.lab-nav-item {
+  position: relative;
+  z-index: 4;
+  width: 48px;
+  height: 48px;
+  margin-inline: auto;
   border-radius: 14px !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: rgba(255, 255, 255, 0.68);
+  background: transparent;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
 }
+
+.lab-nav-item[data-enabled="true"]:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.065);
+}
+
+.lab-nav-item[data-enabled="false"] {
+  color: rgba(255, 255, 255, 0.25);
+  cursor: not-allowed;
+}
+
+.lab-nav-item.active {
+  color: #fff;
+  background: linear-gradient(180deg, rgba(111, 68, 156, 0.58) 0%, rgba(80, 43, 116, 0.5) 100%);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 8px 18px rgba(0, 0, 0, 0.16);
+}
+
+.lab-nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: 11px;
+  bottom: 11px;
+  width: 2px;
+  border-radius: 999px;
+  background: #d8b77b;
+}
+
+.lab-sidebar-footer {
+  position: relative;
+  z-index: 4;
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding-top: 14px;
+}
+
 .lab-sidebar .rounded-\[10px\] {
   border-radius: 10px !important;
 }
