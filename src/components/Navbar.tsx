@@ -1,7 +1,6 @@
 import NextLink from "next/link";
 import Image from "next/image";
 import { Mail } from "lucide-react";
-import { IconFlask } from "@tabler/icons-react";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -194,13 +193,14 @@ export default async function Navbar() {
               <Mail className="h-4 w-4" />
             </Link>
           )}
-          <NextLink
-            href="/lab"
-            title="Lab"
-            aria-label="Lab"
-            className="text-[#4A3360] transition-colors hover:text-[#1C1028] dark:text-neutral-400 dark:hover:text-white"
-          >
-            <IconFlask className="h-4 w-4" stroke={1.75} />
+          <NextLink href="/lab" title="Lab" aria-label="Lab" className="shrink-0">
+            <Image
+              src="/lab/lab-flask-icon.png"
+              alt=""
+              width={29}
+              height={20}
+              className="h-5 w-auto"
+            />
           </NextLink>
         </div>
       </nav>
