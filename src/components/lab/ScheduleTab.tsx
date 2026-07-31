@@ -15,7 +15,7 @@ import {
 } from "@/lib/lab/types";
 
 const inputClass =
-  "rounded-[10px] border border-[#e8e2ec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
+  "rounded-[10px] border border-[#e6deec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
 
 function EventTypeTag({ type }: { type: EventType }) {
   return (
@@ -113,7 +113,7 @@ export default function ScheduleTab({
         ))}
       </datalist>
 
-      <section className="rounded-[14px] border border-[#e8e2ec] bg-white/95 p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+      <section className="rounded-[16px] border border-[#e6deec] bg-white p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
         <h2 className="text-sm font-semibold text-[#201a2b]">Oś czasu</h2>
         {events.length === 0 ? (
           <p className="mt-4 text-sm text-[#706878]">Brak zaplanowanych wydarzeń.</p>
@@ -124,13 +124,13 @@ export default function ScheduleTab({
         )}
       </section>
 
-      <section className="rounded-[14px] border border-[#e8e2ec] bg-white/95 p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+      <section className="rounded-[16px] border border-[#e6deec] bg-white p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-[#201a2b]">Wydarzenia</h2>
           <button
             type="button"
             onClick={() => setShowAddForm((v) => !v)}
-            className="rounded-[10px] border border-[#e8e2ec] px-3 py-1.5 text-sm text-[#5b2a86] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd]"
+            className="rounded-[10px] border border-[#e6deec] px-3 py-1.5 text-sm text-[#5b2a86] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd]"
           >
             {showAddForm ? "Anuluj" : "+ Dodaj wydarzenie"}
           </button>
@@ -144,7 +144,7 @@ export default function ScheduleTab({
               formRef.current?.reset();
               setShowAddForm(false);
             }}
-            className="mt-4 flex flex-col gap-3 rounded-[10px] border border-[#e8e2ec] bg-[#f7f4ef] p-4"
+            className="mt-4 flex flex-col gap-3 rounded-[10px] border border-[#e6deec] bg-[#f7f4ef] p-4"
           >
             <input type="hidden" name="article_id" value={articleId} />
             <EventFields />
@@ -159,7 +159,7 @@ export default function ScheduleTab({
             <ul>
               {orderedForList.map((event) =>
                 editingId === event.id ? (
-                  <li key={event.id} className="border-b border-[#e8e2ec] py-4">
+                  <li key={event.id} className="border-b border-[#e6deec] py-4">
                     <form
                       action={async (formData) => {
                         await updateEvent(formData);
@@ -175,7 +175,7 @@ export default function ScheduleTab({
                         <button
                           type="button"
                           onClick={() => setEditingId(null)}
-                          className="rounded-[10px] border border-[#e8e2ec] px-4 py-2 text-sm text-[#706878] hover:border-[#d9cde5]"
+                          className="rounded-[10px] border border-[#e6deec] px-4 py-2 text-sm text-[#706878] hover:border-[#d9cde5]"
                         >
                           Anuluj
                         </button>
@@ -185,7 +185,7 @@ export default function ScheduleTab({
                 ) : (
                   <li
                     key={event.id}
-                    className="flex items-center justify-between gap-4 border-b border-[#e8e2ec] py-4"
+                    className="flex items-center justify-between gap-4 border-b border-[#e6deec] py-4"
                   >
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-[#201a2b]">{event.title}</p>

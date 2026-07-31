@@ -11,7 +11,7 @@ import {
 } from "@/lib/lab/types";
 
 const inputClass =
-  "rounded-[10px] border border-[#e8e2ec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
+  "rounded-[10px] border border-[#e6deec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
 
 function ReadingStatusTag({ status }: { status: ReadingStatus }) {
   if (status === "przeczytane") {
@@ -128,7 +128,7 @@ export default function SourcesTab({
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="rounded-[14px] border border-[#e8e2ec] bg-white/95 p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+      <section className="rounded-[16px] border border-[#e6deec] bg-white p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
         <h2 className="text-sm font-semibold text-[#201a2b]">Dodaj źródło</h2>
         <form
           ref={formRef}
@@ -146,17 +146,17 @@ export default function SourcesTab({
 
       <section>
         {sources.length === 0 ? (
-          <div className="rounded-[14px] border border-[#e8e2ec] bg-white/95 px-6 py-10 text-center shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+          <div className="rounded-[16px] border border-[#e6deec] bg-white px-6 py-10 text-center shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
             <p className="text-sm text-[#706878]">Brak dodanych źródeł.</p>
           </div>
         ) : (
-          <ul className="rounded-[14px] border border-[#e8e2ec] bg-white/95 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+          <ul className="rounded-[16px] border border-[#e6deec] bg-white shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
             {sources.map((s, i) => {
               const isLast = i === sources.length - 1;
               return editingId === s.id ? (
                 <li
                   key={s.id}
-                  className={isLast ? "px-6 py-4" : "border-b border-[#e8e2ec] px-6 py-4"}
+                  className={isLast ? "px-6 py-4" : "border-b border-[#e6deec] px-6 py-4"}
                 >
                   <form
                     action={async (formData) => {
@@ -173,7 +173,7 @@ export default function SourcesTab({
                       <button
                         type="button"
                         onClick={() => setEditingId(null)}
-                        className="rounded-[10px] border border-[#e8e2ec] px-4 py-2 text-sm text-[#706878] hover:border-[#d9cde5]"
+                        className="rounded-[10px] border border-[#e6deec] px-4 py-2 text-sm text-[#706878] hover:border-[#d9cde5]"
                       >
                         Anuluj
                       </button>
@@ -186,7 +186,7 @@ export default function SourcesTab({
                   className={
                     isLast
                       ? "flex items-center justify-between gap-4 px-6 py-4"
-                      : "flex items-center justify-between gap-4 border-b border-[#e8e2ec] px-6 py-4"
+                      : "flex items-center justify-between gap-4 border-b border-[#e6deec] px-6 py-4"
                   }
                 >
                   <div className="min-w-0 flex-1">

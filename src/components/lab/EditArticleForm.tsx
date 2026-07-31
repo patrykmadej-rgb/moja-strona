@@ -5,7 +5,7 @@ import { updateArticle } from "@/app/lab/artykuly/[id]/actions";
 import { ARTICLE_STATUSES, ARTICLE_STATUS_LABELS, type Article } from "@/lib/lab/types";
 
 const inputClass =
-  "rounded-[10px] border border-[#e8e2ec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
+  "rounded-[10px] border border-[#e6deec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
 const labelClass = "text-sm font-medium text-[#201a2b]";
 
 function SubmitButton() {
@@ -177,7 +177,7 @@ export default function EditArticleForm({
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-[10px] border border-[#e8e2ec] px-5 py-2.5 text-sm font-medium text-[#706878] hover:border-[#d9cde5]"
+          className="rounded-[10px] border border-[#e6deec] px-5 py-2.5 text-sm font-medium text-[#706878] hover:border-[#d9cde5]"
         >
           Anuluj
         </button>

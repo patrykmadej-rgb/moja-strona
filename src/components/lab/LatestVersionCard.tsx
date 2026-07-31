@@ -40,7 +40,7 @@ export default function LatestVersionCard({
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <section className="rounded-[14px] border border-[#e8e2ec] bg-white/95 p-5 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+    <section className="rounded-[16px] border border-[#e6deec] bg-white p-5 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
       <h2 className="text-sm font-semibold text-[#201a2b]">Najnowsza wersja</h2>
 
       {latestVersion ? (
@@ -64,7 +64,7 @@ export default function LatestVersionCard({
             {latestVersion.signedUrl && (
               <a
                 href={latestVersion.signedUrl}
-                className="flex items-center gap-1.5 rounded-[10px] border border-[#e8e2ec] px-3 py-1.5 text-sm text-[#201a2b] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] hover:text-[#32134f]"
+                className="flex items-center gap-1.5 rounded-[10px] border border-[#e6deec] px-3 py-1.5 text-sm text-[#201a2b] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] hover:text-[#32134f]"
               >
                 <IconDownload className="h-4 w-4" stroke={1.75} />
                 Pobierz
@@ -74,12 +74,12 @@ export default function LatestVersionCard({
               <button
                 type="button"
                 onClick={() => setMenuOpen((v) => !v)}
-                className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-[#e8e2ec] text-[#706878] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] hover:text-[#32134f]"
+                className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-[#e6deec] text-[#706878] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] hover:text-[#32134f]"
               >
                 <IconDots className="h-4 w-4" stroke={1.75} />
               </button>
               {menuOpen && (
-                <div className="absolute right-0 z-10 mt-1 w-40 rounded-[10px] border border-[#e8e2ec] bg-white py-1 shadow-[0_8px_24px_rgba(49,30,64,0.12)]">
+                <div className="absolute right-0 z-10 mt-1 w-40 rounded-[10px] border border-[#e6deec] bg-white py-1 shadow-[0_8px_24px_rgba(49,30,64,0.12)]">
                   <form
                     action={deleteVersion}
                     onSubmit={(e) => {

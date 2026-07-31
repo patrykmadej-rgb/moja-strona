@@ -8,7 +8,7 @@ import { formatDateTime } from "@/lib/lab/format";
 import type { ArticleNote } from "@/lib/lab/types";
 
 const textareaClass =
-  "rounded-[10px] border border-[#e8e2ec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
+  "rounded-[10px] border border-[#e6deec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
 
 function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
   const { pending } = useFormStatus();
@@ -29,7 +29,7 @@ function NoteCard({ articleId, note }: { articleId: string; note: ArticleNote })
 
   if (isEditing) {
     return (
-      <li className="border-b border-[#e8e2ec] py-4">
+      <li className="border-b border-[#e6deec] py-4">
         <form
           action={async (formData) => {
             await updateNote(formData);
@@ -51,7 +51,7 @@ function NoteCard({ articleId, note }: { articleId: string; note: ArticleNote })
             <button
               type="button"
               onClick={() => setIsEditing(false)}
-              className="rounded-[10px] border border-[#e8e2ec] px-4 py-2 text-sm text-[#706878] hover:border-[#d9cde5]"
+              className="rounded-[10px] border border-[#e6deec] px-4 py-2 text-sm text-[#706878] hover:border-[#d9cde5]"
             >
               Anuluj
             </button>
@@ -62,7 +62,7 @@ function NoteCard({ articleId, note }: { articleId: string; note: ArticleNote })
   }
 
   return (
-    <li className="border-b border-[#e8e2ec] py-4">
+    <li className="border-b border-[#e6deec] py-4">
       <div className="flex items-start justify-between gap-4">
         <p className="min-w-0 flex-1 whitespace-pre-wrap text-sm text-[#201a2b]">{note.content}</p>
         <NotePinnedToggle articleId={articleId} noteId={note.id} isPinned={note.is_pinned} />
@@ -117,7 +117,7 @@ export default function NotesTab({
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="rounded-[14px] border border-[#e8e2ec] bg-white/95 p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+      <section className="rounded-[16px] border border-[#e6deec] bg-white p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
         <h2 className="text-sm font-semibold text-[#201a2b]">Dodaj notatkę</h2>
         <form
           ref={formRef}
@@ -141,11 +141,11 @@ export default function NotesTab({
 
       <section>
         {orderedForList.length === 0 ? (
-          <div className="rounded-[14px] border border-[#e8e2ec] bg-white/95 px-6 py-10 text-center shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+          <div className="rounded-[16px] border border-[#e6deec] bg-white px-6 py-10 text-center shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
             <p className="text-sm text-[#706878]">Brak notatek — dodaj pierwszą powyżej.</p>
           </div>
         ) : (
-          <ul className="rounded-[14px] border border-[#e8e2ec] bg-white/95 px-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+          <ul className="rounded-[16px] border border-[#e6deec] bg-white px-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
             {orderedForList.map((note) => (
               <NoteCard key={note.id} articleId={articleId} note={note} />
             ))}

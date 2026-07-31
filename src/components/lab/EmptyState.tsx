@@ -17,8 +17,8 @@ export default function EmptyState({
     <div
       className={
         compact
-          ? "flex flex-col items-center justify-center gap-2 py-6 text-center"
-          : "flex min-h-[170px] flex-col items-center justify-center gap-2 py-8 text-center"
+          ? "flex flex-col items-center justify-center gap-2 py-4 text-center"
+          : "flex min-h-[120px] flex-col items-center justify-center gap-2 py-6 text-center"
       }
     >
       <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#f1eafd] text-[#5b2a86]">

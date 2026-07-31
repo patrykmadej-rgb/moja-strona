@@ -25,7 +25,7 @@ export default function ArticleTabs({
   onChange: (tab: TabKey) => void;
 }) {
   return (
-    <div className="flex gap-6 overflow-x-auto border-b border-[#e8e2ec]">
+    <div className="flex gap-[30px] overflow-x-auto border-b border-[#e6deec]">
       {TABS.map((t) => (
         <button
           key={t.key}

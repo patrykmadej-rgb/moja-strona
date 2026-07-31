@@ -3,7 +3,7 @@ import { formatDateOnly } from "@/lib/lab/format";
 
 export default function ArticleProgressCard({ article }: { article: Article }) {
   return (
-    <section className="rounded-[14px] border border-[#e8e2ec] bg-white/95 p-5 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+    <section className="rounded-[16px] border border-[#e6deec] bg-white p-5 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
       <h2 className="text-sm font-semibold text-[#201a2b]">Status i postęp</h2>
 
       <p className="mt-4 text-xs text-[#706878]">Aktualny etap</p>
@@ -22,7 +22,7 @@ export default function ArticleProgressCard({ article }: { article: Article }) {
         />
       </div>
 
-      <div className="mt-5 border-t border-[#e8e2ec] pt-4">
+      <div className="mt-5 border-t border-[#e6deec] pt-4">
         <p className="text-xs text-[#706878]">Następny krok</p>
         <p className={article.next_step ? "mt-1 text-sm text-[#201a2b]" : "mt-1 text-sm italic text-[#706878]"}>
           {article.next_step || "Nie określono"}

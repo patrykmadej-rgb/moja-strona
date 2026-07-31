@@ -30,7 +30,7 @@ export default function VersionsTab({
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="rounded-[14px] border border-[#e8e2ec] bg-white/95 p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+      <section className="rounded-[16px] border border-[#e6deec] bg-white p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
         <h2 className="text-sm font-semibold text-[#201a2b]">Dodaj nową wersję</h2>
         <form
           ref={formRef}
@@ -61,7 +61,7 @@ export default function VersionsTab({
             <input
               id="notes"
               name="notes"
-              className="rounded-[10px] border border-[#e8e2ec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]"
+              className="rounded-[10px] border border-[#e6deec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]"
             />
           </div>
           <SubmitButton />
@@ -70,18 +70,18 @@ export default function VersionsTab({
 
       <section>
         {versions.length === 0 ? (
-          <div className="rounded-[14px] border border-[#e8e2ec] bg-white/95 px-6 py-10 text-center shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+          <div className="rounded-[16px] border border-[#e6deec] bg-white px-6 py-10 text-center shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
             <p className="text-sm text-[#706878]">Brak wgranych wersji.</p>
           </div>
         ) : (
-          <ul className="rounded-[14px] border border-[#e8e2ec] bg-white/95 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+          <ul className="rounded-[16px] border border-[#e6deec] bg-white shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
             {versions.map((v, i) => (
               <li
                 key={v.id}
                 className={
                   i === versions.length - 1
                     ? "flex items-center justify-between gap-4 px-6 py-4"
-                    : "flex items-center justify-between gap-4 border-b border-[#e8e2ec] px-6 py-4"
+                    : "flex items-center justify-between gap-4 border-b border-[#e6deec] px-6 py-4"
                 }
               >
                 <div className="min-w-0 flex-1">
@@ -97,7 +97,7 @@ export default function VersionsTab({
                   {v.signedUrl && (
                     <a
                       href={v.signedUrl}
-                      className="rounded-[10px] border border-[#e8e2ec] px-3 py-1.5 text-sm text-[#201a2b] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] hover:text-[#32134f]"
+                      className="rounded-[10px] border border-[#e6deec] px-3 py-1.5 text-sm text-[#201a2b] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] hover:text-[#32134f]"
                     >
                       Pobierz
                     </a>

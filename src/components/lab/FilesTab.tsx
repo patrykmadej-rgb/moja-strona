@@ -98,7 +98,7 @@ export default function FilesTab({
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="rounded-[14px] border border-[#e8e2ec] bg-white/95 p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+      <section className="rounded-[16px] border border-[#e6deec] bg-white p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
         <div className="flex items-center justify-between gap-4">
           <h2 className="font-[family-name:var(--font-cormorant)] text-lg font-semibold text-[#5b2a86]">
             Pliki
@@ -137,8 +137,8 @@ export default function FilesTab({
           tabIndex={0}
           className={
             isDraggingOver
-              ? "mt-4 flex cursor-pointer flex-col items-center gap-2 rounded-[14px] border-2 border-dashed border-[#5b2a86] bg-[#f1eafd] px-6 py-10 text-center"
-              : "mt-4 flex cursor-pointer flex-col items-center gap-2 rounded-[14px] border-2 border-dashed border-[#B4A8C4] bg-[#f1eafd] px-6 py-10 text-center"
+              ? "mt-4 flex cursor-pointer flex-col items-center gap-2 rounded-[16px] border-2 border-dashed border-[#5b2a86] bg-[#f1eafd] px-6 py-10 text-center"
+              : "mt-4 flex cursor-pointer flex-col items-center gap-2 rounded-[16px] border-2 border-dashed border-[#B4A8C4] bg-[#f1eafd] px-6 py-10 text-center"
           }
         >
           <IconCloudUpload className="h-8 w-8 text-[#706878]" stroke={1.5} />
@@ -153,18 +153,18 @@ export default function FilesTab({
 
       <section>
         {files.length === 0 ? (
-          <div className="rounded-[14px] border border-[#e8e2ec] bg-white/95 px-6 py-10 text-center shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+          <div className="rounded-[16px] border border-[#e6deec] bg-white px-6 py-10 text-center shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
             <p className="text-sm text-[#706878]">Brak plików.</p>
           </div>
         ) : (
-          <ul className="rounded-[14px] border border-[#e8e2ec] bg-white/95 px-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+          <ul className="rounded-[16px] border border-[#e6deec] bg-white px-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
             {files.map((file, i) => (
               <li
                 key={file.id}
                 className={
                   i === files.length - 1
                     ? "flex items-center justify-between gap-4 py-4"
-                    : "flex items-center justify-between gap-4 border-b border-[#e8e2ec] py-4"
+                    : "flex items-center justify-between gap-4 border-b border-[#e6deec] py-4"
                 }
               >
                 <div className="flex min-w-0 flex-1 items-center gap-3">

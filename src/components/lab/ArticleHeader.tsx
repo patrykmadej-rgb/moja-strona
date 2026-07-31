@@ -34,7 +34,7 @@ export default function ArticleHeader({
           <button
             type="button"
             onClick={onEdit}
-            className="flex items-center gap-1.5 rounded-[10px] border border-[#e8e2ec] px-4 py-2 text-sm font-medium text-[#201a2b] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] hover:text-[#32134f]"
+            className="flex items-center gap-1.5 rounded-[10px] border border-[#e6deec] px-4 py-2 text-sm font-medium text-[#201a2b] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] hover:text-[#32134f]"
           >
             <IconEdit className="h-4 w-4" stroke={1.75} />
             Edytuj artykuł
@@ -43,12 +43,12 @@ export default function ArticleHeader({
             <button
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
-              className="flex h-[38px] w-[38px] items-center justify-center rounded-[10px] border border-[#e8e2ec] text-[#706878] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] hover:text-[#32134f]"
+              className="flex h-[38px] w-[38px] items-center justify-center rounded-[10px] border border-[#e6deec] text-[#706878] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] hover:text-[#32134f]"
             >
               <IconDots className="h-4 w-4" stroke={1.75} />
             </button>
             {menuOpen && (
-              <div className="absolute right-0 z-10 mt-1 w-48 rounded-[10px] border border-[#e8e2ec] bg-white py-1 shadow-[0_8px_24px_rgba(49,30,64,0.12)]">
+              <div className="absolute right-0 z-10 mt-1 w-48 rounded-[10px] border border-[#e6deec] bg-white py-1 shadow-[0_8px_24px_rgba(49,30,64,0.12)]">
                 <form
                   action={async (formData) => {
                     if (!confirm(`Usunąć artykuł „${article.title}”? Tej operacji nie można cofnąć.`)) {
@@ -74,8 +74,8 @@ export default function ArticleHeader({
       </div>
 
       <h1
-        className="mt-4 max-w-[850px] font-[family-name:var(--font-cormorant)] font-medium text-[#201a2b]"
-        style={{ fontSize: "clamp(32px, 3vw, 44px)", lineHeight: 1.08 }}
+        className="mt-4 max-w-[950px] font-[family-name:var(--font-cormorant)] font-medium text-[#201a2b]"
+        style={{ fontSize: "clamp(34px, 3vw, 48px)", lineHeight: 1.08 }}
       >
         {article.title}
       </h1>

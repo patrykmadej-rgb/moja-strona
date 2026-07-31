@@ -24,7 +24,7 @@ export default function ArticleOverview({
 }) {
   return (
     <div className="flex flex-col gap-5">
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <ArticleBasicInfoCard article={article} />
         <div className="flex flex-col gap-5">
           <ArticleProgressCard article={article} />
@@ -34,7 +34,7 @@ export default function ArticleOverview({
 
       <ArticleTimelineCard events={events} onNavigateTab={() => onNavigateTab("harmonogram")} />
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <LatestVersionCard
           articleId={article.id}
           latestVersion={latestVersion}

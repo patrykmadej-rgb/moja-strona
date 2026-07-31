@@ -43,7 +43,7 @@ export default function ArticleWorkspace({
             <h1 className="font-[family-name:var(--font-cormorant)] text-[22px] font-semibold text-[#5b2a86]">
               Edytuj artykuł
             </h1>
-            <div className="mt-4 rounded-[14px] border border-[#e8e2ec] bg-white/95 p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+            <div className="mt-4 rounded-[16px] border border-[#e6deec] bg-white p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
               <EditArticleForm article={article} onCancel={() => setEditing(false)} />
             </div>
           </div>
@@ -51,7 +51,7 @@ export default function ArticleWorkspace({
           <>
             <ArticleHeader article={article} onEdit={() => setEditing(true)} />
 
-            <div className="mt-6">
+            <div className="mt-2">
               <ArticleTabs tab={tab} onChange={setTab} />
             </div>
 
@@ -71,7 +71,7 @@ export default function ArticleWorkspace({
               {tab === "harmonogram" && <ScheduleTab articleId={article.id} events={events} />}
               {tab === "notatki" && <NotesTab articleId={article.id} notes={notes} />}
               {tab === "zadania" && (
-                <div className="rounded-[14px] border border-[#e8e2ec] bg-white/95 p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+                <div className="rounded-[16px] border border-[#e6deec] bg-white p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
                   <EmptyState
                     icon={IconSquareCheck}
                     title="Zadania pojawią się wkrótce"
