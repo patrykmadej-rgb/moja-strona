@@ -18,17 +18,34 @@ export class CalendarEncryptionConfigError extends Error {}
 
 function getKey(): Buffer {
   const raw = process.env.CALENDAR_TOKEN_ENCRYPTION_KEY;
+
   if (!raw) {
+    // Bezpieczny log diagnostyczny — nigdy nie loguje samej wartości, tylko
+    // fakt istnienia i długości, żeby dało się to zdiagnozować z logów
+    // produkcyjnych bez ryzyka wycieku klucza.
+    console.error("[calendar-crypto] CALENDAR_TOKEN_ENCRYPTION_KEY diagnostyka", {
+      exists: false,
+      rawLength: 0,
+      decodedLength: 0,
+    });
     throw new CalendarEncryptionConfigError(
       "Brak CALENDAR_TOKEN_ENCRYPTION_KEY w zmiennych środowiskowych — integracja z kalendarzem wymaga konfiguracji.",
     );
   }
+
   const key = Buffer.from(raw, "base64");
   if (key.length !== 32) {
+    console.error("[calendar-crypto] CALENDAR_TOKEN_ENCRYPTION_KEY diagnostyka", {
+      exists: true,
+      rawLength: raw.length,
+      decodedLength: key.length,
+      expectedDecodedLength: 32,
+    });
     throw new CalendarEncryptionConfigError(
       "CALENDAR_TOKEN_ENCRYPTION_KEY musi być 32-bajtowym kluczem zakodowanym w base64 (np. `openssl rand -base64 32`).",
     );
   }
+
   return key;
 }
 
