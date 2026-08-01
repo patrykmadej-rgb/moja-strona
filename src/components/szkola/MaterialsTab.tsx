@@ -334,10 +334,14 @@ export default function MaterialsTab({
   const [addMode, setAddMode] = useState<"link" | "notatka" | null>(null);
   const [query, setQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<MaterialCategory | "">("");
+  const [lastSelectedNames, setLastSelectedNames] = useState<string | null>(null);
+  const [uploadPhase, setUploadPhase] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUploadFiles = useCallback(
     async (fileList: FileList | File[]) => {
+      console.log("[materials] starting upload", Array.from(fileList).map((f) => f.name));
+      setUploadPhase("Rozpoczynanie uploadu…");
       setError(null);
       setIsUploading(true);
       try {
@@ -351,10 +355,16 @@ export default function MaterialsTab({
         setError(err instanceof Error ? err.message : "Nie udało się wgrać materiału.");
       } finally {
         setIsUploading(false);
+        setUploadPhase(null);
       }
     },
     [sessionId, uploadCategory],
   );
+
+  const openFilePicker = useCallback(() => {
+    console.log("[materials] button clicked");
+    fileInputRef.current?.click();
+  }, []);
 
   const handleDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
@@ -397,6 +407,19 @@ export default function MaterialsTab({
             </select>
             <button
               type="button"
+              disabled={isUploading}
+              onClick={openFilePicker}
+              className="flex h-9 items-center gap-1.5 rounded-[10px] bg-[#5b2a86] px-3 text-sm font-medium text-white transition-colors hover:bg-[#32134f] disabled:opacity-50"
+            >
+              {isUploading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.75} />
+              ) : (
+                <CloudUpload className="h-3.5 w-3.5" strokeWidth={1.75} />
+              )}
+              {isUploading ? "Wgrywanie…" : "Wgraj plik"}
+            </button>
+            <button
+              type="button"
               onClick={() => setAddMode(addMode === "link" ? null : "link")}
               className="flex h-9 items-center gap-1.5 rounded-[10px] border border-[#e8e2ec] px-3 text-sm text-[#5b2a86] hover:border-[#d9cde5] hover:bg-[#f1eafd]"
             >
@@ -425,24 +448,38 @@ export default function MaterialsTab({
 
         <input
           ref={fileInputRef}
+          id="materials-file-input"
           type="file"
           multiple
           className="hidden"
           onChange={(event) => {
             const fileList = event.target.files;
+            console.log(
+              "[materials] file selected",
+              fileList ? Array.from(fileList).map((f) => f.name) : null,
+            );
+            if (fileList?.length) {
+              setLastSelectedNames(Array.from(fileList).map((f) => f.name).join(", "));
+            }
             event.target.value = "";
             if (fileList?.length) handleUploadFiles(fileList);
           }}
         />
 
         <div
-          onClick={() => fileInputRef.current?.click()}
+          onClick={openFilePicker}
           onDragOver={(event) => {
             event.preventDefault();
             setIsDraggingOver(true);
           }}
           onDragLeave={() => setIsDraggingOver(false)}
           onDrop={handleDrop}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              openFilePicker();
+            }
+          }}
           role="button"
           tabIndex={0}
           className={
@@ -462,6 +499,12 @@ export default function MaterialsTab({
           <p className="text-xs text-[#706878]/70">PDF, DOCX, PPTX, JPG, PNG, WEBP, TXT — maks. 30 MB</p>
         </div>
 
+        {lastSelectedNames && !error && (
+          <p className="mt-2 text-xs text-[#706878]">
+            Wybrano: {lastSelectedNames}
+            {uploadPhase ? ` — ${uploadPhase}` : null}
+          </p>
+        )}
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
       </section>
 
