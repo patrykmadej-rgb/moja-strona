@@ -1,7 +1,7 @@
 import "server-only";
 import ical, { type VEvent } from "node-ical";
 import { createHash } from "node:crypto";
-import { assertPublicHttpUrl, parseIcsUrlOrThrow } from "@/lib/szkola/urlSafety";
+import { assertPublicHttpUrl, parseIcsUrlOrThrow, UnsafeUrlError } from "@/lib/szkola/urlSafety";
 import type { NormalizedCalendarEvent } from "@/lib/szkola/types";
 
 const MAX_BODY_LENGTH = 10 * 1024 * 1024; // 10 MB — rozsądny limit na plik ICS
@@ -13,10 +13,19 @@ const MAX_REDIRECTS = 5;
 const EXPAND_WINDOW_PAST_MS = 2 * 365 * 24 * 60 * 60 * 1000;
 const EXPAND_WINDOW_FUTURE_MS = 3 * 365 * 24 * 60 * 60 * 1000;
 
+export type IcsFetchErrorReason =
+  | "invalid_url"
+  | "unsafe_url"
+  | "timeout"
+  | "network_error"
+  | "http_error"
+  | "too_large"
+  | "not_icalendar";
+
 export type IcsFetchResult =
   | { status: "ok"; httpStatus: number; body: string; etag: string | null; lastModified: string | null }
   | { status: "not_modified"; httpStatus: number }
-  | { status: "error"; httpStatus: number | null; errorMessage: string };
+  | { status: "error"; httpStatus: number | null; errorMessage: string; reason: IcsFetchErrorReason };
 
 /**
  * Pobiera surowy feed ICS z ochroną przed SSRF — łącznie z przekierowaniami
@@ -32,7 +41,12 @@ export async function fetchIcsFeed(
   try {
     url = parseIcsUrlOrThrow(rawUrl);
   } catch (err) {
-    return { status: "error", httpStatus: null, errorMessage: err instanceof Error ? err.message : "Nieprawidłowy adres kalendarza." };
+    return {
+      status: "error",
+      httpStatus: null,
+      errorMessage: err instanceof Error ? err.message : "Nieprawidłowy adres kalendarza.",
+      reason: "invalid_url",
+    };
   }
 
   const headers: Record<string, string> = { Accept: "text/calendar, text/plain, */*" };
@@ -61,27 +75,33 @@ export async function fetchIcsFeed(
     clearTimeout(timeout);
 
     if (!res) {
-      return { status: "error", httpStatus: null, errorMessage: "Nie udało się pobrać kalendarza." };
+      return { status: "error", httpStatus: null, errorMessage: "Nie udało się pobrać kalendarza.", reason: "network_error" };
     }
     if (res.status === 304) {
       return { status: "not_modified", httpStatus: 304 };
     }
     if (res.status >= 300 && res.status < 400) {
-      return { status: "error", httpStatus: res.status, errorMessage: "Zbyt wiele przekierowań." };
+      return { status: "error", httpStatus: res.status, errorMessage: "Zbyt wiele przekierowań.", reason: "network_error" };
     }
     if (!res.ok) {
-      return { status: "error", httpStatus: res.status, errorMessage: `Serwer zwrócił błąd HTTP ${res.status}.` };
+      return {
+        status: "error",
+        httpStatus: res.status,
+        errorMessage: `Serwer zwrócił błąd HTTP ${res.status}.`,
+        reason: "http_error",
+      };
     }
 
     const body = await res.text();
     if (body.length > MAX_BODY_LENGTH) {
-      return { status: "error", httpStatus: res.status, errorMessage: "Plik kalendarza jest zbyt duży." };
+      return { status: "error", httpStatus: res.status, errorMessage: "Plik kalendarza jest zbyt duży.", reason: "too_large" };
     }
     if (!body.includes("BEGIN:VCALENDAR")) {
       return {
         status: "error",
         httpStatus: res.status,
         errorMessage: "Nie udało się odczytać kalendarza. Sprawdź, czy link jest aktualny i prowadzi do pliku ICS.",
+        reason: "not_icalendar",
       };
     }
 
@@ -95,12 +115,21 @@ export async function fetchIcsFeed(
   } catch (err) {
     clearTimeout(timeout);
     if (err instanceof Error && err.name === "AbortError") {
-      return { status: "error", httpStatus: null, errorMessage: "Przekroczono czas oczekiwania na odpowiedź serwera kalendarza." };
+      return {
+        status: "error",
+        httpStatus: null,
+        errorMessage: "Przekroczono czas oczekiwania na odpowiedź serwera kalendarza.",
+        reason: "timeout",
+      };
+    }
+    if (err instanceof UnsafeUrlError) {
+      return { status: "error", httpStatus: null, errorMessage: err.message, reason: "unsafe_url" };
     }
     return {
       status: "error",
       httpStatus: null,
       errorMessage: err instanceof Error ? err.message : "Nie udało się odczytać kalendarza. Sprawdź, czy link jest aktualny i prowadzi do pliku ICS.",
+      reason: "network_error",
     };
   }
 }

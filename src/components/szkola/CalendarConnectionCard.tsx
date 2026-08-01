@@ -65,7 +65,9 @@ function SyncSummaryToast({ result, onClose }: { result: NonNullable<Awaited<Ret
   );
 }
 
-function IcsConnectSuccessToast({ result, onClose }: { result: ConnectIcsResult; onClose: () => void }) {
+type ConnectIcsSuccess = Extract<ConnectIcsResult, { success: true }>;
+
+function IcsConnectSuccessToast({ result, onClose }: { result: ConnectIcsSuccess; onClose: () => void }) {
   return (
     <div className="mt-4 rounded-[10px] border border-[#d9cde5] bg-[#f1eafd] p-4 text-sm text-[#32134f]">
       <div className="flex items-start justify-between gap-3">
@@ -98,7 +100,7 @@ function IcsConnectForm({
   initialName?: string;
   initialTimezone?: string;
   submitLabel: string;
-  onConnected: (result: ConnectIcsResult) => void;
+  onConnected: (result: ConnectIcsSuccess) => void;
   onCancel?: () => void;
 }) {
   const [pending, setPending] = useState(false);
@@ -111,8 +113,14 @@ function IcsConnectForm({
         setPending(true);
         try {
           const result = await connectIcsCalendar(formData);
-          onConnected(result);
+          if (result.success) {
+            onConnected(result);
+          } else {
+            setError(result.message);
+          }
         } catch (err) {
+          // Nie powinno się zdarzyć — connectIcsCalendar zawsze zwraca kontrolowany
+          // wynik — ale zabezpieczenie na wypadek nieoczekiwanego błędu sieci/klienta.
           setError(err instanceof Error ? err.message : "Nie udało się połączyć kalendarza.");
         } finally {
           setPending(false);
@@ -295,7 +303,7 @@ export default function CalendarConnectionCard({
   const [isChangingLink, setIsChangingLink] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [syncResult, setSyncResult] = useState<Awaited<ReturnType<typeof runManualSync>> | null>(null);
-  const [connectResult, setConnectResult] = useState<ConnectIcsResult | null>(null);
+  const [connectResult, setConnectResult] = useState<ConnectIcsSuccess | null>(null);
 
   const handleManualSync = async () => {
     setError(null);

@@ -13,16 +13,19 @@ import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 
 const ALGORITHM = "aes-256-gcm";
 
+/** Odróżnia "brak/zła konfiguracja klucza szyfrowania" od innych błędów (np. uszkodzonych danych). */
+export class CalendarEncryptionConfigError extends Error {}
+
 function getKey(): Buffer {
   const raw = process.env.CALENDAR_TOKEN_ENCRYPTION_KEY;
   if (!raw) {
-    throw new Error(
-      "Brak CALENDAR_TOKEN_ENCRYPTION_KEY w zmiennych środowiskowych — integracja z Google Calendar wymaga konfiguracji.",
+    throw new CalendarEncryptionConfigError(
+      "Brak CALENDAR_TOKEN_ENCRYPTION_KEY w zmiennych środowiskowych — integracja z kalendarzem wymaga konfiguracji.",
     );
   }
   const key = Buffer.from(raw, "base64");
   if (key.length !== 32) {
-    throw new Error(
+    throw new CalendarEncryptionConfigError(
       "CALENDAR_TOKEN_ENCRYPTION_KEY musi być 32-bajtowym kluczem zakodowanym w base64 (np. `openssl rand -base64 32`).",
     );
   }

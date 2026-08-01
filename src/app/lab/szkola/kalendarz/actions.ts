@@ -3,12 +3,12 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, AdminClientConfigError } from "@/lib/supabase/admin";
 import { getValidAccessToken, runCalendarSync, type SyncResult } from "@/lib/szkola/calendarSync";
 import { listGoogleCalendars, revokeGoogleToken } from "@/lib/szkola/googleCalendar";
-import { fetchIcsFeed, parseIcsEvents } from "@/lib/szkola/icsCalendar";
+import { fetchIcsFeed, parseIcsEvents, type IcsFetchResult } from "@/lib/szkola/icsCalendar";
 import { normalizeIcsUrl, maskIcsUrl } from "@/lib/szkola/urlSafety";
-import { decryptToken, encryptToken } from "@/lib/szkola/calendarCrypto";
+import { decryptToken, encryptToken, CalendarEncryptionConfigError } from "@/lib/szkola/calendarCrypto";
 import { DEFAULT_SESSION_CHECKLIST, DEFAULT_CALENDAR_SETTINGS } from "@/lib/szkola/types";
 
 async function requireUserId(): Promise<string> {
@@ -69,108 +69,202 @@ export async function selectCalendar(formData: FormData) {
   revalidatePath("/lab/szkola/kalendarz");
 }
 
-export type ConnectIcsResult = {
-  eventsFound: number;
-  nearestEventTitle: string | null;
-  nearestEventAt: string | null;
-  syncedAt: string;
-};
+export type ConnectIcsResult =
+  | {
+      success: true;
+      eventsFound: number;
+      nearestEventTitle: string | null;
+      nearestEventAt: string | null;
+      syncedAt: string;
+    }
+  | { success: false; message: string };
+
+const ICS_CONNECT_GENERIC_MESSAGE = "Nie udało się połączyć kalendarza. Sprawdź link i spróbuj ponownie.";
+
+function logIcsConnectStage(stage: string, extra?: Record<string, unknown>) {
+  // Celowo bez pełnego URL/tokenów — tylko nazwa etapu i bezpieczne metadane (kody, liczby).
+  console.log(`[ics-connect] ${stage}`, extra ?? "");
+}
+
+function mapIcsFetchErrorToMessage(result: Extract<IcsFetchResult, { status: "error" }>): string {
+  if (result.reason === "not_icalendar" || result.reason === "invalid_url" || result.reason === "unsafe_url") {
+    return "Link nie prowadzi do kalendarza ICS.";
+  }
+  if (result.reason === "http_error" && (result.httpStatus === 401 || result.httpStatus === 403)) {
+    return "Serwer szkoły odrzucił dostęp do kalendarza.";
+  }
+  return ICS_CONNECT_GENERIC_MESSAGE;
+}
 
 /**
  * Podstawowy, domyślny sposób połączenia kalendarza: prywatny link
  * subskrypcji ICS (żadnego Google OAuth). Testuje połączenie PRZED
  * zapisaniem — jeśli pierwsze pobranie się nie powiedzie, konfiguracja
  * w ogóle nie zostaje zapisana jako aktywna (sekcja 4 specyfikacji).
+ *
+ * WAŻNE: ta funkcja NIGDY nie rzuca wyjątku na zewnątrz — Next.js redaguje
+ * treść błędów Server Actions w produkcji do ogólnego komunikatu
+ * "An error occurred in the Server Components render", więc każdy błąd
+ * (walidacja, sieć, szyfrowanie, zapis do bazy) jest łapany tutaj i
+ * zwracany jako kontrolowany wynik { success: false, message }.
  */
 export async function connectIcsCalendar(formData: FormData): Promise<ConnectIcsResult> {
-  const userId = await requireUserId();
-
-  const name = String(formData.get("calendar_name") ?? "").trim();
-  const rawUrl = String(formData.get("ics_url") ?? "").trim();
-  const timezone = String(formData.get("default_timezone") ?? "").trim() || DEFAULT_CALENDAR_SETTINGS.default_timezone;
-  const syncEnabled = formData.get("sync_enabled") === "on";
-
-  if (!name) throw new Error("Nazwa kalendarza jest wymagana.");
-  if (!rawUrl) throw new Error("Adres kalendarza jest wymagany.");
-
-  const normalizedUrl = normalizeIcsUrl(rawUrl);
-
-  const fetchResult = await fetchIcsFeed(normalizedUrl, {});
-  if (fetchResult.status === "error") {
-    throw new Error(fetchResult.errorMessage);
-  }
-  if (fetchResult.status === "not_modified") {
-    throw new Error("Serwer nie zwrócił zawartości kalendarza. Spróbuj ponownie.");
-  }
-
-  const events = parseIcsEvents(fetchResult.body);
-  const now = Date.now();
-  const upcoming = events
-    .filter((e) => e.status !== "cancelled" && e.start_at && new Date(e.start_at).getTime() >= now)
-    .sort((a, b) => new Date(a.start_at!).getTime() - new Date(b.start_at!).getTime());
-  const nearest = upcoming[0] ?? null;
-
-  const admin = createAdminClient();
-  const { error } = await admin.from("school_calendar_connections").upsert(
-    {
-      user_id: userId,
-      provider: "google",
-      connection_type: "ics_url",
-      calendar_name: name,
-      encrypted_ics_url: encryptToken(normalizedUrl),
-      masked_ics_url: maskIcsUrl(normalizedUrl),
-      etag: fetchResult.etag,
-      last_modified: fetchResult.lastModified,
-      last_successful_fetch_at: new Date().toISOString(),
-      last_http_status: fetchResult.httpStatus,
-      sync_enabled: syncEnabled,
-      sync_frequency: "weekly",
-      last_error: null,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id,provider" },
-  );
-  if (error) throw new Error(error.message);
-
-  const supabase = await createClient();
-  const { data: existingSettings } = await supabase
-    .from("school_calendar_settings")
-    .select("*")
-    .eq("user_id", userId)
-    .maybeSingle();
-  await supabase.from("school_calendar_settings").upsert(
-    {
-      user_id: userId,
-      buffer_before_minutes: existingSettings?.buffer_before_minutes ?? DEFAULT_CALENDAR_SETTINGS.buffer_before_minutes,
-      buffer_after_minutes: existingSettings?.buffer_after_minutes ?? DEFAULT_CALENDAR_SETTINGS.buffer_after_minutes,
-      flight_buffer_minutes: existingSettings?.flight_buffer_minutes ?? DEFAULT_CALENDAR_SETTINGS.flight_buffer_minutes,
-      train_buffer_minutes: existingSettings?.train_buffer_minutes ?? DEFAULT_CALENDAR_SETTINGS.train_buffer_minutes,
-      default_timezone: timezone,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id" },
-  );
-
-  revalidatePath("/lab/szkola/kalendarz");
-
+  let stage = "start";
   try {
-    await runCalendarSync(userId, "initial");
-  } catch {
-    // Błąd pierwszej pełnej synchronizacji zostaje zapisany w
-    // school_calendar_sync_runs i widoczny na stronie — samo połączenie
-    // (test pobrania) już się powiodło, więc konfigurację zostawiamy zapisaną.
+    logIcsConnectStage(stage);
+    const userId = await requireUserId();
+
+    const name = String(formData.get("calendar_name") ?? "").trim();
+    const rawUrl = String(formData.get("ics_url") ?? "").trim();
+    const timezone = String(formData.get("default_timezone") ?? "").trim() || DEFAULT_CALENDAR_SETTINGS.default_timezone;
+    const syncEnabled = formData.get("sync_enabled") === "on";
+
+    if (!name) return { success: false, message: "Nazwa kalendarza jest wymagana." };
+    if (!rawUrl) return { success: false, message: "Adres kalendarza jest wymagany." };
+
+    stage = "url validated";
+    const normalizedUrl = normalizeIcsUrl(rawUrl);
+    logIcsConnectStage(stage);
+
+    stage = "fetch started";
+    logIcsConnectStage(stage);
+    const fetchResult = await fetchIcsFeed(normalizedUrl, {});
+
+    stage = "fetch status";
+    logIcsConnectStage(stage, { httpStatus: "httpStatus" in fetchResult ? fetchResult.httpStatus : null, result: fetchResult.status });
+
+    if (fetchResult.status === "error") {
+      logIcsConnectStage("failed at fetch", { reason: fetchResult.reason, httpStatus: fetchResult.httpStatus });
+      return { success: false, message: mapIcsFetchErrorToMessage(fetchResult) };
+    }
+    if (fetchResult.status === "not_modified") {
+      // Nie powinno się zdarzyć bez podanych nagłówków warunkowych przy pierwszym połączeniu.
+      return { success: false, message: "Serwer nie zwrócił zawartości kalendarza. Spróbuj ponownie." };
+    }
+
+    stage = "calendar parsed";
+    let events: ReturnType<typeof parseIcsEvents>;
+    try {
+      events = parseIcsEvents(fetchResult.body);
+    } catch (err) {
+      logIcsConnectStage("failed at parse", { name: err instanceof Error ? err.name : typeof err });
+      return { success: false, message: "Link nie prowadzi do kalendarza ICS." };
+    }
+    logIcsConnectStage(stage, { eventsFound: events.length });
+
+    const now = Date.now();
+    const upcoming = events
+      .filter((e) => e.status !== "cancelled" && e.start_at && new Date(e.start_at).getTime() >= now)
+      .sort((a, b) => new Date(a.start_at!).getTime() - new Date(b.start_at!).getTime());
+    const nearest = upcoming[0] ?? null;
+
+    stage = "url encrypted";
+    let encryptedUrl: string;
+    let maskedUrl: string;
+    try {
+      encryptedUrl = encryptToken(normalizedUrl);
+      maskedUrl = maskIcsUrl(normalizedUrl);
+    } catch (err) {
+      if (err instanceof CalendarEncryptionConfigError) {
+        logIcsConnectStage("failed at encryption", { name: err.name });
+        return { success: false, message: "Brakuje konfiguracji szyfrowania po stronie serwera." };
+      }
+      throw err;
+    }
+    logIcsConnectStage(stage);
+
+    stage = "admin client ready";
+    let admin: ReturnType<typeof createAdminClient>;
+    try {
+      admin = createAdminClient();
+    } catch (err) {
+      if (err instanceof AdminClientConfigError) {
+        logIcsConnectStage("failed at admin client", { name: err.name });
+        return { success: false, message: "Brakuje konfiguracji serwera (klucz dostępu do bazy)." };
+      }
+      throw err;
+    }
+
+    stage = "connection saved";
+    const { error } = await admin.from("school_calendar_connections").upsert(
+      {
+        user_id: userId,
+        provider: "google",
+        connection_type: "ics_url",
+        calendar_name: name,
+        encrypted_ics_url: encryptedUrl,
+        masked_ics_url: maskedUrl,
+        etag: fetchResult.etag,
+        last_modified: fetchResult.lastModified,
+        last_successful_fetch_at: new Date().toISOString(),
+        last_http_status: fetchResult.httpStatus,
+        sync_enabled: syncEnabled,
+        sync_frequency: "weekly",
+        last_error: null,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,provider" },
+    );
+    if (error) {
+      logIcsConnectStage("failed at save", { code: error.code });
+      return { success: false, message: "Nie udało się zapisać konfiguracji kalendarza." };
+    }
+    logIcsConnectStage(stage);
+
+    const supabase = await createClient();
+    const { data: existingSettings } = await supabase
+      .from("school_calendar_settings")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle();
+    await supabase.from("school_calendar_settings").upsert(
+      {
+        user_id: userId,
+        buffer_before_minutes: existingSettings?.buffer_before_minutes ?? DEFAULT_CALENDAR_SETTINGS.buffer_before_minutes,
+        buffer_after_minutes: existingSettings?.buffer_after_minutes ?? DEFAULT_CALENDAR_SETTINGS.buffer_after_minutes,
+        flight_buffer_minutes: existingSettings?.flight_buffer_minutes ?? DEFAULT_CALENDAR_SETTINGS.flight_buffer_minutes,
+        train_buffer_minutes: existingSettings?.train_buffer_minutes ?? DEFAULT_CALENDAR_SETTINGS.train_buffer_minutes,
+        default_timezone: timezone,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" },
+    );
+
+    revalidatePath("/lab/szkola/kalendarz");
+
+    stage = "initial sync completed";
+    try {
+      await runCalendarSync(userId, "initial");
+      logIcsConnectStage(stage);
+    } catch (err) {
+      // Błąd pierwszej pełnej synchronizacji zostaje zapisany w
+      // school_calendar_sync_runs i widoczny na stronie — samo połączenie
+      // (test pobrania) już się powiodło, więc konfigurację zostawiamy zapisaną.
+      logIcsConnectStage("initial sync failed (non-fatal, connection stays saved)", {
+        name: err instanceof Error ? err.name : typeof err,
+      });
+    }
+
+    revalidatePath("/lab/szkola/kalendarz");
+    revalidatePath("/lab/szkola/kalendarz/zmiany");
+    revalidatePath("/lab/szkola");
+
+    return {
+      success: true,
+      eventsFound: events.filter((e) => e.status !== "cancelled").length,
+      nearestEventTitle: nearest?.title ?? null,
+      nearestEventAt: nearest?.start_at ?? null,
+      syncedAt: new Date().toISOString(),
+    };
+  } catch (err) {
+    console.error("[ics-connect] failed", {
+      stage,
+      name: err instanceof Error ? err.name : typeof err,
+      code: (err as { code?: string } | null)?.code ?? null,
+      message: ICS_CONNECT_GENERIC_MESSAGE,
+    });
+    return { success: false, message: ICS_CONNECT_GENERIC_MESSAGE };
   }
-
-  revalidatePath("/lab/szkola/kalendarz");
-  revalidatePath("/lab/szkola/kalendarz/zmiany");
-  revalidatePath("/lab/szkola");
-
-  return {
-    eventsFound: events.filter((e) => e.status !== "cancelled").length,
-    nearestEventTitle: nearest?.title ?? null,
-    nearestEventAt: nearest?.start_at ?? null,
-    syncedAt: new Date().toISOString(),
-  };
 }
 
 export async function toggleCalendarSync(formData: FormData) {

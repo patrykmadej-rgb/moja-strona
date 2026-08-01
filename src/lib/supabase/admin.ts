@@ -15,13 +15,16 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
  * NEXT_PUBLIC_ — inaczej trafiłaby do przeglądarki). Klucz znajdziesz w
  * Supabase Dashboard -> Settings -> API -> service_role secret.
  */
+/** Odróżnia "brak konfiguracji service_role" od innych błędów (np. Supabase czasowo niedostępny). */
+export class AdminClientConfigError extends Error {}
+
 export function createAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !serviceRoleKey) {
-    throw new Error(
-      "Brak SUPABASE_SERVICE_ROLE_KEY (lub NEXT_PUBLIC_SUPABASE_URL) w zmiennych środowiskowych — integracja z Google Calendar wymaga konfiguracji.",
+    throw new AdminClientConfigError(
+      "Brak SUPABASE_SERVICE_ROLE_KEY (lub NEXT_PUBLIC_SUPABASE_URL) w zmiennych środowiskowych — integracja z kalendarzem wymaga konfiguracji.",
     );
   }
 
