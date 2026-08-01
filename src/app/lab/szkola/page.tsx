@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Plus, CalendarDays } from "lucide-react";
 import SzkolaNav from "@/components/szkola/SzkolaNav";
 import NextSessionCard from "@/components/szkola/NextSessionCard";
 import SchoolSummaryCards from "@/components/szkola/SchoolSummaryCards";
+import CalendarChangesSummaryCard, { type DashboardCalendarChange } from "@/components/szkola/CalendarChangesSummaryCard";
 import { todayDateString } from "@/lib/lab/format";
 import { sumByCurrency } from "@/lib/szkola/money";
 import type { Currency, SchoolSession, SessionTask } from "@/lib/szkola/types";
@@ -18,24 +20,67 @@ export default async function SzkolaPulpitPage() {
   const today = todayDateString();
   const currentYear = new Date().getFullYear();
 
-  const [
-    { data: upcomingSessions },
-    { data: itinerarySessionIds },
-    { data: payments },
-    { data: expenses },
-    { data: calendarChanges },
-  ] = await Promise.all([
-    supabase
-      .from("school_sessions")
-      .select("*")
-      .neq("status", "anulowany")
-      .gte("start_date", today)
-      .order("start_date", { ascending: true }),
-    supabase.from("travel_itineraries").select("session_id"),
-    supabase.from("school_payments").select("amount, currency, paid_date, due_date"),
-    supabase.from("expenses").select("amount, currency, expense_date"),
-    supabase.from("calendar_changes").select("id, acknowledged"),
-  ]);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const [{ data: upcomingSessions }, { data: itinerarySessionIds }, { data: payments }, { data: expenses }] =
+    await Promise.all([
+      supabase
+        .from("school_sessions")
+        .select("*")
+        .neq("status", "anulowany")
+        .gte("start_date", today)
+        .order("start_date", { ascending: true }),
+      supabase.from("travel_itineraries").select("session_id"),
+      supabase.from("school_payments").select("amount, currency, paid_date, due_date"),
+      supabase.from("expenses").select("amount, currency, expense_date"),
+    ]);
+
+  let calendarConnected = false;
+  let dashboardChanges: DashboardCalendarChange[] = [];
+  let calendarChangesCount = 0;
+
+  if (user) {
+    const admin = createAdminClient();
+    const { data: connectionRow } = await admin
+      .from("school_calendar_connections")
+      .select("id, connection_type, calendar_id, masked_ics_url")
+      .eq("user_id", user.id)
+      .eq("provider", "google")
+      .maybeSingle();
+    calendarConnected =
+      connectionRow?.connection_type === "ics_url" ? Boolean(connectionRow.masked_ics_url) : Boolean(connectionRow?.calendar_id);
+
+    if (calendarConnected) {
+      const { count } = await supabase
+        .from("school_calendar_changes")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("status", "new");
+      calendarChangesCount = count ?? 0;
+
+      const { data: changesData } = await supabase
+        .from("school_calendar_changes")
+        .select("id, change_type, field_name, impact_level, impact_summary, session:school_sessions(title)")
+        .eq("user_id", user.id)
+        .eq("status", "new")
+        .order("detected_at", { ascending: false })
+        .limit(5);
+
+      dashboardChanges = ((changesData as unknown as
+        | { id: string; change_type: DashboardCalendarChange["change_type"]; field_name: string | null; impact_level: DashboardCalendarChange["impact_level"]; impact_summary: string | null; session: { title: string } | null }[]
+        | null) ?? []
+      ).map((row) => ({
+        id: row.id,
+        change_type: row.change_type,
+        field_name: row.field_name,
+        impact_level: row.impact_level,
+        impact_summary: row.impact_summary,
+        session_title: row.session?.title ?? null,
+      }));
+    }
+  }
 
   const sessions = (upcomingSessions as SchoolSession[] | null) ?? [];
   const nextSession = sessions[0] ?? null;
@@ -59,8 +104,6 @@ export default async function SzkolaPulpitPage() {
     ...(paymentsThisYear as { amount: number; currency: Currency | null }[]),
     ...(expensesThisYear as { amount: number; currency: Currency | null }[]),
   ]);
-
-  const calendarChangesCount = (calendarChanges ?? []).filter((c) => !c.acknowledged).length;
 
   return (
     <div className="lab-szkola-page min-h-full bg-[#f7f4ef]">
@@ -107,7 +150,13 @@ export default async function SzkolaPulpitPage() {
             totalSessionsForTravel={sessions.length}
             expensesThisYearSums={expensesThisYearSums}
             calendarChangesCount={calendarChangesCount}
-            calendarConnected={false}
+            calendarConnected={calendarConnected}
+          />
+
+          <CalendarChangesSummaryCard
+            calendarConnected={calendarConnected}
+            changes={dashboardChanges}
+            totalCount={calendarChangesCount}
           />
         </div>
       </div>

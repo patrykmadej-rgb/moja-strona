@@ -19,6 +19,20 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // /api/cron/* (Vercel Cron) — brak sesji użytkownika, autoryzacja przez
+  // CRON_SECRET w samym route handlerze. Musi być poza next-intl, inaczej
+  // middleware dopisuje prefiks językowy (/pl/api/...) i zwraca 404.
+  if (pathname.startsWith("/api/cron")) {
+    return NextResponse.next();
+  }
+
+  // /api/szkola/* (OAuth Google Calendar) — poza next-intl z tego samego
+  // powodu co /api/cron, ale odświeżamy sesję Supabase (callback czyta
+  // zalogowanego użytkownika).
+  if (pathname.startsWith("/api/szkola")) {
+    return updateSession(request);
+  }
+
   // /lab (panel logowania + zarządzania artykułami) też jest poza next-intl,
   // bez prefiksu językowego. Odświeżamy tylko sesję Supabase — bramkę dostępu
   // (zalogowany/niezalogowany) obsługuje sam src/app/lab/layout.tsx, więc tu

@@ -5,6 +5,7 @@ import SessionWorkspace from "@/components/szkola/SessionWorkspace";
 import type {
   Accommodation,
   Expense,
+  SchoolCalendarEvent,
   SchoolPayment,
   SchoolSession,
   SessionDocument,
@@ -45,6 +46,7 @@ export default async function SessionDetailPage({
     { data: materialsData },
     { data: documentsData },
     { data: hoursEntriesData },
+    { data: googleEventsData },
   ] = await Promise.all([
     supabase.from("session_tasks").select("*").eq("session_id", id).order("sort_order", { ascending: true }),
     supabase.from("travel_itineraries").select("id").eq("session_id", id).maybeSingle(),
@@ -64,6 +66,12 @@ export default async function SessionDetailPage({
       .select("*")
       .eq("session_id", id)
       .order("entry_date", { ascending: true }),
+    supabase
+      .from("school_calendar_events")
+      .select("*")
+      .eq("session_id", id)
+      .is("deleted_at", null)
+      .order("start_at", { ascending: true }),
   ]);
 
   let segments: TravelSegment[] = [];
@@ -76,6 +84,13 @@ export default async function SessionDetailPage({
     segments = (segmentsData as TravelSegment[] | null) ?? [];
   }
 
+  const scheduleItems = (scheduleItemsData as SessionScheduleItem[] | null) ?? [];
+  const importedGoogleEventIds = new Set(scheduleItems.map((item) => item.google_event_id).filter(Boolean));
+  const googleEvents = (googleEventsData as SchoolCalendarEvent[] | null) ?? [];
+  const importableGoogleEvents = googleEvents.filter(
+    (event) => event.status !== "cancelled" && !importedGoogleEventIds.has(event.google_event_id),
+  );
+
   return (
     <SessionWorkspace
       session={session as SchoolSession}
@@ -84,10 +99,11 @@ export default async function SessionDetailPage({
       accommodations={(accommodationsData as Accommodation[] | null) ?? []}
       payments={(paymentsData as SchoolPayment[] | null) ?? []}
       expenses={(expensesData as Expense[] | null) ?? []}
-      scheduleItems={(scheduleItemsData as SessionScheduleItem[] | null) ?? []}
+      scheduleItems={scheduleItems}
       materials={(materialsData as SessionMaterial[] | null) ?? []}
       documents={(documentsData as SessionDocument[] | null) ?? []}
       hoursEntries={(hoursEntriesData as TrainingHoursEntry[] | null) ?? []}
+      importableGoogleEvents={importableGoogleEvents}
     />
   );
 }

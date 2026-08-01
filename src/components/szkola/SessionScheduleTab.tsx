@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { CalendarDays, Copy, Download, Ellipsis } from "lucide-react";
+import { CalendarDays, CalendarPlus, Copy, Download, Ellipsis } from "lucide-react";
 import {
   addScheduleItem,
   deleteScheduleItem,
@@ -11,11 +11,14 @@ import {
   moveScheduleItem,
   updateScheduleItem,
 } from "@/app/lab/szkola/zjazdy/[id]/actions";
+import { importScheduleItemFromEvent } from "@/app/lab/szkola/kalendarz/actions";
 import EmptyState from "@/components/lab/EmptyState";
+import { formatDateTime } from "@/lib/lab/format";
 import { formatHours, formatWeekdayDate } from "@/lib/szkola/format";
 import {
   ACTIVITY_TYPES,
   ACTIVITY_TYPE_LABELS,
+  type SchoolCalendarEvent,
   type SessionScheduleItem,
 } from "@/lib/szkola/types";
 
@@ -367,12 +370,16 @@ function DuplicateDayForm({ sessionId, sourceDate }: { sessionId: string; source
 export default function SessionScheduleTab({
   sessionId,
   items,
+  importableGoogleEvents,
 }: {
   sessionId: string;
   items: SessionScheduleItem[];
+  importableGoogleEvents: SchoolCalendarEvent[];
 }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
+  const [importedIds, setImportedIds] = useState<Set<string>>(new Set());
+  const [importError, setImportError] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   const days = useMemo(() => {
@@ -451,6 +458,50 @@ export default function SessionScheduleTab({
           </form>
         )}
       </section>
+
+      {importableGoogleEvents.length > 0 && (
+        <section className="rounded-[16px] border border-[#d9cde5] bg-[#f1eafd] p-5">
+          <h3 className="flex items-center gap-1.5 text-sm font-semibold text-[#32134f]">
+            <CalendarPlus className="h-4 w-4" strokeWidth={1.75} />
+            Wydarzenia z Google Calendar do zaimportowania
+          </h3>
+          {importError && <p className="mt-2 text-xs text-red-600">{importError}</p>}
+          <ul className="mt-3 flex flex-col gap-2">
+            {importableGoogleEvents
+              .filter((event) => !importedIds.has(event.id))
+              .map((event) => (
+                <li
+                  key={event.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-[10px] bg-white px-3 py-2 text-sm"
+                >
+                  <span className="text-[#201a2b]">
+                    {event.title || "Wydarzenie bez tytułu"}
+                    {event.start_at && (
+                      <span className="ml-2 text-xs text-[#706878]">{formatDateTime(event.start_at)}</span>
+                    )}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setImportError(null);
+                      const formData = new FormData();
+                      formData.set("event_id", event.id);
+                      try {
+                        await importScheduleItemFromEvent(formData);
+                        setImportedIds((prev) => new Set(prev).add(event.id));
+                      } catch (err) {
+                        setImportError(err instanceof Error ? err.message : "Nie udało się zaimportować.");
+                      }
+                    }}
+                    className="text-xs font-medium text-[#5b2a86] hover:underline"
+                  >
+                    Importuj jako punkt planu
+                  </button>
+                </li>
+              ))}
+          </ul>
+        </section>
+      )}
 
       {days.length === 0 ? (
         <section className="rounded-[16px] border border-[#e8e2ec] bg-white p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">

@@ -297,6 +297,8 @@ export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
   inne: "Inne",
 };
 
+export type ScheduleItemSource = "manual" | "google_calendar";
+
 export type SessionScheduleItem = {
   id: string;
   session_id: string;
@@ -311,6 +313,8 @@ export type SessionScheduleItem = {
   hours: number | null;
   notes: string | null;
   sort_order: number;
+  source: ScheduleItemSource;
+  google_event_id: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -504,3 +508,201 @@ export const DEFAULT_SESSION_CHECKLIST: string[] = [
   "Odprawa lotnicza",
   "Dokumenty podróżne",
 ];
+
+// ---------------------------------------------------------------------------
+// ETAP 4 — integracja z Google Calendar.
+// Uwaga: school_calendar_connections zawiera zaszyfrowane tokeny OAuth i
+// NIE ma odpowiednika typu tutaj celowo — ten plik jest importowany także
+// przez komponenty klienckie, a tokeny nigdy nie powinny nawet przejść
+// przez typ używany po stronie przeglądarki. Server-only kod (routes/
+// server actions) używa własnego, węższego typu wewnątrz googleCalendar.ts.
+// ---------------------------------------------------------------------------
+
+export type CalendarSyncFrequency = "weekly" | "manual";
+export const CALENDAR_CONNECTION_TYPES = ["ics_url", "google_oauth"] as const;
+export type CalendarConnectionType = (typeof CALENDAR_CONNECTION_TYPES)[number];
+
+/**
+ * Bezpieczny (bez tokenów/URL-i) widok połączenia kalendarza dla UI.
+ * Celowo BEZ encrypted_ics_url/etag/last_modified/access_token_encrypted/
+ * refresh_token_encrypted/sync_token — to pola serwerowe, nigdy nie
+ * powinny trafić do komponentu klienckiego, nawet w postaci zaszyfrowanej.
+ */
+export type CalendarConnectionSummary = {
+  id: string;
+  connection_type: CalendarConnectionType;
+  calendar_id: string | null;
+  calendar_name: string | null;
+  calendar_color: string | null;
+  masked_ics_url: string | null;
+  sync_enabled: boolean;
+  sync_frequency: CalendarSyncFrequency;
+  last_synced_at: string | null;
+  next_sync_at: string | null;
+  last_successful_fetch_at: string | null;
+  last_http_status: number | null;
+  last_error: string | null;
+  created_at: string;
+};
+
+export const CALENDAR_SYNC_TYPES = ["manual", "scheduled", "initial"] as const;
+export type CalendarSyncType = (typeof CALENDAR_SYNC_TYPES)[number];
+
+export type SchoolCalendarSyncRun = {
+  id: string;
+  user_id: string;
+  connection_id: string | null;
+  started_at: string;
+  completed_at: string | null;
+  status: "running" | "success" | "error";
+  events_received: number;
+  events_created: number;
+  events_updated: number;
+  events_deleted: number;
+  error_message: string | null;
+  sync_type: CalendarSyncType;
+  created_at: string;
+};
+
+/**
+ * Znormalizowany kształt wydarzenia kalendarza, wspólny dla obu źródeł
+ * (Google Calendar API i sparsowany feed ICS) — `google_event_id` i
+ * `google_updated_at` to nazwy z czasów, gdy istniało tylko OAuth; teraz
+ * służą jako generyczny "identyfikator wydarzenia u źródła" (dla ICS: UID,
+ * a dla wystąpień cyklicznych UID+data/RECURRENCE-ID) i "znacznik czasu
+ * ostatniej aktualizacji u źródła" niezależnie od pochodzenia. Nie
+ * zmieniamy nazw, żeby uniknąć duplikowania kolumn o tym samym znaczeniu
+ * (patrz decyzje nazewnicze w migracjach 007/009/010).
+ */
+export type NormalizedCalendarEvent = {
+  google_event_id: string;
+  ical_uid: string | null;
+  title: string | null;
+  description: string | null;
+  location: string | null;
+  start_at: string | null;
+  end_at: string | null;
+  all_day: boolean;
+  timezone: string | null;
+  status: string | null;
+  organizer_email: string | null;
+  attendees: { email?: string; responseStatus?: string }[] | null;
+  attachments: { title?: string; fileUrl?: string; mimeType?: string }[] | null;
+  recurrence: string[] | null;
+  recurring_event_id: string | null;
+  original_start_time: string | null;
+  google_updated_at: string | null;
+  html_link: string | null;
+  raw_hash: string;
+};
+
+export type SchoolCalendarEvent = {
+  id: string;
+  user_id: string;
+  google_event_id: string;
+  ical_uid: string | null;
+  calendar_id: string | null;
+  session_id: string | null;
+  ignored: boolean;
+  title: string | null;
+  description: string | null;
+  location: string | null;
+  start_at: string | null;
+  end_at: string | null;
+  all_day: boolean;
+  timezone: string | null;
+  status: string | null;
+  organizer_email: string | null;
+  attendees: unknown | null;
+  attachments: unknown | null;
+  recurrence: string[] | null;
+  recurring_event_id: string | null;
+  original_start_time: string | null;
+  google_updated_at: string | null;
+  raw_hash: string | null;
+  html_link: string | null;
+  first_seen_at: string;
+  last_seen_at: string;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export const CALENDAR_CHANGE_TYPES = ["created", "updated", "deleted", "moved", "cancelled"] as const;
+export type CalendarChangeType = (typeof CALENDAR_CHANGE_TYPES)[number];
+export const CALENDAR_CHANGE_TYPE_LABELS: Record<CalendarChangeType, string> = {
+  created: "Nowe wydarzenie",
+  updated: "Zmiana",
+  deleted: "Wydarzenie usunięte",
+  moved: "Przeniesiono termin",
+  cancelled: "Zjazd anulowany",
+};
+
+export const CALENDAR_CHANGE_STATUSES = ["new", "reviewed", "accepted", "ignored"] as const;
+export type CalendarChangeStatus = (typeof CALENDAR_CHANGE_STATUSES)[number];
+export const CALENDAR_CHANGE_STATUS_LABELS: Record<CalendarChangeStatus, string> = {
+  new: "Nowa",
+  reviewed: "Przejrzana",
+  accepted: "Zaakceptowana",
+  ignored: "Zignorowana",
+};
+
+export const CALENDAR_IMPACT_LEVELS = ["none", "information", "warning", "conflict"] as const;
+export type CalendarImpactLevel = (typeof CALENDAR_IMPACT_LEVELS)[number];
+export const CALENDAR_IMPACT_LEVEL_LABELS: Record<CalendarImpactLevel, string> = {
+  none: "Brak wpływu",
+  information: "Informacja",
+  warning: "Ostrzeżenie",
+  conflict: "Konflikt",
+};
+
+export const CALENDAR_CHANGE_FIELD_LABELS: Record<string, string> = {
+  title: "Tytuł",
+  description: "Opis",
+  location: "Lokalizacja",
+  start_at: "Data/godzina rozpoczęcia",
+  end_at: "Data/godzina zakończenia",
+  timezone: "Strefa czasowa",
+  status: "Status",
+  organizer_email: "Organizator",
+  attachments: "Załączniki",
+  recurrence: "Cykliczność",
+};
+
+export type SchoolCalendarChange = {
+  id: string;
+  user_id: string;
+  calendar_event_id: string | null;
+  session_id: string | null;
+  sync_run_id: string | null;
+  change_type: CalendarChangeType;
+  field_name: string | null;
+  old_value: string | null;
+  new_value: string | null;
+  detected_at: string;
+  reviewed_at: string | null;
+  status: CalendarChangeStatus;
+  impact_level: CalendarImpactLevel;
+  impact_summary: string | null;
+  created_at: string;
+};
+
+export type SchoolCalendarSettings = {
+  id: string;
+  user_id: string;
+  buffer_before_minutes: number;
+  buffer_after_minutes: number;
+  flight_buffer_minutes: number;
+  train_buffer_minutes: number;
+  default_timezone: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export const DEFAULT_CALENDAR_SETTINGS: Omit<SchoolCalendarSettings, "id" | "user_id" | "created_at" | "updated_at"> = {
+  buffer_before_minutes: 60,
+  buffer_after_minutes: 60,
+  flight_buffer_minutes: 120,
+  train_buffer_minutes: 30,
+  default_timezone: "Europe/Warsaw",
+};

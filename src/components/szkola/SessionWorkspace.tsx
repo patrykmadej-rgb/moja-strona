@@ -19,6 +19,7 @@ import { updateSession } from "@/app/lab/szkola/zjazdy/[id]/actions";
 import type {
   Accommodation,
   Expense,
+  SchoolCalendarEvent,
   SchoolPayment,
   SchoolSession,
   SessionDocument,
@@ -40,6 +41,7 @@ export default function SessionWorkspace({
   materials,
   documents,
   hoursEntries,
+  importableGoogleEvents,
 }: {
   session: SchoolSession;
   tasks: SessionTask[];
@@ -51,6 +53,7 @@ export default function SessionWorkspace({
   materials: SessionMaterial[];
   documents: SessionDocument[];
   hoursEntries: TrainingHoursEntry[];
+  importableGoogleEvents: SchoolCalendarEvent[];
 }) {
   const [tab, setTab] = useState<SessionTabKey>("przeglad");
   const [editing, setEditing] = useState(false);
@@ -106,7 +109,9 @@ export default function SessionWorkspace({
               )}
               {tab === "platnosci" && <SchoolPaymentsTab sessionId={session.id} payments={payments} />}
               {tab === "koszty" && <ExpensesTab sessionId={session.id} expenses={expenses} />}
-              {tab === "plan" && <SessionScheduleTab sessionId={session.id} items={scheduleItems} />}
+              {tab === "plan" && (
+                <SessionScheduleTab sessionId={session.id} items={scheduleItems} importableGoogleEvents={importableGoogleEvents} />
+              )}
               {tab === "materialy" && <MaterialsTab sessionId={session.id} materials={materials} />}
               {tab === "dokumenty" && <DocumentsTab sessionId={session.id} documents={documents} />}
               {tab === "godziny" && (
