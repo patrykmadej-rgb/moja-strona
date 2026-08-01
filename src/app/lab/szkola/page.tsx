@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { getCalendarConnectionSummary, isCalendarConnectionActive } from "@/lib/szkola/calendarConnectionStatus";
 import { Plus, CalendarDays } from "lucide-react";
 import SzkolaNav from "@/components/szkola/SzkolaNav";
 import NextSessionCard from "@/components/szkola/NextSessionCard";
@@ -42,43 +42,44 @@ export default async function SzkolaPulpitPage() {
   let calendarChangesCount = 0;
 
   if (user) {
-    const admin = createAdminClient();
-    const { data: connectionRow } = await admin
-      .from("school_calendar_connections")
-      .select("id, connection_type, calendar_id, masked_ics_url")
-      .eq("user_id", user.id)
-      .eq("provider", "google")
-      .maybeSingle();
-    calendarConnected =
-      connectionRow?.connection_type === "ics_url" ? Boolean(connectionRow.masked_ics_url) : Boolean(connectionRow?.calendar_id);
+    try {
+      const { connection } = await getCalendarConnectionSummary(user.id);
+      calendarConnected = isCalendarConnectionActive(connection);
 
-    if (calendarConnected) {
-      const { count } = await supabase
-        .from("school_calendar_changes")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .eq("status", "new");
-      calendarChangesCount = count ?? 0;
+      if (calendarConnected) {
+        const { count } = await supabase
+          .from("school_calendar_changes")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("status", "new");
+        calendarChangesCount = count ?? 0;
 
-      const { data: changesData } = await supabase
-        .from("school_calendar_changes")
-        .select("id, change_type, field_name, impact_level, impact_summary, session:school_sessions(title)")
-        .eq("user_id", user.id)
-        .eq("status", "new")
-        .order("detected_at", { ascending: false })
-        .limit(5);
+        const { data: changesData } = await supabase
+          .from("school_calendar_changes")
+          .select("id, change_type, field_name, impact_level, impact_summary, session:school_sessions(title)")
+          .eq("user_id", user.id)
+          .eq("status", "new")
+          .order("detected_at", { ascending: false })
+          .limit(5);
 
-      dashboardChanges = ((changesData as unknown as
-        | { id: string; change_type: DashboardCalendarChange["change_type"]; field_name: string | null; impact_level: DashboardCalendarChange["impact_level"]; impact_summary: string | null; session: { title: string } | null }[]
-        | null) ?? []
-      ).map((row) => ({
-        id: row.id,
-        change_type: row.change_type,
-        field_name: row.field_name,
-        impact_level: row.impact_level,
-        impact_summary: row.impact_summary,
-        session_title: row.session?.title ?? null,
-      }));
+        dashboardChanges = ((changesData as unknown as
+          | { id: string; change_type: DashboardCalendarChange["change_type"]; field_name: string | null; impact_level: DashboardCalendarChange["impact_level"]; impact_summary: string | null; session: { title: string } | null }[]
+          | null) ?? []
+        ).map((row) => ({
+          id: row.id,
+          change_type: row.change_type,
+          field_name: row.field_name,
+          impact_level: row.impact_level,
+          impact_summary: row.impact_summary,
+          session_title: row.session?.title ?? null,
+        }));
+      }
+    } catch {
+      // Pulpit szkoły musi się renderować niezależnie od stanu integracji
+      // kalendarza — brak konfiguracji/danych nie może wywalić całej strony.
+      calendarConnected = false;
+      calendarChangesCount = 0;
+      dashboardChanges = [];
     }
   }
 

@@ -272,6 +272,7 @@ function GoogleOAuthSection({
 
 export default function CalendarConnectionCard({
   googleConfigured,
+  adminConfigured,
   connection,
   eventsCount,
   pendingChangesCount,
@@ -280,6 +281,7 @@ export default function CalendarConnectionCard({
   calendarErrorCode,
 }: {
   googleConfigured: boolean;
+  adminConfigured: boolean;
   connection: CalendarConnectionSummary | null;
   eventsCount: number;
   pendingChangesCount: number;
@@ -346,7 +348,18 @@ export default function CalendarConnectionCard({
           </div>
         )}
 
-        {connectResult ? (
+        {!adminConfigured ? (
+          <div className="flex flex-col items-center gap-2 py-6 text-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#efedf0] text-[#6f6874]">
+              <CalendarCheck2 className="h-5 w-5" strokeWidth={1.75} />
+            </div>
+            <p className="mt-1 text-sm font-medium text-[#201a2b]">Integracja kalendarza wymaga konfiguracji</p>
+            <p className="max-w-sm text-xs text-[#9a919f]">
+              Brakuje zmiennej środowiskowej po stronie serwera (SUPABASE_SERVICE_ROLE_KEY). Kod integracji jest gotowy —
+              po dodaniu klucza w konfiguracji hostingu ta strona pozwoli połączyć kalendarz przez link ICS.
+            </p>
+          </div>
+        ) : connectResult ? (
           <IcsConnectSuccessToast result={connectResult} onClose={() => setConnectResult(null)} />
         ) : (
           <>
@@ -362,8 +375,12 @@ export default function CalendarConnectionCard({
 
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 
-        <GoogleOAuthSection connection={connection} onError={setError} />
-        {!googleConfigured && <p className="mt-2 text-[11px] text-[#c3bcc9]">(Wariant Google wymaga jeszcze konfiguracji.)</p>}
+        {adminConfigured && (
+          <>
+            <GoogleOAuthSection connection={connection} onError={setError} />
+            {!googleConfigured && <p className="mt-2 text-[11px] text-[#c3bcc9]">(Wariant Google wymaga jeszcze konfiguracji.)</p>}
+          </>
+        )}
       </section>
     );
   }
