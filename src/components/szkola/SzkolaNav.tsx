@@ -12,6 +12,7 @@ import {
   Files,
   Clock4,
   Inbox,
+  Bell,
   type LucideIcon,
 } from "lucide-react";
 
@@ -27,6 +28,7 @@ const ITEMS: NavItem[] = [
   { href: "/lab/szkola/dokumenty", label: "Dokumenty", icon: Files, enabled: true },
   { href: "/lab/szkola/godziny", label: "Godziny", icon: Clock4, enabled: true },
   { href: "/lab/szkola/import", label: "Import", icon: Inbox, enabled: true },
+  { href: "/lab/szkola/alerty", label: "Alerty", icon: Bell, enabled: true },
 ];
 
 export default function SzkolaNav() {

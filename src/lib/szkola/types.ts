@@ -706,3 +706,228 @@ export const DEFAULT_CALENDAR_SETTINGS: Omit<SchoolCalendarSettings, "id" | "use
   train_buffer_minutes: 30,
   default_timezone: "Europe/Warsaw",
 };
+
+// ---------------------------------------------------------------------------
+// ETAP 5 — skrzynka importu rezerwacji/dokumentów, centrum alertów, automatyzacje.
+// ---------------------------------------------------------------------------
+
+export const IMPORT_STATUSES = [
+  "new",
+  "processing",
+  "recognized",
+  "needs_review",
+  "ready",
+  "assigned",
+  "rejected",
+  "error",
+] as const;
+export type ImportStatus = (typeof IMPORT_STATUSES)[number];
+export const IMPORT_STATUS_LABELS: Record<ImportStatus, string> = {
+  new: "Nowe",
+  processing: "Przetwarzanie",
+  recognized: "Rozpoznane",
+  needs_review: "Wymaga sprawdzenia",
+  ready: "Gotowe do zatwierdzenia",
+  assigned: "Przypisane",
+  rejected: "Odrzucone",
+  error: "Błąd",
+};
+
+export const IMPORT_SOURCE_TYPES = ["upload", "pasted_email", "eml", "inbound_email", "manual"] as const;
+export type ImportSourceType = (typeof IMPORT_SOURCE_TYPES)[number];
+export const IMPORT_SOURCE_TYPE_LABELS: Record<ImportSourceType, string> = {
+  upload: "Przesłany plik",
+  pasted_email: "Wklejona wiadomość",
+  eml: "Plik EML",
+  inbound_email: "Przekazany e-mail",
+  manual: "Ręczne",
+};
+
+/**
+ * Wspólne słownictwo dla wykrytego typu dokumentu (import_inbox_items.detected_type)
+ * i typu rezerwacji (imported_reservations.reservation_type) — to ten sam koncept
+ * w dwóch miejscach cyklu życia jednego importu, patrz migracja 011.
+ */
+export const IMPORT_DETECTED_TYPES = [
+  "flight",
+  "train",
+  "bus",
+  "hotel",
+  "school_payment",
+  "invoice",
+  "receipt",
+  "school_information",
+  "schedule",
+  "certificate",
+  "other",
+] as const;
+export type ImportDetectedType = (typeof IMPORT_DETECTED_TYPES)[number];
+export const IMPORT_DETECTED_TYPE_LABELS: Record<ImportDetectedType, string> = {
+  flight: "Lot",
+  train: "Pociąg",
+  bus: "Autobus",
+  hotel: "Hotel",
+  school_payment: "Płatność za szkołę",
+  invoice: "Faktura",
+  receipt: "Paragon",
+  school_information: "Wiadomość organizacyjna",
+  schedule: "Harmonogram",
+  certificate: "Certyfikat",
+  other: "Inne",
+};
+
+export type ImportInboxItem = {
+  id: string;
+  user_id: string | null;
+  source: ImportSourceType;
+  original_filename: string | null;
+  storage_path: string | null;
+  raw_email_subject: string | null;
+  raw_email_from: string | null;
+  sender_name: string | null;
+  raw_text: string | null;
+  mime_type: string | null;
+  file_size: number | null;
+  file_hash: string | null;
+  received_at: string;
+  status: ImportStatus;
+  detected_type: ImportDetectedType | null;
+  confidence_score: number | null;
+  proposed_session_id: string | null;
+  processing_error: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/**
+ * Luźno otypowane pola wyciągnięte z dokumentu — różny podzbiór jest
+ * wypełniony w zależności od detected_type. Przechowywane jako jsonb
+ * w imported_reservations.parsed_data (patrz decyzja nazewnicza w
+ * migracji 011: parsed_data pełni rolę "extracted_data").
+ */
+export type ImportExtractedData = {
+  carrier?: string;
+  transport_number?: string;
+  origin?: string;
+  destination?: string;
+  date?: string;
+  time?: string;
+  seat?: string;
+  baggage?: string;
+  hotel_name?: string;
+  address?: string;
+  nights?: number;
+  breakfast_included?: boolean;
+  free_cancellation_until?: string;
+  payment_type?: string;
+  recipient?: string;
+  payment_title?: string;
+  document_number?: string;
+  location?: string;
+  trainer?: string;
+  room?: string;
+  tasks?: string[];
+  passenger_name?: string;
+};
+
+export type ImportedReservation = {
+  id: string;
+  user_id: string | null;
+  inbox_item_id: string | null;
+  session_id: string | null;
+  reservation_type: ImportDetectedType;
+  provider: string | null;
+  booking_reference: string | null;
+  origin: string | null;
+  destination: string | null;
+  start_at: string | null;
+  end_at: string | null;
+  check_in: string | null;
+  check_out: string | null;
+  amount: number | null;
+  currency: Currency | null;
+  payment_status: string | null;
+  passenger_name: string | null;
+  baggage: string | null;
+  seat: string | null;
+  cancellation_deadline: string | null;
+  parsed_data: ImportExtractedData;
+  confidence_score: number | null;
+  status: ImportStatus;
+  approved_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export const ALERT_CATEGORIES = [
+  "podroz",
+  "zakwaterowanie",
+  "platnosc",
+  "kalendarz",
+  "materialy",
+  "dokumenty",
+  "godziny",
+  "import",
+] as const;
+export type AlertCategory = (typeof ALERT_CATEGORIES)[number];
+export const ALERT_CATEGORY_LABELS: Record<AlertCategory, string> = {
+  podroz: "Podróż",
+  zakwaterowanie: "Zakwaterowanie",
+  platnosc: "Płatność",
+  kalendarz: "Kalendarz",
+  materialy: "Materiały",
+  dokumenty: "Dokumenty",
+  godziny: "Godziny",
+  import: "Import",
+};
+
+export const ALERT_PRIORITIES = ["informacja", "uwaga", "pilne"] as const;
+export type AlertPriority = (typeof ALERT_PRIORITIES)[number];
+export const ALERT_PRIORITY_LABELS: Record<AlertPriority, string> = {
+  informacja: "Informacja",
+  uwaga: "Uwaga",
+  pilne: "Pilne",
+};
+
+export const ALERT_STATUSES = ["new", "seen", "resolved", "ignored"] as const;
+export type AlertStatus = (typeof ALERT_STATUSES)[number];
+export const ALERT_STATUS_LABELS: Record<AlertStatus, string> = {
+  new: "Nowy",
+  seen: "Zobaczony",
+  resolved: "Rozwiązany",
+  ignored: "Zignorowany",
+};
+
+export type SchoolAlert = {
+  id: string;
+  user_id: string;
+  category: AlertCategory;
+  priority: AlertPriority;
+  title: string;
+  description: string | null;
+  session_id: string | null;
+  source: string | null;
+  source_id: string | null;
+  action_label: string | null;
+  action_href: string | null;
+  status: AlertStatus;
+  dedupe_key: string | null;
+  detected_at: string;
+  resolved_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type SchoolAutomationRun = {
+  id: string;
+  user_id: string;
+  task_type: "daily_checks";
+  started_at: string;
+  completed_at: string | null;
+  status: "running" | "success" | "partial" | "failed";
+  records_processed: number;
+  alerts_created: number;
+  error_message: string | null;
+  created_at: string;
+};

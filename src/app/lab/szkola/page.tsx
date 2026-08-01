@@ -7,9 +7,12 @@ import SzkolaNav from "@/components/szkola/SzkolaNav";
 import NextSessionCard from "@/components/szkola/NextSessionCard";
 import SchoolSummaryCards from "@/components/szkola/SchoolSummaryCards";
 import CalendarChangesSummaryCard, { type DashboardCalendarChange } from "@/components/szkola/CalendarChangesSummaryCard";
+import NextSessionLogisticsCard from "@/components/szkola/NextSessionLogisticsCard";
+import ImportSummaryCard from "@/components/szkola/ImportSummaryCard";
+import AlertsSummaryCard from "@/components/szkola/AlertsSummaryCard";
 import { todayDateString } from "@/lib/lab/format";
 import { sumByCurrency } from "@/lib/szkola/money";
-import type { Currency, SchoolSession, SessionTask } from "@/lib/szkola/types";
+import type { Accommodation, Currency, SchoolAlert, SchoolSession, SessionTask, TravelSegment } from "@/lib/szkola/types";
 
 export const metadata: Metadata = {
   title: "Szkoła psychoterapii",
@@ -87,13 +90,50 @@ export default async function SzkolaPulpitPage() {
   const nextSession = sessions[0] ?? null;
 
   let tasks: SessionTask[] = [];
+  let nextSessionSegments: TravelSegment[] = [];
+  let nextSessionAccommodations: Accommodation[] = [];
   if (nextSession) {
-    const { data: tasksData } = await supabase
-      .from("session_tasks")
-      .select("*")
-      .eq("session_id", nextSession.id)
-      .order("sort_order", { ascending: true });
+    const [{ data: tasksData }, { data: itinerary }, { data: accommodationsData }] = await Promise.all([
+      supabase.from("session_tasks").select("*").eq("session_id", nextSession.id).order("sort_order", { ascending: true }),
+      supabase.from("travel_itineraries").select("id").eq("session_id", nextSession.id).maybeSingle(),
+      supabase.from("accommodations").select("*").eq("session_id", nextSession.id),
+    ]);
     tasks = (tasksData as SessionTask[] | null) ?? [];
+    nextSessionAccommodations = (accommodationsData as Accommodation[] | null) ?? [];
+    if (itinerary) {
+      const { data: segmentsData } = await supabase.from("travel_segments").select("*").eq("itinerary_id", itinerary.id);
+      nextSessionSegments = (segmentsData as TravelSegment[] | null) ?? [];
+    }
+  }
+
+  let importNewCount = 0;
+  let importNeedsReviewCount = 0;
+  let importReadyCount = 0;
+  let alerts: SchoolAlert[] = [];
+
+  if (user) {
+    const [{ count: newCount }, { count: reviewCount }, { count: readyCount }, { data: alertsData }] = await Promise.all([
+      supabase
+        .from("import_inbox_items")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .in("status", ["new", "processing"]),
+      supabase
+        .from("import_inbox_items")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .in("status", ["needs_review", "error"]),
+      supabase
+        .from("import_inbox_items")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .in("status", ["recognized", "ready"]),
+      supabase.from("school_alerts").select("*").eq("user_id", user.id).in("status", ["new", "seen"]),
+    ]);
+    importNewCount = newCount ?? 0;
+    importNeedsReviewCount = reviewCount ?? 0;
+    importReadyCount = readyCount ?? 0;
+    alerts = (alertsData as SchoolAlert[] | null) ?? [];
   }
 
   const preparedTripsCount = new Set((itinerarySessionIds ?? []).map((r) => r.session_id)).size;
@@ -143,6 +183,14 @@ export default async function SzkolaPulpitPage() {
         <div className="mt-6 flex flex-col gap-5">
           <NextSessionCard session={nextSession ? { ...nextSession, tasks } : null} />
 
+          {nextSession && (
+            <NextSessionLogisticsCard
+              sessionId={nextSession.id}
+              segments={nextSessionSegments}
+              accommodations={nextSessionAccommodations}
+            />
+          )}
+
           <SchoolSummaryCards
             nextSessionLabel={
               nextSession ? (nextSession.session_number ? `Zjazd ${nextSession.session_number}` : nextSession.title) : "Brak"
@@ -159,6 +207,11 @@ export default async function SzkolaPulpitPage() {
             changes={dashboardChanges}
             totalCount={calendarChangesCount}
           />
+
+          <div className="grid grid-cols-1 gap-5 min-[700px]:grid-cols-2">
+            <ImportSummaryCard newCount={importNewCount} needsReviewCount={importNeedsReviewCount} readyCount={importReadyCount} />
+            <AlertsSummaryCard alerts={alerts} />
+          </div>
         </div>
       </div>
     </div>

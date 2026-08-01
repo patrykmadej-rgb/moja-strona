@@ -13,15 +13,13 @@ export default function SessionsPageHeader() {
         </p>
       </div>
       <div className="flex shrink-0 items-center gap-2">
-        <button
-          type="button"
-          disabled
-          title="Synchronizacja Google Calendar jest w przygotowaniu"
-          className="flex h-10 items-center gap-1.5 rounded-[10px] border border-[#e8e2ec] px-4 text-[13px] font-medium text-[#9a919f] opacity-60"
+        <Link
+          href="/lab/szkola/kalendarz"
+          className="flex h-10 items-center gap-1.5 rounded-[10px] border border-[#e8e2ec] px-4 text-[13px] font-medium text-[#201a2b] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd]"
         >
           <RefreshCw className="h-4 w-4" strokeWidth={1.75} />
           Synchronizuj kalendarz
-        </button>
+        </Link>
         <Link
           href="/lab/szkola/zjazdy/nowy"
           className="flex h-10 shrink-0 items-center gap-1.5 rounded-[10px] bg-[#5b2a86] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#32134f]"

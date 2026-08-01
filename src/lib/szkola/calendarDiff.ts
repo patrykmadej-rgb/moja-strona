@@ -42,6 +42,22 @@ function stringifyForCompare(value: unknown): string | null {
   return JSON.stringify(value);
 }
 
+// start_at/end_at wracają z Postgresa jako "...+00:00", a ze świeżo
+// sparsowanego ICS/Google jako "...Z" (Date#toISOString) — ten sam moment,
+// inny zapis stringa. Porównanie czysto tekstowe fałszywie zgłaszało "moved"
+// przy KAŻDEJ synchronizacji dla praktycznie każdego wydarzenia.
+const DATE_FIELDS = new Set<keyof ComparableEventFields>(["start_at", "end_at"]);
+
+function valuesEqual(field: keyof ComparableEventFields, oldVal: string | null, newVal: string | null): boolean {
+  if (oldVal === newVal) return true;
+  if (DATE_FIELDS.has(field) && oldVal !== null && newVal !== null) {
+    const oldTime = new Date(oldVal).getTime();
+    const newTime = new Date(newVal).getTime();
+    if (!Number.isNaN(oldTime) && !Number.isNaN(newTime)) return oldTime === newTime;
+  }
+  return false;
+}
+
 /** `previous === null` oznacza nowe wydarzenie — brak zmian pól do zgłoszenia (obsługiwane osobno jako "created"). */
 export function diffEventFields(
   previous: ComparableEventFields | null,
@@ -53,7 +69,7 @@ export function diffEventFields(
   for (const field of COMPARED_FIELDS) {
     const oldVal = stringifyForCompare(previous[field]);
     const newVal = stringifyForCompare(incoming[field]);
-    if (oldVal !== newVal) {
+    if (!valuesEqual(field, oldVal, newVal)) {
       changes.push({ field_name: field, old_value: oldVal, new_value: newVal });
     }
   }
