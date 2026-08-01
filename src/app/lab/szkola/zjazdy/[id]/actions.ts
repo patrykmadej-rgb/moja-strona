@@ -5,16 +5,23 @@ import { createClient } from "@/lib/supabase/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   ACCOMMODATION_STATUSES,
+  ACTIVITY_TO_HOUR_CATEGORY,
+  ACTIVITY_TYPES,
   CURRENCIES,
+  DOCUMENT_TYPES,
   EXPENSE_CATEGORIES,
   EXPENSE_STATUSES,
+  MATERIAL_CATEGORIES,
   PAYMENT_CATEGORIES,
   PAYMENT_STATUSES,
+  RELATED_ENTITY_TYPES,
   SEGMENT_DIRECTIONS,
   SEGMENT_STATUSES,
   SEGMENT_TYPES,
   SESSION_STATUSES,
   TASK_PRIORITIES,
+  TRAINING_HOUR_CATEGORIES,
+  type ActivityType,
 } from "@/lib/szkola/types";
 
 function requireSessionId(formData: FormData): string {
@@ -66,6 +73,15 @@ function requireEnum<T extends string>(
   const value = String(formData.get(key) ?? fallback) as T;
   if (!allowed.includes(value)) throw new Error(`Nieprawidłowa wartość pola ${key}.`);
   return value;
+}
+
+function computeHoursBetween(start: string, end: string): number | null {
+  const [sh, sm] = start.split(":").map(Number);
+  const [eh, em] = end.split(":").map(Number);
+  if ([sh, sm, eh, em].some((n) => Number.isNaN(n))) return null;
+  const minutes = eh * 60 + em - (sh * 60 + sm);
+  if (minutes <= 0) return null;
+  return Math.round((minutes / 60) * 100) / 100;
 }
 
 async function getOrCreateItinerary(supabase: SupabaseClient, sessionId: string): Promise<string> {
@@ -544,5 +560,414 @@ export async function deleteExpense(formData: FormData) {
 
   revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
   revalidatePath("/lab/szkola/zjazdy");
+  revalidatePath("/lab/szkola");
+}
+
+// --- Plan zajęć ---
+
+function readScheduleItemFields(formData: FormData) {
+  const title = requireString(formData, "title", "Tytuł zajęć jest wymagany.");
+  const item_date = requireString(formData, "item_date", "Data jest wymagana.");
+
+  const activityTypeRaw = String(formData.get("activity_type") ?? "");
+  if (activityTypeRaw && !ACTIVITY_TYPES.includes(activityTypeRaw as ActivityType)) {
+    throw new Error("Nieprawidłowy typ zajęć.");
+  }
+
+  const start_time = optionalString(formData, "start_time");
+  const end_time = optionalString(formData, "end_time");
+  if (start_time && end_time && start_time >= end_time) {
+    throw new Error("Godzina rozpoczęcia musi być wcześniejsza niż godzina zakończenia.");
+  }
+
+  const hoursRaw = String(formData.get("hours") ?? "").trim();
+  const autoHours = start_time && end_time ? computeHoursBetween(start_time, end_time) : null;
+  const hours = hoursRaw ? Number(hoursRaw) : autoHours;
+  if (hours !== null && (Number.isNaN(hours) || hours < 0)) {
+    throw new Error("Nieprawidłowa liczba godzin.");
+  }
+
+  return {
+    title,
+    item_date,
+    start_time,
+    end_time,
+    activity_type: activityTypeRaw || null,
+    trainer: optionalString(formData, "trainer"),
+    room: optionalString(formData, "room"),
+    location: optionalString(formData, "location"),
+    hours,
+    notes: optionalString(formData, "notes"),
+  };
+}
+
+export async function addScheduleItem(formData: FormData) {
+  const supabase = await createClient();
+  const sessionId = requireSessionId(formData);
+  const fields = readScheduleItemFields(formData);
+
+  const { data: maxRow } = await supabase
+    .from("session_schedule_items")
+    .select("sort_order")
+    .eq("session_id", sessionId)
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const { error } = await supabase.from("session_schedule_items").insert({
+    session_id: sessionId,
+    ...fields,
+    sort_order: (maxRow?.sort_order ?? -1) + 1,
+  });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+  revalidatePath("/lab/szkola");
+}
+
+export async function updateScheduleItem(formData: FormData) {
+  const supabase = await createClient();
+  const sessionId = requireSessionId(formData);
+  const id = String(formData.get("id") ?? "");
+  if (!id) throw new Error("Brak identyfikatora punktu planu.");
+  const fields = readScheduleItemFields(formData);
+
+  const { error } = await supabase
+    .from("session_schedule_items")
+    .update({ ...fields, updated_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+  revalidatePath("/lab/szkola");
+}
+
+export async function deleteScheduleItem(formData: FormData) {
+  const supabase = await createClient();
+  const sessionId = requireSessionId(formData);
+  const id = String(formData.get("id") ?? "");
+
+  const { error } = await supabase.from("session_schedule_items").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+  revalidatePath("/lab/szkola");
+}
+
+export async function duplicateScheduleItem(formData: FormData) {
+  const supabase = await createClient();
+  const sessionId = requireSessionId(formData);
+  const id = String(formData.get("id") ?? "");
+  if (!id) throw new Error("Brak identyfikatora punktu planu.");
+
+  const { data: original, error: fetchError } = await supabase
+    .from("session_schedule_items")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (fetchError) throw new Error(fetchError.message);
+
+  const { data: maxRow } = await supabase
+    .from("session_schedule_items")
+    .select("sort_order")
+    .eq("session_id", sessionId)
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const { error } = await supabase.from("session_schedule_items").insert({
+    session_id: original.session_id,
+    item_date: original.item_date,
+    start_time: original.start_time,
+    end_time: original.end_time,
+    title: `${original.title} (kopia)`,
+    activity_type: original.activity_type,
+    trainer: original.trainer,
+    room: original.room,
+    location: original.location,
+    hours: original.hours,
+    notes: original.notes,
+    sort_order: (maxRow?.sort_order ?? -1) + 1,
+  });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+}
+
+export async function duplicateScheduleDay(formData: FormData) {
+  const supabase = await createClient();
+  const sessionId = requireSessionId(formData);
+  const sourceDate = requireString(formData, "source_date", "Brak dnia źródłowego.");
+  const targetDate = requireString(formData, "target_date", "Podaj docelową datę.");
+
+  const { data: items, error: fetchError } = await supabase
+    .from("session_schedule_items")
+    .select("*")
+    .eq("session_id", sessionId)
+    .eq("item_date", sourceDate)
+    .order("sort_order", { ascending: true });
+  if (fetchError) throw new Error(fetchError.message);
+  if (!items || items.length === 0) throw new Error("Brak punktów planu do skopiowania w tym dniu.");
+
+  const { data: maxRow } = await supabase
+    .from("session_schedule_items")
+    .select("sort_order")
+    .eq("session_id", sessionId)
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  let nextSortOrder = (maxRow?.sort_order ?? -1) + 1;
+
+  const { error } = await supabase.from("session_schedule_items").insert(
+    items.map((item) => ({
+      session_id: sessionId,
+      item_date: targetDate,
+      start_time: item.start_time,
+      end_time: item.end_time,
+      title: item.title,
+      activity_type: item.activity_type,
+      trainer: item.trainer,
+      room: item.room,
+      location: item.location,
+      hours: item.hours,
+      notes: item.notes,
+      sort_order: nextSortOrder++,
+    })),
+  );
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+}
+
+export async function moveScheduleItem(
+  sessionId: string,
+  itemId: string,
+  direction: "up" | "down",
+) {
+  const supabase = await createClient();
+  const { data: items, error } = await supabase
+    .from("session_schedule_items")
+    .select("id, sort_order, item_date")
+    .eq("session_id", sessionId)
+    .order("sort_order", { ascending: true });
+  if (error) throw new Error(error.message);
+
+  const list = items ?? [];
+  const index = list.findIndex((i) => i.id === itemId);
+  if (index === -1) return;
+
+  const swapWith = direction === "up" ? index - 1 : index + 1;
+  if (swapWith < 0 || swapWith >= list.length) return;
+  if (list[index].item_date !== list[swapWith].item_date) return;
+
+  const a = list[index];
+  const b = list[swapWith];
+
+  const { error: err1 } = await supabase
+    .from("session_schedule_items")
+    .update({ sort_order: b.sort_order })
+    .eq("id", a.id);
+  if (err1) throw new Error(err1.message);
+
+  const { error: err2 } = await supabase
+    .from("session_schedule_items")
+    .update({ sort_order: a.sort_order })
+    .eq("id", b.id);
+  if (err2) throw new Error(err2.message);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+}
+
+// --- Materiały (metadane; upload/usuwanie pliku obsługuje klient przez
+// lib/szkola/materialsStorage.ts, bo server actions mają limit rozmiaru body) ---
+
+export async function updateMaterialMeta(formData: FormData) {
+  const supabase = await createClient();
+  const sessionId = requireSessionId(formData);
+  const id = String(formData.get("id") ?? "");
+  if (!id) throw new Error("Brak identyfikatora materiału.");
+
+  const title = requireString(formData, "title", "Nazwa materiału jest wymagana.");
+  const categoryRaw = String(formData.get("category") ?? "");
+  if (categoryRaw && !MATERIAL_CATEGORIES.includes(categoryRaw as (typeof MATERIAL_CATEGORIES)[number])) {
+    throw new Error("Nieprawidłowa kategoria.");
+  }
+
+  const tags = String(formData.get("tags") ?? "")
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+
+  const { error } = await supabase
+    .from("session_materials")
+    .update({
+      title,
+      description: optionalString(formData, "description"),
+      category: categoryRaw || null,
+      folder: optionalString(formData, "folder"),
+      author: optionalString(formData, "author"),
+      tags,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+  revalidatePath("/lab/szkola/materialy");
+}
+
+// --- Dokumenty (metadane; upload/usuwanie pliku obsługuje klient przez
+// lib/szkola/documentsStorage.ts) ---
+
+export async function updateDocumentMeta(formData: FormData) {
+  const supabase = await createClient();
+  const sessionId = requireSessionId(formData);
+  const id = String(formData.get("id") ?? "");
+  if (!id) throw new Error("Brak identyfikatora dokumentu.");
+
+  const title = requireString(formData, "title", "Nazwa dokumentu jest wymagana.");
+  const docType = requireEnum(formData, "doc_type", DOCUMENT_TYPES, "inne");
+
+  const relatedTypeRaw = String(formData.get("related_entity_type") ?? "");
+  if (relatedTypeRaw && !RELATED_ENTITY_TYPES.includes(relatedTypeRaw as (typeof RELATED_ENTITY_TYPES)[number])) {
+    throw new Error("Nieprawidłowy typ powiązania.");
+  }
+
+  const { error } = await supabase
+    .from("session_documents")
+    .update({
+      title,
+      doc_type: docType,
+      document_date: optionalString(formData, "document_date"),
+      related_entity_type: relatedTypeRaw || null,
+      related_entity_id: optionalString(formData, "related_entity_id"),
+      notes: optionalString(formData, "notes"),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+  revalidatePath("/lab/szkola/dokumenty");
+}
+
+export async function deleteDocumentRecord(formData: FormData) {
+  const supabase = await createClient();
+  const sessionId = requireSessionId(formData);
+  const id = String(formData.get("id") ?? "");
+
+  const { error } = await supabase.from("session_documents").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+  revalidatePath("/lab/szkola/dokumenty");
+}
+
+// --- Godziny szkoleniowe ---
+
+export async function addHoursEntry(formData: FormData) {
+  const supabase = await createClient();
+  const sessionId = requireSessionId(formData);
+
+  const category = requireEnum(formData, "category", TRAINING_HOUR_CATEGORIES, "inne");
+  const hours = parseAmount(formData, "hours", "Liczba godzin jest wymagana i musi być nieujemna.");
+
+  const { error } = await supabase.from("training_hours_entries").insert({
+    session_id: sessionId,
+    category,
+    hours,
+    entry_date: optionalString(formData, "entry_date"),
+    attended: formData.get("attended") !== "off",
+    trainer: optionalString(formData, "trainer"),
+    schedule_item_id: optionalString(formData, "schedule_item_id"),
+    notes: optionalString(formData, "notes"),
+  });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+  revalidatePath("/lab/szkola/godziny");
+  revalidatePath("/lab/szkola");
+}
+
+export async function updateHoursEntry(formData: FormData) {
+  const supabase = await createClient();
+  const sessionId = requireSessionId(formData);
+  const id = String(formData.get("id") ?? "");
+  if (!id) throw new Error("Brak identyfikatora wpisu godzinowego.");
+
+  const category = requireEnum(formData, "category", TRAINING_HOUR_CATEGORIES, "inne");
+  const hours = parseAmount(formData, "hours", "Liczba godzin jest wymagana i musi być nieujemna.");
+
+  const { error } = await supabase
+    .from("training_hours_entries")
+    .update({
+      category,
+      hours,
+      entry_date: optionalString(formData, "entry_date"),
+      attended: formData.get("attended") !== "off",
+      trainer: optionalString(formData, "trainer"),
+      schedule_item_id: optionalString(formData, "schedule_item_id"),
+      notes: optionalString(formData, "notes"),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+  revalidatePath("/lab/szkola/godziny");
+  revalidatePath("/lab/szkola");
+}
+
+export async function deleteHoursEntry(formData: FormData) {
+  const supabase = await createClient();
+  const sessionId = requireSessionId(formData);
+  const id = String(formData.get("id") ?? "");
+
+  const { error } = await supabase.from("training_hours_entries").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+  revalidatePath("/lab/szkola/godziny");
+  revalidatePath("/lab/szkola");
+}
+
+export async function createHoursEntryFromScheduleItem(formData: FormData) {
+  const supabase = await createClient();
+  const sessionId = requireSessionId(formData);
+  const scheduleItemId = String(formData.get("schedule_item_id") ?? "");
+  if (!scheduleItemId) throw new Error("Brak identyfikatora punktu planu.");
+
+  const { data: item, error: fetchError } = await supabase
+    .from("session_schedule_items")
+    .select("*")
+    .eq("id", scheduleItemId)
+    .single();
+  if (fetchError) throw new Error(fetchError.message);
+
+  const category = ACTIVITY_TO_HOUR_CATEGORY[item.activity_type as ActivityType] ?? "inne";
+
+  const { error } = await supabase.from("training_hours_entries").insert({
+    session_id: sessionId,
+    category,
+    hours: item.hours ?? 0,
+    entry_date: item.item_date,
+    attended: true,
+    trainer: item.trainer,
+    schedule_item_id: item.id,
+  });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+  revalidatePath("/lab/szkola/godziny");
   revalidatePath("/lab/szkola");
 }

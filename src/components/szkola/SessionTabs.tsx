@@ -7,18 +7,20 @@ export type SessionTabKey =
   | "koszty"
   | "materialy"
   | "dokumenty"
+  | "godziny"
   | "notatki"
   | "historia";
 
 export const SESSION_TABS: { key: SessionTabKey; label: string; enabled: boolean }[] = [
   { key: "przeglad", label: "Przegląd", enabled: true },
-  { key: "plan", label: "Plan zajęć", enabled: false },
+  { key: "plan", label: "Plan zajęć", enabled: true },
   { key: "podroz", label: "Podróż", enabled: true },
   { key: "zakwaterowanie", label: "Zakwaterowanie", enabled: true },
   { key: "platnosci", label: "Płatności", enabled: true },
   { key: "koszty", label: "Koszty", enabled: true },
-  { key: "materialy", label: "Materiały", enabled: false },
-  { key: "dokumenty", label: "Dokumenty", enabled: false },
+  { key: "materialy", label: "Materiały", enabled: true },
+  { key: "dokumenty", label: "Dokumenty", enabled: true },
+  { key: "godziny", label: "Godziny", enabled: true },
   { key: "notatki", label: "Notatki", enabled: false },
   { key: "historia", label: "Historia zmian", enabled: false },
 ];

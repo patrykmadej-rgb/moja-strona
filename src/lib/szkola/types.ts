@@ -273,6 +273,223 @@ export type SessionTask = {
   created_at: string;
 };
 
+export const ACTIVITY_TYPES = [
+  "teoria",
+  "doswiadczenie_wlasne",
+  "superwizja",
+  "warsztat",
+  "praktyka",
+  "wyklad",
+  "cwiczenia",
+  "seminarium",
+  "inne",
+] as const;
+export type ActivityType = (typeof ACTIVITY_TYPES)[number];
+export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
+  teoria: "Teoria",
+  doswiadczenie_wlasne: "Doświadczenie własne",
+  superwizja: "Superwizja",
+  warsztat: "Warsztat",
+  praktyka: "Praktyka",
+  wyklad: "Wykład",
+  cwiczenia: "Ćwiczenia",
+  seminarium: "Seminarium",
+  inne: "Inne",
+};
+
+export type SessionScheduleItem = {
+  id: string;
+  session_id: string;
+  item_date: string;
+  start_time: string | null;
+  end_time: string | null;
+  title: string;
+  activity_type: ActivityType | null;
+  trainer: string | null;
+  room: string | null;
+  location: string | null;
+  hours: number | null;
+  notes: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export const MATERIAL_CATEGORIES = [
+  "program_zjazdu",
+  "prezentacje",
+  "literatura",
+  "zdjecia_tablicy",
+  "zadania",
+  "notatki_wlasne",
+  "materialy_prowadzacego",
+  "inne",
+] as const;
+export type MaterialCategory = (typeof MATERIAL_CATEGORIES)[number];
+export const MATERIAL_CATEGORY_LABELS: Record<MaterialCategory, string> = {
+  program_zjazdu: "Program zjazdu",
+  prezentacje: "Prezentacje",
+  literatura: "Literatura",
+  zdjecia_tablicy: "Zdjęcia tablicy",
+  zadania: "Zadania",
+  notatki_wlasne: "Notatki własne",
+  materialy_prowadzacego: "Materiały prowadzącego",
+  inne: "Inne",
+};
+
+export const MATERIAL_TYPES = ["plik", "link", "notatka"] as const;
+export type MaterialType = (typeof MATERIAL_TYPES)[number];
+export const MATERIAL_TYPE_LABELS: Record<MaterialType, string> = {
+  plik: "Plik",
+  link: "Link",
+  notatka: "Notatka",
+};
+
+export type SessionMaterial = {
+  id: string;
+  session_id: string;
+  folder: string | null;
+  name: string;
+  file_type: string | null;
+  storage_path: string | null;
+  external_link: string | null;
+  tags: string[];
+  author: string | null;
+  related_schedule_item_id: string | null;
+  file_size: number | null;
+  title: string | null;
+  description: string | null;
+  category: MaterialCategory | null;
+  material_type: MaterialType;
+  added_by: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export const DOCUMENT_TYPES = [
+  "bilet",
+  "rezerwacja",
+  "faktura",
+  "paragon",
+  "potwierdzenie_platnosci",
+  "harmonogram",
+  "zaswiadczenie",
+  "certyfikat",
+  "zgoda",
+  "umowa",
+  "inne",
+] as const;
+export type DocumentType = (typeof DOCUMENT_TYPES)[number];
+export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
+  bilet: "Bilet",
+  rezerwacja: "Rezerwacja",
+  faktura: "Faktura",
+  paragon: "Paragon",
+  potwierdzenie_platnosci: "Potwierdzenie płatności",
+  harmonogram: "Harmonogram",
+  zaswiadczenie: "Zaświadczenie",
+  certyfikat: "Certyfikat",
+  zgoda: "Zgoda",
+  umowa: "Umowa",
+  inne: "Inne",
+};
+
+export const RELATED_ENTITY_TYPES = [
+  "travel_segment",
+  "accommodation",
+  "school_payment",
+  "expense",
+  "schedule_item",
+  "session",
+  "other",
+] as const;
+export type RelatedEntityType = (typeof RELATED_ENTITY_TYPES)[number];
+export const RELATED_ENTITY_TYPE_LABELS: Record<RelatedEntityType, string> = {
+  travel_segment: "Odcinek podróży",
+  accommodation: "Zakwaterowanie",
+  school_payment: "Płatność za szkołę",
+  expense: "Wydatek",
+  schedule_item: "Punkt planu zajęć",
+  session: "Zjazd",
+  other: "Inne",
+};
+
+export type SessionDocument = {
+  id: string;
+  session_id: string;
+  name: string;
+  doc_type: DocumentType;
+  document_date: string | null;
+  travel_segment_id: string | null;
+  accommodation_id: string | null;
+  payment_id: string | null;
+  storage_path: string | null;
+  file_size: number | null;
+  notes: string | null;
+  title: string | null;
+  mime_type: string | null;
+  related_entity_type: RelatedEntityType | null;
+  related_entity_id: string | null;
+  uploaded_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export const TRAINING_HOUR_CATEGORIES = [
+  "teoria",
+  "doswiadczenie_wlasne",
+  "superwizja",
+  "praktyka_kliniczna",
+  "warsztat",
+  "terapia_wlasna",
+  "inne",
+] as const;
+export type TrainingHourCategory = (typeof TRAINING_HOUR_CATEGORIES)[number];
+export const TRAINING_HOUR_CATEGORY_LABELS: Record<TrainingHourCategory, string> = {
+  teoria: "Teoria",
+  doswiadczenie_wlasne: "Doświadczenie własne",
+  superwizja: "Superwizja",
+  praktyka_kliniczna: "Praktyka kliniczna",
+  warsztat: "Warsztat",
+  terapia_wlasna: "Terapia własna",
+  inne: "Inne",
+};
+
+export type TrainingHoursEntry = {
+  id: string;
+  session_id: string | null;
+  category: TrainingHourCategory;
+  hours: number;
+  entry_date: string | null;
+  attended: boolean;
+  trainer: string | null;
+  certificate_document_id: string | null;
+  schedule_item_id: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export const ACTIVITY_TO_HOUR_CATEGORY: Partial<Record<ActivityType, TrainingHourCategory>> = {
+  teoria: "teoria",
+  doswiadczenie_wlasne: "doswiadczenie_wlasne",
+  superwizja: "superwizja",
+  warsztat: "warsztat",
+  praktyka: "praktyka_kliniczna",
+};
+
+export type TrainingHourRequirement = {
+  id: string;
+  category: TrainingHourCategory;
+  required_hours: number;
+  label: string;
+  sort_order: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
 export const DEFAULT_SESSION_CHECKLIST: string[] = [
   "Rejestracja na zjazd",
   "Bilet w jedną stronę",

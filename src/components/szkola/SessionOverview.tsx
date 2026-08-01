@@ -1,4 +1,4 @@
-import { CalendarClock, FolderOpen, Files, StickyNote } from "lucide-react";
+import { StickyNote } from "lucide-react";
 import PreparationChecklistCard from "@/components/szkola/PreparationChecklistCard";
 import SessionPlaceholderCard from "@/components/szkola/SessionPlaceholderCard";
 import TravelSummaryCard from "@/components/szkola/TravelSummaryCard";
@@ -6,13 +6,21 @@ import AccommodationSummaryCard from "@/components/szkola/AccommodationSummaryCa
 import BudgetCard from "@/components/szkola/BudgetCard";
 import UpcomingDeadlinesCard from "@/components/szkola/UpcomingDeadlinesCard";
 import SessionWarningsCard from "@/components/szkola/SessionWarningsCard";
+import ScheduleSummaryCard from "@/components/szkola/ScheduleSummaryCard";
+import MaterialsSummaryCard from "@/components/szkola/MaterialsSummaryCard";
+import DocumentsSummaryCard from "@/components/szkola/DocumentsSummaryCard";
+import HoursSummaryCard from "@/components/szkola/HoursSummaryCard";
 import { getSessionWarnings } from "@/lib/szkola/warnings";
 import type {
   Accommodation,
   Expense,
   SchoolPayment,
   SchoolSession,
+  SessionDocument,
+  SessionMaterial,
+  SessionScheduleItem,
   SessionTask,
+  TrainingHoursEntry,
   TravelSegment,
 } from "@/lib/szkola/types";
 import type { SessionTabKey } from "@/components/szkola/SessionTabs";
@@ -24,6 +32,10 @@ export default function SessionOverview({
   accommodations,
   payments,
   expenses,
+  scheduleItems,
+  materials,
+  documents,
+  hoursEntries,
   onNavigateTab,
 }: {
   session: SchoolSession;
@@ -32,6 +44,10 @@ export default function SessionOverview({
   accommodations: Accommodation[];
   payments: SchoolPayment[];
   expenses: Expense[];
+  scheduleItems: SessionScheduleItem[];
+  materials: SessionMaterial[];
+  documents: SessionDocument[];
+  hoursEntries: TrainingHoursEntry[];
   onNavigateTab: (tab: SessionTabKey) => void;
 }) {
   const warnings = getSessionWarnings({
@@ -39,23 +55,15 @@ export default function SessionOverview({
     segments,
     accommodations,
     payments,
-    scheduleItems: [],
+    scheduleItems,
   });
 
   const mainColumn = (
     <>
       <PreparationChecklistCard sessionId={session.id} tasks={tasks} />
       <TravelSummaryCard segments={segments} onNavigateTab={() => onNavigateTab("podroz")} />
-      <SessionPlaceholderCard
-        icon={CalendarClock}
-        title="Plan zajęć"
-        description="Harmonogram dni i punktów programu pojawi się tutaj w kolejnym etapie modułu."
-      />
-      <SessionPlaceholderCard
-        icon={FolderOpen}
-        title="Materiały ze zjazdu"
-        description="Prezentacje, zdjęcia tablicy i literatura — moduł materiałów jest w przygotowaniu."
-      />
+      <ScheduleSummaryCard items={scheduleItems} onNavigateTab={() => onNavigateTab("plan")} />
+      <MaterialsSummaryCard materials={materials} onNavigateTab={() => onNavigateTab("materialy")} />
     </>
   );
 
@@ -64,11 +72,8 @@ export default function SessionOverview({
       <UpcomingDeadlinesCard tasks={tasks} payments={payments} accommodations={accommodations} />
       <AccommodationSummaryCard accommodations={accommodations} onNavigateTab={() => onNavigateTab("zakwaterowanie")} />
       <BudgetCard session={session} payments={payments} expenses={expenses} />
-      <SessionPlaceholderCard
-        icon={Files}
-        title="Dokumenty"
-        description="Bilety, rezerwacje i faktury przypisane do tego zjazdu — w przygotowaniu."
-      />
+      <DocumentsSummaryCard documents={documents} onNavigateTab={() => onNavigateTab("dokumenty")} />
+      <HoursSummaryCard entries={hoursEntries} onNavigateTab={() => onNavigateTab("godziny")} />
       <SessionPlaceholderCard
         icon={StickyNote}
         title="Notatki"

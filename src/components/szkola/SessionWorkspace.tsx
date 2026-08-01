@@ -9,6 +9,10 @@ import TravelTab from "@/components/szkola/TravelTab";
 import AccommodationTab from "@/components/szkola/AccommodationTab";
 import SchoolPaymentsTab from "@/components/szkola/SchoolPaymentsTab";
 import ExpensesTab from "@/components/szkola/ExpensesTab";
+import SessionScheduleTab from "@/components/szkola/SessionScheduleTab";
+import MaterialsTab from "@/components/szkola/MaterialsTab";
+import DocumentsTab from "@/components/szkola/DocumentsTab";
+import TrainingHoursTab from "@/components/szkola/TrainingHoursTab";
 import EmptyState from "@/components/lab/EmptyState";
 import { Hourglass } from "lucide-react";
 import { updateSession } from "@/app/lab/szkola/zjazdy/[id]/actions";
@@ -17,7 +21,11 @@ import type {
   Expense,
   SchoolPayment,
   SchoolSession,
+  SessionDocument,
+  SessionMaterial,
+  SessionScheduleItem,
   SessionTask,
+  TrainingHoursEntry,
   TravelSegment,
 } from "@/lib/szkola/types";
 
@@ -28,6 +36,10 @@ export default function SessionWorkspace({
   accommodations,
   payments,
   expenses,
+  scheduleItems,
+  materials,
+  documents,
+  hoursEntries,
 }: {
   session: SchoolSession;
   tasks: SessionTask[];
@@ -35,6 +47,10 @@ export default function SessionWorkspace({
   accommodations: Accommodation[];
   payments: SchoolPayment[];
   expenses: Expense[];
+  scheduleItems: SessionScheduleItem[];
+  materials: SessionMaterial[];
+  documents: SessionDocument[];
+  hoursEntries: TrainingHoursEntry[];
 }) {
   const [tab, setTab] = useState<SessionTabKey>("przeglad");
   const [editing, setEditing] = useState(false);
@@ -77,6 +93,10 @@ export default function SessionWorkspace({
                   accommodations={accommodations}
                   payments={payments}
                   expenses={expenses}
+                  scheduleItems={scheduleItems}
+                  materials={materials}
+                  documents={documents}
+                  hoursEntries={hoursEntries}
                   onNavigateTab={setTab}
                 />
               )}
@@ -86,11 +106,21 @@ export default function SessionWorkspace({
               )}
               {tab === "platnosci" && <SchoolPaymentsTab sessionId={session.id} payments={payments} />}
               {tab === "koszty" && <ExpensesTab sessionId={session.id} expenses={expenses} />}
+              {tab === "plan" && <SessionScheduleTab sessionId={session.id} items={scheduleItems} />}
+              {tab === "materialy" && <MaterialsTab sessionId={session.id} materials={materials} />}
+              {tab === "dokumenty" && <DocumentsTab sessionId={session.id} documents={documents} />}
+              {tab === "godziny" && (
+                <TrainingHoursTab sessionId={session.id} entries={hoursEntries} scheduleItems={scheduleItems} />
+              )}
               {tab !== "przeglad" &&
                 tab !== "podroz" &&
                 tab !== "zakwaterowanie" &&
                 tab !== "platnosci" &&
-                tab !== "koszty" && (
+                tab !== "koszty" &&
+                tab !== "plan" &&
+                tab !== "materialy" &&
+                tab !== "dokumenty" &&
+                tab !== "godziny" && (
                   <div className="rounded-[16px] border border-[#e8e2ec] bg-white p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
                     <EmptyState
                       icon={Hourglass}
