@@ -394,3 +394,37 @@ html {
 .lab-sidebar .rounded-full {
   border-radius: 9999px !important;
 }
+
+/* Tooltip ikon sidebara — renderowany przez portal do document.body
+   (Sidebar.tsx), więc position: fixed liczony jest względem viewportu,
+   a nie .lab-sidebar. Dzięki temu overflow: hidden na .lab-sidebar (potrzebne
+   dla maski grafiki konstelacji) już go nie przycina. */
+.lab-sidebar-tooltip {
+  position: fixed;
+  transform: translateY(-50%);
+  z-index: 9999;
+  min-width: max-content;
+  max-width: 220px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: #24152f;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow:
+    0 10px 30px rgba(24, 12, 32, 0.22),
+    0 2px 8px rgba(24, 12, 32, 0.12);
+  pointer-events: none;
+  animation: lab-sidebar-tooltip-in 120ms ease-out;
+}
+
+@keyframes lab-sidebar-tooltip-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

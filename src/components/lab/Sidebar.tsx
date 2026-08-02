@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -43,38 +45,111 @@ const SECONDARY_ITEMS: NavItem[] = [
   { key: "ustawienia", href: "/lab/ustawienia", label: "Ustawienia", icon: Settings, enabled: false },
 ];
 
+/**
+ * Tooltip renderowany przez portal do document.body — .lab-sidebar ma
+ * overflow: hidden (wymagane dla maski grafiki konstelacji), więc tooltip
+ * jako zwykłe dziecko nav-itemu byłby przez to ucinany. Pozycja liczona
+ * z getBoundingClientRect() aktywnego triggera, position: fixed w CSS.
+ */
+function useSidebarTooltip<T extends HTMLElement>(label: string) {
+  const ref = useRef<T>(null);
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+
+  const computePosition = () => {
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect) return null;
+    return { top: rect.top + rect.height / 2, left: rect.right + 10 };
+  };
+
+  const showOnHover = () => {
+    // Na dotyku nie pokazujemy tooltipa na "tap" — tylko realny hover myszą.
+    if (typeof window !== "undefined" && window.matchMedia && !window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      return;
+    }
+    setPos(computePosition());
+  };
+  const showOnFocus = () => setPos(computePosition());
+  const hide = () => setPos(null);
+
+  const portal =
+    pos && typeof document !== "undefined"
+      ? createPortal(
+          <div className="lab-sidebar-tooltip" role="tooltip" style={{ top: pos.top, left: pos.left }}>
+            {label}
+          </div>,
+          document.body,
+        )
+      : null;
+
+  return { ref, onMouseEnter: showOnHover, onMouseLeave: hide, onFocus: showOnFocus, onBlur: hide, portal };
+}
+
 function NavButton({ item, isActive }: { item: NavItem; isActive: boolean }) {
   const Icon = item.icon;
+  const label = `${item.label}${!item.enabled ? " — wkrótce" : ""}`;
+  const { ref, onMouseEnter, onMouseLeave, onFocus, onBlur, portal } = useSidebarTooltip<HTMLAnchorElement | HTMLSpanElement>(label);
 
-  const inner = (
-    <span
-      className={`lab-nav-item group${isActive ? " active" : ""}`}
-      data-enabled={item.enabled}
-    >
+  const icon = (
+    <span className={`lab-nav-item${isActive ? " active" : ""}`} data-enabled={item.enabled}>
       <Icon className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
-      <span
-        role="tooltip"
-        aria-hidden="true"
-        className="pointer-events-none absolute left-full ml-2 whitespace-nowrap rounded-[6px] bg-[#160b21] px-2 py-1 text-xs text-white opacity-0 shadow-[0_4px_14px_rgba(0,0,0,0.25)] transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
-      >
-        {item.label}
-        {!item.enabled && " — wkrótce"}
-      </span>
     </span>
   );
 
   if (!item.enabled) {
     return (
-      <span aria-label={`${item.label} — wkrótce`} aria-disabled="true">
-        {inner}
-      </span>
+      <>
+        <span
+          ref={ref as React.RefObject<HTMLSpanElement>}
+          aria-label={label}
+          aria-disabled="true"
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+        >
+          {icon}
+        </span>
+        {portal}
+      </>
     );
   }
 
   return (
-    <Link href={item.href} aria-label={item.label} aria-current={isActive ? "page" : undefined}>
-      {inner}
-    </Link>
+    <>
+      <Link
+        ref={ref as React.RefObject<HTMLAnchorElement>}
+        href={item.href}
+        aria-label={item.label}
+        aria-current={isActive ? "page" : undefined}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onFocus={onFocus}
+        onBlur={onBlur}
+      >
+        {icon}
+      </Link>
+      {portal}
+    </>
+  );
+}
+
+function LogoutButton() {
+  const { ref, onMouseEnter, onMouseLeave, onFocus, onBlur, portal } = useSidebarTooltip<HTMLButtonElement>("Wyloguj");
+
+  return (
+    <form action={signOutLab}>
+      <button
+        ref={ref}
+        type="submit"
+        aria-label="Wyloguj"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        className="flex h-9 w-9 items-center justify-center rounded-[10px] text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
+      >
+        <LogOut className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
+      </button>
+      {portal}
+    </form>
   );
 }
 
@@ -128,15 +203,7 @@ export default function Sidebar({ email }: { email?: string | null }) {
           >
             {initial}
           </span>
-          <form action={signOutLab}>
-            <button
-              type="submit"
-              aria-label="Wyloguj"
-              className="flex h-9 w-9 items-center justify-center rounded-[10px] text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
-            >
-              <LogOut className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
-            </button>
-          </form>
+          <LogoutButton />
         </div>
       </div>
     </aside>
