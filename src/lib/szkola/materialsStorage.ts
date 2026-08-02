@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { sanitizeStorageFilename } from "@/lib/storageFilename";
 import type { MaterialCategory, SessionMaterial } from "@/lib/szkola/types";
 
 export const MATERIALS_BUCKET = "school-materials";
@@ -39,7 +40,7 @@ export async function uploadMaterialFile(
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Brak autoryzacji.");
 
-  const storagePath = `${user.id}/${sessionId}/materials/${Date.now()}-${file.name}`;
+  const storagePath = `${user.id}/${sessionId}/materials/${Date.now()}-${sanitizeStorageFilename(file.name)}`;
 
   const { error: uploadError } = await supabase.storage
     .from(MATERIALS_BUCKET)

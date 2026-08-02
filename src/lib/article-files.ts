@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { sanitizeStorageFilename } from "@/lib/storageFilename";
 
 export const FILES_BUCKET = "article-files";
 const SIGNED_URL_TTL_SECONDS = 60;
@@ -52,7 +53,7 @@ export async function uploadFile(articleId: string, file: File): Promise<Article
   if (validationError) throw new Error(validationError);
 
   const supabase = createClient();
-  const storagePath = `${articleId}/${Date.now()}-${file.name}`;
+  const storagePath = `${articleId}/${Date.now()}-${sanitizeStorageFilename(file.name)}`;
 
   const { error: uploadError } = await supabase.storage
     .from(FILES_BUCKET)

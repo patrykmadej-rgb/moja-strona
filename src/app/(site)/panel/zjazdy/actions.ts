@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { sanitizeStorageFilename } from "@/lib/storageFilename";
 
 const BUCKET = "documents";
 
@@ -40,7 +41,7 @@ export async function createTrip(formData: FormData) {
   if (error) throw new Error(error.message);
 
   if (file instanceof File && file.size > 0) {
-    const path = `${user.id}/zjazdy/${trip.id}-${file.name}`;
+    const path = `${user.id}/zjazdy/${trip.id}-${sanitizeStorageFilename(file.name)}`;
     const { error: uploadError } = await supabase.storage
       .from(BUCKET)
       .upload(path, file, { contentType: file.type || "application/pdf" });

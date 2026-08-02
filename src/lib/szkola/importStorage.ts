@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { sanitizeStorageFilename } from "@/lib/storageFilename";
 
 /**
  * Upload plików do skrzynki importu — osobny, prywatny bucket school-imports
@@ -55,7 +56,7 @@ export async function uploadImportFile(file: File): Promise<{ storagePath: strin
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const mimeType = resolveMimeType(file);
-  const storagePath = `${user.id}/imports/${year}/${month}/${Date.now()}-${file.name}`;
+  const storagePath = `${user.id}/imports/${year}/${month}/${Date.now()}-${sanitizeStorageFilename(file.name)}`;
 
   const { error } = await supabase.storage.from(IMPORTS_BUCKET).upload(storagePath, file, { contentType: mimeType });
   if (error) throw new Error(error.message);

@@ -10,6 +10,7 @@ import { matchImportToSession } from "@/lib/szkola/importSessionMatching";
 import { findDuplicateInboxItem, findDuplicateReservation, hashFileBuffer } from "@/lib/szkola/importDuplicates";
 import { IMPORTS_BUCKET } from "@/lib/szkola/importStorage";
 import { DOCUMENTS_BUCKET } from "@/lib/szkola/documentsStorage";
+import { sanitizeStorageFilename } from "@/lib/storageFilename";
 import {
   CURRENCIES,
   IMPORT_DETECTED_TYPES,
@@ -484,7 +485,7 @@ async function moveImportFileToDocuments(
   const { data: blob, error: downloadError } = await supabase.storage.from(IMPORTS_BUCKET).download(storagePath);
   if (downloadError) throw new Error(downloadError.message);
 
-  const destinationPath = `${userId}/${sessionId}/documents/${Date.now()}-${filename}`;
+  const destinationPath = `${userId}/${sessionId}/documents/${Date.now()}-${sanitizeStorageFilename(filename)}`;
   const { error: uploadError } = await supabase.storage
     .from(DOCUMENTS_BUCKET)
     .upload(destinationPath, blob, { contentType: blob.type || "application/octet-stream" });

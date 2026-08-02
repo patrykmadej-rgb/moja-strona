@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { sanitizeStorageFilename } from "@/lib/storageFilename";
 import type { ArticleVersion } from "@/lib/lab/types";
 
 /**
@@ -50,7 +51,7 @@ export async function uploadArticleVersion(
     .maybeSingle();
 
   const versionNumber = (maxRow?.version_number ?? 0) + 1;
-  const storagePath = `${articleId}/${versionNumber}_${file.name}`;
+  const storagePath = `${articleId}/${versionNumber}_${sanitizeStorageFilename(file.name)}`;
 
   const { error: uploadError } = await supabase.storage
     .from(VERSIONS_BUCKET)

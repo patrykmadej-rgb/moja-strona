@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { sanitizeStorageFilename } from "@/lib/storageFilename";
 import type { DocumentType, RelatedEntityType, SessionDocument } from "@/lib/szkola/types";
 
 export const DOCUMENTS_BUCKET = "school-documents";
@@ -42,7 +43,7 @@ export async function uploadDocumentFile(
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Brak autoryzacji.");
 
-  const storagePath = `${user.id}/${sessionId}/documents/${Date.now()}-${file.name}`;
+  const storagePath = `${user.id}/${sessionId}/documents/${Date.now()}-${sanitizeStorageFilename(file.name)}`;
 
   const { error: uploadError } = await supabase.storage
     .from(DOCUMENTS_BUCKET)
