@@ -27,53 +27,65 @@ function parseOptionalHttpUrl(value: string, fieldLabel: string): string | null 
   return parsed.toString();
 }
 
-export async function updateArticle(formData: FormData) {
-  const supabase = await createClient();
-  const id = requireArticleId(formData);
+/**
+ * Zwraca błąd jako wartość zamiast go rzucać — Next.js w buildzie
+ * produkcyjnym zamienia treść RZUCONYCH wyjątków z akcji serwerowych na
+ * ogólny komunikat ("An error occurred in the Server Components render…"),
+ * więc konkretna przyczyna (np. brakująca kolumna przed migracją) byłaby
+ * niewidoczna dla użytkownika. Zwrócona wartość nie podlega tej sanityzacji.
+ */
+export async function updateArticle(formData: FormData): Promise<{ error: string } | undefined> {
+  try {
+    const supabase = await createClient();
+    const id = requireArticleId(formData);
 
-  const title = String(formData.get("title") ?? "").trim();
-  if (!title) throw new Error("Tytuł jest wymagany.");
+    const title = String(formData.get("title") ?? "").trim();
+    if (!title) throw new Error("Tytuł jest wymagany.");
 
-  const status = String(formData.get("status") ?? "pomysl");
-  if (!ARTICLE_STATUSES.includes(status as (typeof ARTICLE_STATUSES)[number])) {
-    throw new Error("Nieprawidłowy status.");
+    const status = String(formData.get("status") ?? "pomysl");
+    if (!ARTICLE_STATUSES.includes(status as (typeof ARTICLE_STATUSES)[number])) {
+      throw new Error("Nieprawidłowy status.");
+    }
+
+    const progress_percent = Math.min(
+      100,
+      Math.max(0, Number(formData.get("progress_percent") ?? 0) || 0),
+    );
+
+    const keywords = String(formData.get("keywords") ?? "")
+      .split(",")
+      .map((k) => k.trim())
+      .filter(Boolean);
+
+    const chatgpt_link = parseOptionalHttpUrl(String(formData.get("chatgpt_link") ?? ""), "Link do ChatGPT");
+
+    const { error } = await supabase
+      .from("articles")
+      .update({
+        title,
+        language: String(formData.get("language") ?? "").trim() || null,
+        target_journal: String(formData.get("target_journal") ?? "").trim() || null,
+        discipline: String(formData.get("discipline") ?? "").trim() || null,
+        abstract: String(formData.get("abstract") ?? "").trim() || null,
+        keywords,
+        status,
+        progress_percent,
+        next_step: String(formData.get("next_step") ?? "").trim() || null,
+        deadline: String(formData.get("deadline") ?? "").trim() || null,
+        is_private: formData.get("is_private") === "on",
+        chatgpt_link,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath(`/lab/artykuly/${id}`);
+    revalidatePath("/lab/artykuly");
+    return undefined;
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Nie udało się zapisać zmian." };
   }
-
-  const progress_percent = Math.min(
-    100,
-    Math.max(0, Number(formData.get("progress_percent") ?? 0) || 0),
-  );
-
-  const keywords = String(formData.get("keywords") ?? "")
-    .split(",")
-    .map((k) => k.trim())
-    .filter(Boolean);
-
-  const chatgpt_link = parseOptionalHttpUrl(String(formData.get("chatgpt_link") ?? ""), "Link do ChatGPT");
-
-  const { error } = await supabase
-    .from("articles")
-    .update({
-      title,
-      language: String(formData.get("language") ?? "").trim() || null,
-      target_journal: String(formData.get("target_journal") ?? "").trim() || null,
-      discipline: String(formData.get("discipline") ?? "").trim() || null,
-      abstract: String(formData.get("abstract") ?? "").trim() || null,
-      keywords,
-      status,
-      progress_percent,
-      next_step: String(formData.get("next_step") ?? "").trim() || null,
-      deadline: String(formData.get("deadline") ?? "").trim() || null,
-      is_private: formData.get("is_private") === "on",
-      chatgpt_link,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", id);
-
-  if (error) throw new Error(error.message);
-
-  revalidatePath(`/lab/artykuly/${id}`);
-  revalidatePath("/lab/artykuly");
 }
 
 export async function deleteVersion(formData: FormData) {

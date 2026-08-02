@@ -36,8 +36,12 @@ export default function EditArticleForm({
       action={async (formData) => {
         setError(null);
         try {
-          await updateArticle(formData);
-          onCancel();
+          const result = await updateArticle(formData);
+          if (result?.error) {
+            setError(result.error);
+          } else {
+            onCancel();
+          }
         } catch (err) {
           setError(err instanceof Error ? err.message : "Nie udało się zapisać zmian.");
         }
