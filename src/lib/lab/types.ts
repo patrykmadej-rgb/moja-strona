@@ -35,6 +35,7 @@ export type Article = {
   next_step: string | null;
   deadline: string | null;
   is_private: boolean;
+  chatgpt_link: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;

@@ -162,6 +162,20 @@ export default function EditArticleForm({
         </div>
       </div>
 
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="chatgpt_link" className={labelClass}>
+          Link do powiązanego czatu ChatGPT
+        </label>
+        <input
+          id="chatgpt_link"
+          name="chatgpt_link"
+          type="url"
+          placeholder="https://chatgpt.com/c/..."
+          defaultValue={article.chatgpt_link ?? ""}
+          className={inputClass}
+        />
+      </div>
+
       <label className="flex items-center gap-2 text-sm text-[#201a2b]">
         <input
           type="checkbox"

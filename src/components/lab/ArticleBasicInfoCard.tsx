@@ -46,6 +46,23 @@ export default function ArticleBasicInfoCard({ article }: { article: Article }) 
           <dt className="text-xs text-[#706878]">Typ publikacji</dt>
           <FieldValue value={null} />
         </div>
+        <div>
+          <dt className="text-xs text-[#706878]">Powiązany czat ChatGPT</dt>
+          {article.chatgpt_link ? (
+            <dd className="mt-1 text-sm">
+              <a
+                href={article.chatgpt_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#5b2a86] hover:underline"
+              >
+                Otwórz w ChatGPT ↗
+              </a>
+            </dd>
+          ) : (
+            <FieldValue value={null} />
+          )}
+        </div>
       </dl>
 
       <div className="mt-4">

@@ -12,6 +12,21 @@ function requireArticleId(formData: FormData): string {
   return id;
 }
 
+function parseOptionalHttpUrl(value: string, fieldLabel: string): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  let parsed: URL;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    throw new Error(`${fieldLabel}: nieprawidłowy adres URL.`);
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error(`${fieldLabel}: dozwolone są tylko adresy http(s).`);
+  }
+  return parsed.toString();
+}
+
 export async function updateArticle(formData: FormData) {
   const supabase = await createClient();
   const id = requireArticleId(formData);
@@ -34,6 +49,8 @@ export async function updateArticle(formData: FormData) {
     .map((k) => k.trim())
     .filter(Boolean);
 
+  const chatgpt_link = parseOptionalHttpUrl(String(formData.get("chatgpt_link") ?? ""), "Link do ChatGPT");
+
   const { error } = await supabase
     .from("articles")
     .update({
@@ -48,6 +65,7 @@ export async function updateArticle(formData: FormData) {
       next_step: String(formData.get("next_step") ?? "").trim() || null,
       deadline: String(formData.get("deadline") ?? "").trim() || null,
       is_private: formData.get("is_private") === "on",
+      chatgpt_link,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);
