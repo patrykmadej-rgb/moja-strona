@@ -76,58 +76,6 @@ export async function updateArticle(formData: FormData) {
   revalidatePath("/lab/artykuly");
 }
 
-export async function addVersion(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Brak autoryzacji.");
-
-  const articleId = requireArticleId(formData);
-  const file = formData.get("file");
-  const notes = String(formData.get("notes") ?? "").trim() || null;
-
-  if (!(file instanceof File) || file.size === 0) {
-    throw new Error("Wybierz plik do wgrania.");
-  }
-
-  const { data: maxRow } = await supabase
-    .from("article_versions")
-    .select("version_number")
-    .eq("article_id", articleId)
-    .order("version_number", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  const versionNumber = (maxRow?.version_number ?? 0) + 1;
-  const path = `${articleId}/${versionNumber}_${file.name}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from(VERSIONS_BUCKET)
-    .upload(path, file, { contentType: file.type || "application/octet-stream" });
-
-  if (uploadError) throw new Error(uploadError.message);
-
-  const { error: insertError } = await supabase.from("article_versions").insert({
-    article_id: articleId,
-    version_number: versionNumber,
-    file_path: path,
-    file_name: file.name,
-    file_size_bytes: file.size,
-    notes,
-    uploaded_by: user.id,
-  });
-
-  if (insertError) throw new Error(insertError.message);
-
-  await supabase
-    .from("articles")
-    .update({ updated_at: new Date().toISOString() })
-    .eq("id", articleId);
-
-  revalidatePath(`/lab/artykuly/${articleId}`);
-}
-
 export async function deleteVersion(formData: FormData) {
   const supabase = await createClient();
   const articleId = requireArticleId(formData);

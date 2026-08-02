@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { updateArticle } from "@/app/lab/artykuly/[id]/actions";
 import { ARTICLE_STATUSES, ARTICLE_STATUS_LABELS, type Article } from "@/lib/lab/types";
@@ -28,11 +29,18 @@ export default function EditArticleForm({
   article: Article;
   onCancel: () => void;
 }) {
+  const [error, setError] = useState<string | null>(null);
+
   return (
     <form
       action={async (formData) => {
-        await updateArticle(formData);
-        onCancel();
+        setError(null);
+        try {
+          await updateArticle(formData);
+          onCancel();
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Nie udało się zapisać zmian.");
+        }
       }}
       className="flex flex-col gap-4"
     >
@@ -185,6 +193,8 @@ export default function EditArticleForm({
         />
         Utajniony projekt
       </label>
+
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       <div className="flex gap-3">
         <SubmitButton />
