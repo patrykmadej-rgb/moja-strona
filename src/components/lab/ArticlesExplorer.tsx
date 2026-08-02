@@ -6,9 +6,15 @@ import ArticleStatusTabs from "@/components/lab/ArticleStatusTabs";
 import ArticlesToolbar, { type SortKey } from "@/components/lab/ArticlesToolbar";
 import ArticlesTable from "@/components/lab/ArticlesTable";
 import { BUCKETS, matchesBucket, type BucketKey } from "@/lib/lab/articleBuckets";
-import type { Article, ArticleStatus } from "@/lib/lab/types";
+import type { Article, ArticleStatus, LatestArticleVersion } from "@/lib/lab/types";
 
-export default function ArticlesExplorer({ articles }: { articles: Article[] }) {
+export default function ArticlesExplorer({
+  articles,
+  latestVersions,
+}: {
+  articles: Article[];
+  latestVersions: Record<string, LatestArticleVersion>;
+}) {
   const [bucket, setBucket] = useState<BucketKey>("wszystkie");
   const [statusFilter, setStatusFilter] = useState<ArticleStatus | "">("");
   const [query, setQuery] = useState("");
@@ -64,7 +70,7 @@ export default function ArticlesExplorer({ articles }: { articles: Article[] }) 
         />
       </div>
 
-      <ArticlesTable articles={filtered} hasAnyArticles={articles.length > 0} />
+      <ArticlesTable articles={filtered} hasAnyArticles={articles.length > 0} latestVersions={latestVersions} />
     </div>
   );
 }

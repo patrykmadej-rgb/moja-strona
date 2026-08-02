@@ -53,6 +53,13 @@ export type ArticleVersion = {
   uploaded_at: string;
 };
 
+export type LatestArticleVersion = {
+  version_number: number;
+  file_path: string | null;
+  file_name: string | null;
+  signed_url: string | null;
+};
+
 export const READING_STATUSES = [
   "do_przeczytania",
   "w_trakcie",

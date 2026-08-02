@@ -3,14 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { IconDots, IconPointFilled } from "@tabler/icons-react";
-import StatusTag, { STATUS_COLORS } from "@/components/lab/StatusTag";
+import { IconDots } from "@tabler/icons-react";
+import { Download, MessageSquare } from "lucide-react";
+import StatusTag from "@/components/lab/StatusTag";
 import { deleteArticle } from "@/app/lab/artykuly/actions";
-import { formatDateMedium, formatTimeOnly } from "@/lib/lab/format";
-import type { Article } from "@/lib/lab/types";
+import { fileKindLabel, formatDateMedium, formatTimeOnly } from "@/lib/lab/format";
+import type { Article, LatestArticleVersion } from "@/lib/lab/types";
 
 export const TABLE_GRID_COLS =
-  "min-[768px]:grid-cols-[minmax(240px,1.8fr)_110px_130px_40px] min-[1100px]:grid-cols-[minmax(300px,1.8fr)_120px_150px_minmax(180px,1fr)_40px]";
+  "min-[900px]:grid-cols-[minmax(280px,1.8fr)_110px_minmax(150px,0.9fr)_minmax(120px,0.7fr)_40px] min-[1200px]:grid-cols-[minmax(320px,1.8fr)_120px_150px_minmax(170px,0.9fr)_minmax(130px,0.7fr)_40px]";
+
+const linkButtonClass =
+  "inline-flex min-h-[32px] items-center gap-1.5 whitespace-nowrap rounded-lg border border-transparent bg-transparent px-[9px] py-1.5 text-[11px] font-medium text-[#5b2a86] transition-colors hover:border-[#e3d8ec] hover:bg-[#f1eafd] hover:text-[#431d66] disabled:cursor-not-allowed disabled:opacity-60";
 
 function RowMenu({ article }: { article: Article }) {
   const [open, setOpen] = useState(false);
@@ -100,9 +104,72 @@ function RowMenu({ article }: { article: Article }) {
   );
 }
 
-export default function ArticleTableRow({ article, isLast }: { article: Article; isLast: boolean }) {
+function DownloadVersionButton({ version }: { version: LatestArticleVersion | null }) {
+  if (!version || !version.file_path) {
+    return <span className="text-[11px] italic text-[#9a919f]">Nie dodano</span>;
+  }
+
+  // Brak file_path w bazie to "brak wersji" (obsłużone wyżej) — ale jeśli
+  // wpis w bazie istnieje, a plik w Storage zniknął albo podpisanie się nie
+  // udało, signed_url będzie puste mimo istniejącego rekordu. To osobny,
+  // rzadszy przypadek "plik niedostępny", żeby nie mylić go z "nie dodano".
+  if (!version.signed_url) {
+    return <span className="text-[11px] italic text-[#9a919f]">Plik niedostępny</span>;
+  }
+
+  return (
+    <div className="flex flex-col items-start gap-1">
+      <a
+        href={version.signed_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+        className={linkButtonClass}
+      >
+        <Download className="h-[14px] w-[14px]" strokeWidth={1.75} />
+        Pobierz wersję
+      </a>
+      <span className="max-w-[160px] truncate text-[10px] text-[#9a919f]">
+        v{version.version_number} · {fileKindLabel(version.file_name)}
+      </span>
+    </div>
+  );
+}
+
+function ChatGptLinkButton({ link, articleId }: { link: string | null; articleId: string }) {
+  if (!link) {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-[11px] italic text-[#9a919f]">
+        Nie dodano
+        <Link
+          href={`/lab/artykuly/${articleId}?edit=1`}
+          onClick={(e) => e.stopPropagation()}
+          className="not-italic font-medium text-[#5b2a86] hover:underline"
+        >
+          Dodaj
+        </Link>
+      </span>
+    );
+  }
+
+  return (
+    <a href={link} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className={linkButtonClass}>
+      <MessageSquare className="h-[14px] w-[14px]" strokeWidth={1.75} />
+      Otwórz chat
+    </a>
+  );
+}
+
+export default function ArticleTableRow({
+  article,
+  isLast,
+  latestVersion,
+}: {
+  article: Article;
+  isLast: boolean;
+  latestVersion: LatestArticleVersion | null;
+}) {
   const router = useRouter();
-  const dotColor = STATUS_COLORS[article.status].text;
 
   return (
     <div
@@ -114,44 +181,54 @@ export default function ArticleTableRow({ article, isLast }: { article: Article;
       }}
       className={
         (isLast ? "" : "border-b border-[#eee9f2] ") +
-        `group flex cursor-pointer flex-col gap-3 px-4 py-3.5 transition-colors hover:bg-[#fcfafc] min-[768px]:grid min-[768px]:min-h-[76px] min-[768px]:items-center min-[768px]:gap-4 min-[768px]:py-0 ${TABLE_GRID_COLS}`
+        `group flex cursor-pointer flex-col gap-3 px-4 py-3.5 transition-colors hover:bg-[#fcfafc] min-[900px]:grid min-[900px]:min-h-[76px] min-[900px]:items-center min-[900px]:gap-4 min-[900px]:py-0 ${TABLE_GRID_COLS}`
       }
     >
-      <div className="flex items-start justify-between gap-3 min-[768px]:block">
-        <div className="min-w-0">
-          <p className="line-clamp-2 text-[13px] font-semibold leading-[1.4] text-[#282130] transition-colors group-hover:text-[#5b2a86]">
-            {article.title}
-          </p>
-          <p className="mt-1 truncate text-[11px] text-[#817887]">
-            {article.target_journal || "Nie określono czasopisma"}
-          </p>
+      {/* Karta mobilna — poniżej 900px. */}
+      <div className="min-[900px]:hidden">
+        <p className="line-clamp-2 text-[13px] font-semibold leading-[1.4] text-[#282130]">{article.title}</p>
+        <p className="mt-1 truncate text-[11px] text-[#817887]">{article.target_journal || "Nie określono czasopisma"}</p>
+        <div className="mt-2.5">
+          <StatusTag status={article.status} />
         </div>
-        <div className="shrink-0 min-[768px]:hidden">
-          <RowMenu article={article} />
+        <p className="mt-2.5 text-[11px] text-[#62596b]">
+          Aktualizacja: {formatDateMedium(article.updated_at)}, {formatTimeOnly(article.updated_at)}
+        </p>
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+          <DownloadVersionButton version={latestVersion} />
+          <ChatGptLinkButton link={article.chatgpt_link} articleId={article.id} />
+          <div className="ml-auto shrink-0">
+            <RowMenu article={article} />
+          </div>
         </div>
       </div>
 
-      <div>
+      {/* Kolumny tabeli — od 900px wzwyż. */}
+      <div className="hidden min-w-0 min-[900px]:block">
+        <p className="line-clamp-2 text-[13px] font-semibold leading-[1.4] text-[#282130] transition-colors group-hover:text-[#5b2a86]">
+          {article.title}
+        </p>
+        <p className="mt-1 truncate text-[11px] text-[#817887]">{article.target_journal || "Nie określono czasopisma"}</p>
+      </div>
+
+      <div className="hidden min-[900px]:block">
         <StatusTag status={article.status} />
       </div>
 
-      <div className="text-[11px] text-[#62596b]">
-        {formatDateMedium(article.updated_at)}
-        <span className="block text-[#9a919f]">{formatTimeOnly(article.updated_at)}</span>
+      <div className="hidden min-[1200px]:block">
+        <p className="text-[12px] text-[#62596b]">{formatDateMedium(article.updated_at)}</p>
+        <p className="text-[10px] text-[#9a919f]">{formatTimeOnly(article.updated_at)}</p>
       </div>
 
-      <div className="min-[768px]:hidden min-[1100px]:block">
-        {article.next_step ? (
-          <span className="flex items-center gap-1.5 text-[11px] text-[#4f4758]">
-            <IconPointFilled className="h-2.5 w-2.5 shrink-0" style={{ color: dotColor }} />
-            <span className="truncate">{article.next_step}</span>
-          </span>
-        ) : (
-          <span className="text-[11px] italic text-[#9a919f]">Nie określono</span>
-        )}
+      <div className="hidden min-[900px]:block">
+        <DownloadVersionButton version={latestVersion} />
       </div>
 
-      <div className="hidden min-[768px]:block">
+      <div className="hidden min-[900px]:block">
+        <ChatGptLinkButton link={article.chatgpt_link} articleId={article.id} />
+      </div>
+
+      <div className="hidden min-[900px]:block">
         <RowMenu article={article} />
       </div>
     </div>

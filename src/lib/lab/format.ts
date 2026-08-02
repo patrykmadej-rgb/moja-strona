@@ -74,3 +74,10 @@ export function formatBytes(bytes: number | null): string {
   }
   return `${value.toFixed(1)} ${units[unitIndex]}`;
 }
+
+export function fileKindLabel(fileName: string | null): string {
+  const ext = fileName?.split(".").pop()?.toLowerCase();
+  if (ext === "docx" || ext === "doc") return "DOCX";
+  if (ext === "pdf") return "PDF";
+  return ext ? ext.toUpperCase() : "Plik";
+}

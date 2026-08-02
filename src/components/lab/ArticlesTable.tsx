@@ -6,16 +6,18 @@ import { IconFileText } from "@tabler/icons-react";
 import ArticleTableRow, { TABLE_GRID_COLS } from "@/components/lab/ArticleTableRow";
 import ArticlesPagination from "@/components/lab/ArticlesPagination";
 import EmptyState from "@/components/lab/EmptyState";
-import type { Article } from "@/lib/lab/types";
+import type { Article, LatestArticleVersion } from "@/lib/lab/types";
 
 const PAGE_SIZE = 10;
 
 export default function ArticlesTable({
   articles,
   hasAnyArticles,
+  latestVersions,
 }: {
   articles: Article[];
   hasAnyArticles: boolean;
+  latestVersions: Record<string, LatestArticleVersion>;
 }) {
   const router = useRouter();
   const [page, setPage] = useState(1);
@@ -34,12 +36,13 @@ export default function ArticlesTable({
     <div className="rounded-[14px] border border-[#e8e2ec] bg-white/95 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
       {articles.length > 0 && (
         <div
-          className={`hidden min-[768px]:grid min-[768px]:h-11 min-[768px]:items-center min-[768px]:gap-4 min-[768px]:border-b min-[768px]:border-[#e8e2ec] min-[768px]:bg-[#fbfafc] min-[768px]:px-4 min-[768px]:text-[11px] min-[768px]:font-semibold min-[768px]:text-[#62596b] ${TABLE_GRID_COLS}`}
+          className={`hidden min-[900px]:grid min-[900px]:h-11 min-[900px]:items-center min-[900px]:gap-4 min-[900px]:border-b min-[900px]:border-[#e8e2ec] min-[900px]:bg-[#fbfafc] min-[900px]:px-4 min-[900px]:text-[11px] min-[900px]:font-semibold min-[900px]:text-[#62596b] ${TABLE_GRID_COLS}`}
         >
           <span>Tytuł</span>
           <span>Status</span>
-          <span>Ostatnia aktualizacja</span>
-          <span className="hidden min-[1100px]:block">Następny krok</span>
+          <span className="hidden min-[1200px]:block">Ostatnia aktualizacja</span>
+          <span>Ostatnia wersja</span>
+          <span>ChatGPT</span>
           <span />
         </div>
       )}
@@ -71,7 +74,12 @@ export default function ArticlesTable({
       ) : (
         <>
           {pageArticles.map((article, i) => (
-            <ArticleTableRow key={article.id} article={article} isLast={i === pageArticles.length - 1} />
+            <ArticleTableRow
+              key={article.id}
+              article={article}
+              isLast={i === pageArticles.length - 1}
+              latestVersion={latestVersions[article.id] ?? null}
+            />
           ))}
           <ArticlesPagination
             rangeStart={rangeStart}
