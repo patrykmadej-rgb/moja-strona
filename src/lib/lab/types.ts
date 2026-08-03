@@ -44,6 +44,19 @@ export const ARTICLE_PRIORITY_LABELS: Record<ArticlePriorityValue, string> = {
 export const NO_PRIORITY_LABEL = "Bez priorytetu";
 
 /**
+ * Skrócone etykiety WYŁĄCZNIE do zwartej tabeli /lab/artykuly (badge w
+ * kolumnie Priorytet, karta mobilna) — formularze i widok szczegółów
+ * artykułu nadal używają pełnych ARTICLE_PRIORITY_LABELS. Pełna etykieta
+ * zostaje w atrybucie title/tooltip badge'a.
+ */
+export const ARTICLE_PRIORITY_SHORT_LABELS: Record<ArticlePriorityValue, string> = {
+  top: "Top",
+  medium: "Medium",
+  low: "Low",
+  on_hold: "On hold",
+};
+
+/**
  * Kolejność sortowania listy po priorytecie (nie kolejność w dropdownach —
  * ta jest w ARTICLE_PRIORITIES powyżej). "Bez priorytetu" ląduje przed
  * "On hold": artykuły wstrzymane są świadomie odłożone, więc trafiają na

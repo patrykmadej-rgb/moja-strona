@@ -36,7 +36,7 @@ export default function ArticlesTable({
     <div className="rounded-[14px] border border-[#e8e2ec] bg-white/95 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
       {articles.length > 0 && (
         <div
-          className={`hidden min-[900px]:grid min-[900px]:h-11 min-[900px]:items-center min-[900px]:gap-4 min-[900px]:border-b min-[900px]:border-[#e8e2ec] min-[900px]:bg-[#fbfafc] min-[900px]:px-4 min-[900px]:text-[11px] min-[900px]:font-semibold min-[900px]:text-[#62596b] ${TABLE_GRID_COLS}`}
+          className={`hidden min-[900px]:grid min-[900px]:h-11 min-[900px]:items-center min-[900px]:gap-3 min-[900px]:border-b min-[900px]:border-[#e8e2ec] min-[900px]:bg-[#fbfafc] min-[900px]:px-4 min-[900px]:text-[11px] min-[900px]:font-semibold min-[900px]:text-[#62596b] ${TABLE_GRID_COLS}`}
         >
           <span>Tytuł</span>
           <span>Status</span>

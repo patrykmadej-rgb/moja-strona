@@ -11,8 +11,16 @@ import { deleteArticle } from "@/app/lab/artykuly/actions";
 import { fileKindLabel, formatDateMedium, formatTimeOnly } from "@/lib/lab/format";
 import type { Article, LatestArticleVersion } from "@/lib/lab/types";
 
+// Kontener strony ogranicza rzeczywistą szerokość tabeli do ~1116px
+// (.lab-articles-page ma max-w-[1180px] px-8) — te wartości są dobrane tak,
+// żeby SUMA minimów kolumn + gap + padding wiersza mieściła się w tym
+// budżecie z zapasem (nie tylko "orientacyjnie", żeby uniknąć poziomego
+// scrolla, który był bezpośrednim powodem tej poprawki). Tytuł i tak
+// dostaje większość miejsca dzięki `fr` — pozostałe kolumny mają twarde
+// minimum tylko tam, gdzie naprawdę tego wymaga treść w jednej linii
+// (przyciski "Pobierz wersję"/"Otwórz chat" mają white-space: nowrap).
 export const TABLE_GRID_COLS =
-  "min-[900px]:grid-cols-[minmax(300px,1.7fr)_185px_145px_minmax(150px,0.9fr)_minmax(120px,0.7fr)_40px] min-[1200px]:grid-cols-[minmax(320px,1.7fr)_185px_145px_150px_minmax(170px,0.9fr)_minmax(130px,0.7fr)_40px]";
+  "min-[900px]:grid-cols-[minmax(300px,1.8fr)_150px_118px_minmax(145px,0.9fr)_minmax(120px,0.7fr)_36px] min-[1200px]:grid-cols-[minmax(300px,1.8fr)_150px_118px_95px_minmax(145px,0.9fr)_minmax(120px,0.7fr)_36px]";
 
 const linkButtonClass =
   "inline-flex min-h-[32px] items-center gap-1.5 whitespace-nowrap rounded-lg border border-transparent bg-transparent px-[9px] py-1.5 text-[11px] font-medium text-[#5b2a86] transition-colors hover:border-[#e3d8ec] hover:bg-[#f1eafd] hover:text-[#431d66] disabled:cursor-not-allowed disabled:opacity-60";
@@ -182,7 +190,7 @@ export default function ArticleTableRow({
       }}
       className={
         (isLast ? "" : "border-b border-[#eee9f2] ") +
-        `group flex cursor-pointer flex-col gap-3 px-4 py-3.5 transition-colors hover:bg-[#fcfafc] min-[900px]:grid min-[900px]:min-h-[76px] min-[900px]:items-center min-[900px]:gap-4 min-[900px]:py-0 ${TABLE_GRID_COLS}`
+        `group flex cursor-pointer flex-col gap-3 px-4 py-3.5 transition-colors hover:bg-[#fcfafc] min-[900px]:grid min-[900px]:min-h-[76px] min-[900px]:items-center min-[900px]:gap-3 min-[900px]:py-0 ${TABLE_GRID_COLS}`
       }
     >
       {/* Karta mobilna — poniżej 900px. */}
@@ -191,7 +199,7 @@ export default function ArticleTableRow({
         <p className="mt-1 truncate text-[11px] text-[#817887]">{article.target_journal || "Nie określono czasopisma"}</p>
         <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
           <StatusTag status={article.status} />
-          <PriorityTag priority={article.priority} compact={article.priority === "medium" || article.priority === "low"} />
+          <PriorityTag priority={article.priority} compact />
         </div>
         <p className="mt-2.5 text-[11px] text-[#62596b]">
           Aktualizacja: {formatDateMedium(article.updated_at)}, {formatTimeOnly(article.updated_at)}
@@ -219,9 +227,9 @@ export default function ArticleTableRow({
 
       <div className="hidden min-[900px]:flex min-[900px]:items-center">
         {article.priority ? (
-          <PriorityTag priority={article.priority} />
+          <PriorityTag priority={article.priority} compact />
         ) : (
-          <span className="text-[11px] italic text-[#9a919f]">Nie ustawiono</span>
+          <span className="text-[13px] not-italic text-[rgba(65,55,72,0.38)]">—</span>
         )}
       </div>
 
