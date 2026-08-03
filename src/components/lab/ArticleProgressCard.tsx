@@ -23,13 +23,6 @@ export default function ArticleProgressCard({ article }: { article: Article }) {
       </div>
 
       <div className="mt-5 border-t border-[#e6deec] pt-4">
-        <p className="text-xs text-[#706878]">Następny krok</p>
-        <p className={article.next_step ? "mt-1 text-sm text-[#201a2b]" : "mt-1 text-sm italic text-[#706878]"}>
-          {article.next_step || "Nie określono"}
-        </p>
-      </div>
-
-      <div className="mt-3">
         <p className="text-xs text-[#706878]">Deadline</p>
         <p className={article.deadline ? "mt-1 text-sm text-[#201a2b]" : "mt-1 text-sm italic text-[#706878]"}>
           {article.deadline ? formatDateOnly(article.deadline) : "Nie ustawiono"}

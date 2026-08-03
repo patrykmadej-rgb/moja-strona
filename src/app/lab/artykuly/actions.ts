@@ -3,20 +3,55 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { ARTICLE_STATUSES, DISCIPLINES, LANGUAGES, type ArticleStatus, type Discipline, type LanguageCode } from "@/lib/lab/types";
 
-export async function createArticle(formData: FormData) {
+function parseDisciplines(formData: FormData): Discipline[] | { error: string } {
+  const raw = formData.getAll("disciplines").map((v) => String(v));
+  const unique = Array.from(new Set(raw));
+  for (const value of unique) {
+    if (!DISCIPLINES.includes(value as Discipline)) {
+      return { error: "Nieprawidłowa dyscyplina." };
+    }
+  }
+  if (unique.length === 0) {
+    return { error: "Wybierz przynajmniej jedną dyscyplinę." };
+  }
+  return unique as Discipline[];
+}
+
+/**
+ * Zwraca błąd jako wartość zamiast go rzucać (patrz updateArticle w
+ * [id]/actions.ts) — inaczej Next.js w produkcji zamienia treść błędu na
+ * ogólny, nieczytelny komunikat. redirect() jest wywoływane wyłącznie po
+ * udanym zapisie, poza jakimkolwiek try/catch — redirect() działa przez
+ * rzucenie specjalnego, wewnętrznego sygnału Next.js, który nie może
+ * zostać przechwycony jako zwykły błąd.
+ */
+export async function createArticle(formData: FormData): Promise<{ error: string } | undefined> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) throw new Error("Brak autoryzacji.");
+  if (!user) return { error: "Brak autoryzacji." };
 
   const title = String(formData.get("title") ?? "").trim();
-  if (!title) throw new Error("Tytuł jest wymagany.");
+  if (!title) return { error: "Tytuł jest wymagany." };
 
-  const language = String(formData.get("language") ?? "").trim() || null;
+  const language_code = String(formData.get("language_code") ?? "");
+  if (!LANGUAGES.includes(language_code as LanguageCode)) {
+    return { error: "Język jest wymagany." };
+  }
+
+  const disciplinesResult = parseDisciplines(formData);
+  if (!Array.isArray(disciplinesResult)) return disciplinesResult;
+  const disciplines = disciplinesResult;
+
+  const statusInput = String(formData.get("status") ?? "");
+  const status: ArticleStatus = ARTICLE_STATUSES.includes(statusInput as ArticleStatus)
+    ? (statusInput as ArticleStatus)
+    : ARTICLE_STATUSES[0];
+
   const target_journal = String(formData.get("target_journal") ?? "").trim() || null;
-  const discipline = String(formData.get("discipline") ?? "").trim() || null;
   const abstract = String(formData.get("abstract") ?? "").trim() || null;
   const keywords = String(formData.get("keywords") ?? "")
     .split(",")
@@ -27,9 +62,10 @@ export async function createArticle(formData: FormData) {
     .from("articles")
     .insert({
       title,
-      language,
+      status,
+      language_code,
       target_journal,
-      discipline,
+      disciplines,
       abstract,
       keywords,
       created_by: user.id,
@@ -37,7 +73,7 @@ export async function createArticle(formData: FormData) {
     .select()
     .single();
 
-  if (error) throw new Error(error.message);
+  if (error) return { error: error.message };
 
   revalidatePath("/lab/artykuly");
   redirect(`/lab/artykuly/${article.id}`);

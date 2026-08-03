@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { updateArticle } from "@/app/lab/artykuly/[id]/actions";
-import { ARTICLE_STATUSES, ARTICLE_STATUS_LABELS, type Article } from "@/lib/lab/types";
+import DisciplinesField from "@/components/lab/DisciplinesField";
+import { ARTICLE_STATUSES, ARTICLE_STATUS_LABELS, LANGUAGES, LANGUAGE_LABELS, type Article } from "@/lib/lab/types";
 
 const inputClass =
   "rounded-[10px] border border-[#e6deec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
@@ -59,27 +60,58 @@ export default function EditArticleForm({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="language" className={labelClass}>
-            Język
+          <label htmlFor="status" className={labelClass}>
+            Status
           </label>
-          <input
-            id="language"
-            name="language"
-            defaultValue={article.language ?? ""}
-            className={inputClass}
-          />
+          <select id="status" name="status" defaultValue={article.status} className={inputClass}>
+            {ARTICLE_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {ARTICLE_STATUS_LABELS[s]}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="discipline" className={labelClass}>
-            Dyscyplina
+          <label htmlFor="language_code" className={labelClass}>
+            Język *
           </label>
-          <input
-            id="discipline"
-            name="discipline"
-            defaultValue={article.discipline ?? ""}
+          <select
+            id="language_code"
+            name="language_code"
+            required
+            defaultValue={article.language_code ?? "pl"}
             className={inputClass}
-          />
+          >
+            <option value="" disabled>
+              Wybierz język
+            </option>
+            {LANGUAGES.map((code) => (
+              <option key={code} value={code}>
+                {LANGUAGE_LABELS[code]}
+              </option>
+            ))}
+          </select>
         </div>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="progress_percent" className={labelClass}>
+          Postęp (%)
+        </label>
+        <input
+          id="progress_percent"
+          name="progress_percent"
+          type="number"
+          min={0}
+          max={100}
+          defaultValue={article.progress_percent}
+          className={`${inputClass} max-w-[140px]`}
+        />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label className={labelClass}>Dyscypliny *</label>
+        <DisciplinesField defaultValues={article.disciplines ?? []} />
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -119,60 +151,28 @@ export default function EditArticleForm({
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="status" className={labelClass}>
-            Status
-          </label>
-          <select id="status" name="status" defaultValue={article.status} className={inputClass}>
-            {ARTICLE_STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {ARTICLE_STATUS_LABELS[s]}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="progress_percent" className={labelClass}>
-            Postęp (%)
-          </label>
-          <input
-            id="progress_percent"
-            name="progress_percent"
-            type="number"
-            min={0}
-            max={100}
-            defaultValue={article.progress_percent}
-            className={inputClass}
-          />
-        </div>
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="deadline" className={labelClass}>
+          Deadline
+        </label>
+        <input
+          id="deadline"
+          name="deadline"
+          type="date"
+          defaultValue={article.deadline ?? ""}
+          className={`${inputClass} max-w-[200px]`}
+        />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="next_step" className={labelClass}>
-            Następny krok
-          </label>
-          <input
-            id="next_step"
-            name="next_step"
-            defaultValue={article.next_step ?? ""}
-            className={inputClass}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="deadline" className={labelClass}>
-            Deadline
-          </label>
-          <input
-            id="deadline"
-            name="deadline"
-            type="date"
-            defaultValue={article.deadline ?? ""}
-            className={inputClass}
-          />
-        </div>
-      </div>
+      <label className="flex items-center gap-2 text-sm text-[#201a2b]">
+        <input
+          type="checkbox"
+          name="is_private"
+          defaultChecked={article.is_private}
+          className="h-4 w-4"
+        />
+        Utajniony projekt
+      </label>
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="chatgpt_link" className={labelClass}>
@@ -187,16 +187,6 @@ export default function EditArticleForm({
           className={inputClass}
         />
       </div>
-
-      <label className="flex items-center gap-2 text-sm text-[#201a2b]">
-        <input
-          type="checkbox"
-          name="is_private"
-          defaultChecked={article.is_private}
-          className="h-4 w-4"
-        />
-        Utajniony projekt
-      </label>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 

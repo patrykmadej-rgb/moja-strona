@@ -2,7 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { ARTICLE_STATUSES, READING_STATUSES, EVENT_TYPES, type EventType } from "@/lib/lab/types";
+import {
+  ARTICLE_STATUSES,
+  DISCIPLINES,
+  LANGUAGES,
+  READING_STATUSES,
+  EVENT_TYPES,
+  type Discipline,
+  type EventType,
+  type LanguageCode,
+} from "@/lib/lab/types";
 
 const VERSIONS_BUCKET = "article-versions";
 
@@ -27,6 +36,20 @@ function parseOptionalHttpUrl(value: string, fieldLabel: string): string | null 
   return parsed.toString();
 }
 
+function parseDisciplines(formData: FormData): Discipline[] {
+  const raw = formData.getAll("disciplines").map((v) => String(v));
+  const unique = Array.from(new Set(raw));
+  for (const value of unique) {
+    if (!DISCIPLINES.includes(value as Discipline)) {
+      throw new Error("Nieprawidłowa dyscyplina.");
+    }
+  }
+  if (unique.length === 0) {
+    throw new Error("Wybierz przynajmniej jedną dyscyplinę.");
+  }
+  return unique as Discipline[];
+}
+
 /**
  * Zwraca błąd jako wartość zamiast go rzucać — Next.js w buildzie
  * produkcyjnym zamienia treść RZUCONYCH wyjątków z akcji serwerowych na
@@ -42,7 +65,7 @@ export async function updateArticle(formData: FormData): Promise<{ error: string
     const title = String(formData.get("title") ?? "").trim();
     if (!title) throw new Error("Tytuł jest wymagany.");
 
-    const status = String(formData.get("status") ?? "pomysl");
+    const status = String(formData.get("status") ?? "idea");
     if (!ARTICLE_STATUSES.includes(status as (typeof ARTICLE_STATUSES)[number])) {
       throw new Error("Nieprawidłowy status.");
     }
@@ -57,20 +80,26 @@ export async function updateArticle(formData: FormData): Promise<{ error: string
       .map((k) => k.trim())
       .filter(Boolean);
 
+    const language_code = String(formData.get("language_code") ?? "");
+    if (!LANGUAGES.includes(language_code as LanguageCode)) {
+      throw new Error("Język jest wymagany.");
+    }
+
+    const disciplines = parseDisciplines(formData);
+
     const chatgpt_link = parseOptionalHttpUrl(String(formData.get("chatgpt_link") ?? ""), "Link do ChatGPT");
 
     const { error } = await supabase
       .from("articles")
       .update({
         title,
-        language: String(formData.get("language") ?? "").trim() || null,
+        language_code,
         target_journal: String(formData.get("target_journal") ?? "").trim() || null,
-        discipline: String(formData.get("discipline") ?? "").trim() || null,
+        disciplines,
         abstract: String(formData.get("abstract") ?? "").trim() || null,
         keywords,
         status,
         progress_percent,
-        next_step: String(formData.get("next_step") ?? "").trim() || null,
         deadline: String(formData.get("deadline") ?? "").trim() || null,
         is_private: formData.get("is_private") === "on",
         chatgpt_link,

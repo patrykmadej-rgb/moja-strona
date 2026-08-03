@@ -1,38 +1,56 @@
+// Kolejność ma znaczenie — to porządek pokazywany w dropdownach (nie sortować alfabetycznie).
 export const ARTICLE_STATUSES = [
-  "pomysl",
-  "pisanie",
-  "do_wyslania",
-  "w_redakcji",
-  "recenzja",
-  "poprawki",
-  "przyjety",
-  "opublikowany",
+  "idea",
+  "first_version",
+  "revisions",
+  "final_version",
+  "ready_to_submit",
+  "submitted",
+  "post_review_revisions",
+  "in_publication",
+  "published",
 ] as const;
 
 export type ArticleStatus = (typeof ARTICLE_STATUSES)[number];
 
 export const ARTICLE_STATUS_LABELS: Record<ArticleStatus, string> = {
-  pomysl: "Pomysł",
-  pisanie: "Piszę",
-  do_wyslania: "Do wysłania",
-  w_redakcji: "W redakcji",
-  recenzja: "Recenzja",
-  poprawki: "Poprawki",
-  przyjety: "Przyjęty",
-  opublikowany: "Opublikowany",
+  idea: "Pomysł",
+  first_version: "Wygenerowana pierwsza wersja",
+  revisions: "Poprawki",
+  final_version: "Wersja ostateczna",
+  ready_to_submit: "Do wysłania",
+  submitted: "Wysłane",
+  post_review_revisions: "Poprawki po recenzji",
+  in_publication: "W publikacji",
+  published: "Opublikowano",
+};
+
+export const LANGUAGES = ["pl", "en"] as const;
+export type LanguageCode = (typeof LANGUAGES)[number];
+export const LANGUAGE_LABELS: Record<LanguageCode, string> = {
+  pl: "Polski",
+  en: "Angielski",
+};
+
+export const DISCIPLINES = ["political_science", "security_studies", "psychology", "legal_science"] as const;
+export type Discipline = (typeof DISCIPLINES)[number];
+export const DISCIPLINE_LABELS: Record<Discipline, string> = {
+  political_science: "Nauki o polityce",
+  security_studies: "Nauki o bezpieczeństwie",
+  psychology: "Nauki psychologiczne",
+  legal_science: "Nauki prawne",
 };
 
 export type Article = {
   id: string;
   title: string;
-  language: string | null;
+  language_code: LanguageCode | null;
   target_journal: string | null;
-  discipline: string | null;
+  disciplines: Discipline[];
   keywords: string[];
   abstract: string | null;
   status: ArticleStatus;
   progress_percent: number;
-  next_step: string | null;
   deadline: string | null;
   is_private: boolean;
   chatgpt_link: string | null;

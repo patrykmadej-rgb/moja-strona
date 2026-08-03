@@ -66,8 +66,6 @@ export default function ArticleWorkspace({
                 <ArticleOverview
                   article={article}
                   latestVersion={latestVersion}
-                  versionsCount={versions.length}
-                  sourcesCount={sources.length}
                   events={events}
                   onNavigateTab={setTab}
                 />
