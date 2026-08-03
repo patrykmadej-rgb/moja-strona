@@ -10,32 +10,33 @@ import { useRevealOnce } from "./useRevealOnce";
 
 const NODE_ORDER: ResearchAxisId[] = ["balkans", "security", "profiling", "victimology", "clinical"];
 
-// Współrzędne (viewBox 900x520) wyznaczone geometrycznie tak, żeby żadne dwa
-// węzły — razem z ich dwuliniowymi etykietami — nie nachodziły na siebie
-// (sprawdzone regułą nienachodzenia prostokątów, patrz komentarz przy
-// RESEARCH_MAP_NODE_POSITIONS w research.ts). Węzły: balkans(250,130),
-// security(650,130), profiling(160,345), clinical(740,345), victimology(450,390).
-// Musi zostać spójne z RESEARCH_MAP_NODE_POSITIONS w research.ts.
+// Viewbox 900x580, centrum (450,290) r=86, węzły r=38 — patrz komentarz przy
+// RESEARCH_MAP_NODE_POSITIONS w research.ts dla pełnej geometrii. Każda krzywa
+// to kwadratowy Bézier (Q) liczony tak, żeby zaczynać się DOKŁADNIE na obwodzie
+// centralnego koła i kończyć DOKŁADNIE na obwodzie węzła (nie w jego środku, nie
+// w powietrzu przed nim) — punkt kontrolny przesunięty prostopadle do cięciwy o
+// ~10% jej długości, naprzemiennie w lewo/prawo, żeby linie miały organiczny,
+// lekko "wachlarzowy" wygląd zamiast sztywnych prostych.
 const CONNECTIONS: { axis: ResearchAxisId; d: string }[] = [
-  { axis: "balkans", d: "M450 260C400 193 324 165 250 130" },
-  { axis: "security", d: "M450 260C532 241 588 184 650 130" },
-  { axis: "profiling", d: "M450 260C344 253 255 302 160 345" },
-  { axis: "victimology", d: "M450 260C434 303 444 346 450 390" },
-  { axis: "clinical", d: "M450 260C536 323 637 330 740 345" },
+  { axis: "balkans", d: "M378 242Q352 199 302 191" },
+  { axis: "security", d: "M522 242Q548 199 598 191" },
+  { axis: "profiling", d: "M371 325Q287 331 225 390" },
+  { axis: "clinical", d: "M529 325Q613 331 675 390" },
+  { axis: "victimology", d: "M450 376Q432 402 450 427" },
 ];
 
-const SECONDARY_CONNECTIONS = [
-  "M250 130C350 50 550 50 650 130",
-  "M160 345C220 450 320 460 450 390",
-  "M450 390C580 460 680 450 740 345",
-];
+// Dwie szerokie orbity (górna, dolna) — czysto dekoracyjne, nie łączą
+// konkretnych węzłów, tylko "obejmują" całą kompozycję łagodnym łukiem.
+const TOP_ORBIT = "M100 205C255 65 645 65 800 205";
+const BOTTOM_ORBIT = "M90 385C260 560 640 560 810 385";
 
+// Środek każdej krzywej z CONNECTIONS (t=0.5 na Q), jeden świecący punkt na linię.
 const CONNECTION_DOTS = [
-  { cx: 350, cy: 195, duration: 3.8 },
-  { cx: 550, cy: 195, duration: 4.2 },
-  { cx: 305, cy: 302, duration: 4.6 },
-  { cx: 450, cy: 325, duration: 5 },
-  { cx: 595, cy: 302, duration: 5.2 },
+  { cx: 346, cy: 208, duration: 3.8 },
+  { cx: 554, cy: 208, duration: 4.2 },
+  { cx: 292, cy: 344, duration: 4.6 },
+  { cx: 608, cy: 344, duration: 5 },
+  { cx: 441, cy: 402, duration: 5.2 },
 ];
 
 type Labels = {
@@ -103,16 +104,19 @@ export default function ResearchMap({
         ref={ref}
         role="group"
         aria-label={labels.mapAriaLabel}
-        className="@container relative mx-auto hidden aspect-[900/520] w-full min-[720px]:block"
+        className="@container relative mx-auto hidden aspect-[900/580] w-full min-[720px]:block"
       >
         {/* Warstwa 1: tło — bez twardej ramki/karty; maska radialna rozmywa krawędzie
             tak, żeby akwarela organicznie wtapiała się w tło strony (fallback
-            gradientowy, dopóki nie podmienisz na research-map-background.png). */}
+            gradientowy, dopóki nie podmienisz na research-map-background.png).
+            Elipsa maski powiększona i wycentrowana bliżej środka kompozycji (50% 52%,
+            czyli mniej więcej środek ciężkości węzłów), żeby plama obejmowała
+            centralny węzeł i większość połączeń zamiast kończyć się tuż przy nim. */}
         <div
           className="absolute inset-0"
           style={{
-            maskImage: "radial-gradient(ellipse 62% 68% at 50% 50%, black 40%, transparent 90%)",
-            WebkitMaskImage: "radial-gradient(ellipse 62% 68% at 50% 50%, black 40%, transparent 90%)",
+            maskImage: "radial-gradient(ellipse 72% 78% at 50% 52%, black 45%, transparent 94%)",
+            WebkitMaskImage: "radial-gradient(ellipse 72% 78% at 50% 52%, black 45%, transparent 94%)",
           }}
         >
           {hasBackgroundImage ? (
@@ -136,19 +140,28 @@ export default function ResearchMap({
               }}
             />
           )}
+          {/* Dodatkowa miękka fioletowa poświata pod centrum — wzmacnia pokrycie tła
+              wokół medalionu i połączeń niezależnie od treści assetu PNG. */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 51%, rgba(107,58,145,0.16), transparent 58%)",
+            }}
+          />
         </div>
 
-        {/* Warstwa 2: linie połączeń */}
+        {/* Warstwa 2: linie orbitalne (pod liniami połączeń) + Warstwa 3: linie połączeń */}
         <svg
-          viewBox="0 0 900 520"
+          viewBox="0 0 900 580"
           fill="none"
           aria-hidden="true"
           className="absolute inset-0 h-full w-full"
         >
-          <g stroke="var(--research-gold)" strokeWidth={1.5} opacity={0.65} strokeDasharray="5 9">
-            {SECONDARY_CONNECTIONS.map((d) => (
-              <path key={d} d={d} />
-            ))}
+          <g stroke="var(--research-gold)" strokeWidth={1.2} opacity={0.55} strokeDasharray="4 8" strokeLinecap="round">
+            <path d={TOP_ORBIT} />
+            <path d={BOTTOM_ORBIT} />
           </g>
           {CONNECTIONS.map((line) => {
             const isFocused = focusAxis === line.axis;
@@ -184,10 +197,12 @@ export default function ResearchMap({
           </g>
         </svg>
 
-        {/* Warstwa 3: centralny medalion (dekoracyjny) */}
+        {/* Warstwa 4: centralny medalion (dekoracyjny) — 19% szerokości kontenera,
+            czyli promień r≈86 w jednostkach viewBox 900×580 (2 * (0.19*900/2) / 900
+            = 0.19), spójne z promieniem Rc użytym do liczenia CONNECTIONS. */}
         <div
           aria-hidden="true"
-          className="absolute top-1/2 left-1/2 w-[16%] -translate-x-1/2 -translate-y-1/2"
+          className="absolute top-1/2 left-1/2 w-[19%] -translate-x-1/2 -translate-y-1/2"
           style={{ animation: "research-breathe 5.5s ease-in-out infinite" }}
         >
           <Image
@@ -200,7 +215,7 @@ export default function ResearchMap({
           />
         </div>
 
-        {/* Warstwa 4 + 5: węzły-przyciski z ikonami i etykietami HTML */}
+        {/* Warstwa 5 + 6: węzły-przyciski z ikonami i etykietami HTML */}
         {axes.map((axis) => {
           const pos = RESEARCH_MAP_NODE_POSITIONS[axis.id];
           const Icon = RESEARCH_AXIS_ICONS[axis.id];
@@ -229,29 +244,33 @@ export default function ResearchMap({
                 opacity: isDimmed ? 0.38 : 1,
                 transform: isFocused ? "translate(-50%, calc(-50% - 3px)) scale(1.04)" : "translate(-50%, -50%) scale(1)",
                 transition: "opacity 250ms var(--research-ease), transform 250ms var(--research-ease)",
-                // Odstęp ikona→etykieta min. 0.4x rozmiaru węzła (ten sam clamp co
-                // szerokość/wysokość ikony niżej, tylko przemnożony przez 0.4).
-                gap: "clamp(12px, 3.2cqw, 36px)",
+                // Odstęp ikona→etykieta ~10-16px (docelowe 10-18px z mockupu), żeby
+                // etykieta "przywierała" do węzła zamiast wyglądać jak osobny napis.
+                gap: "clamp(10px, 1.8cqw, 16px)",
               }}
               className="group absolute flex flex-col items-center rounded-research-md p-1.5 text-center outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2 focus-visible:ring-[var(--research-gold)]"
             >
               <span
                 className="flex items-center justify-center rounded-full bg-[var(--research-paper)]"
                 style={{
-                  width: "clamp(26px, 6.5cqw, 72px)",
-                  height: "clamp(26px, 6.5cqw, 72px)",
+                  // ~48-58px na desktopie (kontener query ok. 600-700px szerokości),
+                  // lekko mniejsze na tablecie dzięki mniejszemu cqw, nigdy poniżej 40px.
+                  width: "clamp(40px, 8cqw, 58px)",
+                  height: "clamp(40px, 8cqw, 58px)",
                   border: "1.5px solid",
                   borderColor: isFocused ? "var(--research-gold)" : "var(--research-amethyst)",
-                  boxShadow: isFocused ? "0 0 0 5px rgba(195,154,59,.12)" : undefined,
+                  boxShadow: isFocused
+                    ? "0 0 0 5px rgba(195,154,59,.12)"
+                    : "0 6px 16px rgba(40,19,55,.10)",
                   color: isFocused ? "var(--research-plum-800)" : "var(--research-violet)",
                   transition: "border-color 250ms var(--research-ease), box-shadow 250ms var(--research-ease), color 250ms var(--research-ease)",
                 }}
               >
-                <Icon style={{ width: "clamp(13px, 3.2cqw, 34px)", height: "clamp(13px, 3.2cqw, 34px)" }} />
+                <Icon style={{ width: "clamp(20px, 4cqw, 30px)", height: "clamp(20px, 4cqw, 30px)" }} />
               </span>
               <span
                 className="max-w-[9rem] leading-tight font-semibold text-[var(--research-plum-800)] dark:text-white"
-                style={{ fontSize: "clamp(10px, 1.9cqw, 14px)" }}
+                style={{ fontSize: "clamp(10px, 2cqw, 15px)" }}
               >
                 {axis.shortTitle}
               </span>

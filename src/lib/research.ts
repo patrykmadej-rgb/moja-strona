@@ -54,24 +54,26 @@ export type CurrentWorkItem = {
 };
 
 /**
- * Pozycje węzłów na mapie badań (desktop), w procentach kontenera 900×520.
- * Wyprowadzone geometrycznie z viewBox-owych współrzędnych (patrz niżej) tak,
- * żeby żadne dwa węzły (razem z ich dwuliniowymi etykietami, ok. 0.156 szerokości
- * kontenera wysokości każdy) nie nachodziły na siebie — sprawdzone regułą
- * nienachodzenia prostokątów (|dx| ≥ szerokość LUB |dy| ≥ wysokość, z zapasem
- * ~15%). Musi zostać spójne z krzywymi w ResearchMap.tsx
- * (CONNECTIONS/SECONDARY_CONNECTIONS/CONNECTION_DOTS), które są liczone z tych
- * samych współrzędnych viewBox:
- *   balkans: (250,130)  security: (650,130)
- *   profiling: (160,345) clinical: (740,345)
- *   victimology: (450,390)
+ * Pozycje węzłów na mapie badań (desktop), w procentach kontenera 900×580.
+ * Wyprowadzone geometrycznie z viewBox-owych współrzędnych (patrz niżej):
+ *   center: (450,290) r=86
+ *   balkans: (270,170)   security: (630,170)
+ *   profiling: (190,405) clinical: (710,405)
+ *   victimology: (450,465)
+ * Elipsoidalny, symetryczny wokół pionowej osi x=450 układ — dwa węzły u góry,
+ * dwa po bokach niżej, jeden na dole na środku. Odległości od centrum dobrane
+ * tak, żeby każde połączenie (patrz CONNECTIONS w ResearchMap.tsx) miało
+ * widoczny, niezerowy odcinek między obwodem centralnego koła (r=86) a
+ * obwodem węzła (r=38), a etykieta pod węzłem mieściła się w viewBoksie.
+ * Musi zostać spójne z CONNECTIONS/CONNECTION_DOTS/TOP_ORBIT/BOTTOM_ORBIT
+ * w ResearchMap.tsx, które są liczone z tych samych współrzędnych viewBox.
  */
 export const RESEARCH_MAP_NODE_POSITIONS: Record<ResearchAxisId, { x: number; y: number }> = {
-  balkans: { x: 27.78, y: 25 },
-  security: { x: 72.22, y: 25 },
-  profiling: { x: 17.78, y: 66.35 },
-  victimology: { x: 50, y: 75 },
-  clinical: { x: 82.22, y: 66.35 },
+  balkans: { x: 30, y: 29.31 },
+  security: { x: 70, y: 29.31 },
+  profiling: { x: 21.11, y: 69.83 },
+  victimology: { x: 50, y: 80.17 },
+  clinical: { x: 78.89, y: 69.83 },
 };
 
 export const researchAxes: ResearchAxis[] = [
