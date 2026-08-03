@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { IconChevronDown, IconSearch } from "@tabler/icons-react";
-import { ARTICLE_STATUSES, ARTICLE_STATUS_LABELS, type ArticleStatus } from "@/lib/lab/types";
 
 export type SortKey = "updated_desc" | "title_asc" | "deadline_asc";
 
@@ -90,15 +89,11 @@ function MenuItem({
 export default function ArticlesToolbar({
   query,
   onQueryChange,
-  statusFilter,
-  onStatusFilterChange,
   sort,
   onSortChange,
 }: {
   query: string;
   onQueryChange: (value: string) => void;
-  statusFilter: ArticleStatus | "";
-  onStatusFilterChange: (value: ArticleStatus | "") => void;
   sort: SortKey;
   onSortChange: (value: SortKey) => void;
 }) {
@@ -119,34 +114,6 @@ export default function ArticlesToolbar({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <DropdownButton label={statusFilter ? ARTICLE_STATUS_LABELS[statusFilter] : "Status"}>
-          {(close) => (
-            <>
-              <MenuItem
-                active={statusFilter === ""}
-                onClick={() => {
-                  onStatusFilterChange("");
-                  close();
-                }}
-              >
-                Wszystkie statusy
-              </MenuItem>
-              {ARTICLE_STATUSES.map((s) => (
-                <MenuItem
-                  key={s}
-                  active={statusFilter === s}
-                  onClick={() => {
-                    onStatusFilterChange(s);
-                    close();
-                  }}
-                >
-                  {ARTICLE_STATUS_LABELS[s]}
-                </MenuItem>
-              ))}
-            </>
-          )}
-        </DropdownButton>
-
         <DropdownButton label={`Sortuj: ${SORT_LABELS[sort]}`}>
           {(close) => (
             <>
