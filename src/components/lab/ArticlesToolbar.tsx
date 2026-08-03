@@ -7,10 +7,10 @@ import { ARTICLE_PRIORITIES, ARTICLE_PRIORITY_LABELS, NO_PRIORITY_LABEL, type Ar
 export type SortKey = "updated_desc" | "title_asc" | "deadline_asc" | "priority";
 
 const SORT_LABELS: Record<SortKey, string> = {
+  priority: "Priorytet",
   updated_desc: "Data aktualizacji",
   title_asc: "Tytuł A-Z",
   deadline_asc: "Deadline",
-  priority: "Priorytet",
 };
 
 /**

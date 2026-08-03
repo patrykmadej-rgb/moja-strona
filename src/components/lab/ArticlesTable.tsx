@@ -40,6 +40,7 @@ export default function ArticlesTable({
         >
           <span>Tytuł</span>
           <span>Status</span>
+          <span>Priorytet</span>
           <span className="hidden min-[1200px]:block">Ostatnia aktualizacja</span>
           <span>Ostatnia wersja</span>
           <span>ChatGPT</span>

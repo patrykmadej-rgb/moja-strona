@@ -22,7 +22,7 @@ export default function ArticlesExplorer({
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all");
   const [priorityFilter, setPriorityFilter] = useState<PriorityFilterValue>("all");
   const [query, setQuery] = useState("");
-  const [sort, setSort] = useState<SortKey>("updated_desc");
+  const [sort, setSort] = useState<SortKey>("priority");
 
   const counts = useMemo(() => {
     const result = Object.fromEntries(ARTICLE_STATUSES.map((status) => [status, 0])) as Record<

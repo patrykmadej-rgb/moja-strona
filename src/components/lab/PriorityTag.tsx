@@ -32,10 +32,10 @@ export default function PriorityTag({ priority, compact = false }: { priority: A
   return (
     <span
       title={label}
-      className="inline-flex w-fit shrink-0 items-center gap-1 whitespace-nowrap rounded-[7px] px-[7px] py-[3px] text-[10px] font-medium leading-[1.2]"
+      className="inline-flex w-fit min-h-[27px] shrink-0 items-center gap-[6px] whitespace-nowrap rounded-[8px] px-2 py-[5px] text-[11px] font-medium leading-[1.2]"
       style={{ background: bg, color: text }}
     >
-      <Icon className="h-[11px] w-[11px] shrink-0" strokeWidth={2.25} />
+      <Icon className="h-[12px] w-[12px] shrink-0" strokeWidth={2.25} />
       {!compact && label}
     </span>
   );
