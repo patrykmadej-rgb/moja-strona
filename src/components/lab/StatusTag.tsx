@@ -24,9 +24,10 @@ export default function StatusTag({ status }: { status: ArticleStatus }) {
 
   return (
     <span
-      className="inline-flex h-6 items-center rounded-full px-[9px] text-[10px] font-semibold"
+      className="inline-flex w-fit max-w-[175px] min-h-[28px] items-center gap-[7px] whitespace-normal rounded-[8px] px-[9px] py-[6px] text-left text-[11px] font-medium leading-[1.25]"
       style={{ background: bg, color: text }}
     >
+      <span className="h-[6px] w-[6px] shrink-0 rounded-full" style={{ background: text }} />
       {label}
     </span>
   );

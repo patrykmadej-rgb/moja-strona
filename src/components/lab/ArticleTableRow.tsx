@@ -11,7 +11,7 @@ import { fileKindLabel, formatDateMedium, formatTimeOnly } from "@/lib/lab/forma
 import type { Article, LatestArticleVersion } from "@/lib/lab/types";
 
 export const TABLE_GRID_COLS =
-  "min-[900px]:grid-cols-[minmax(280px,1.8fr)_110px_minmax(150px,0.9fr)_minmax(120px,0.7fr)_40px] min-[1200px]:grid-cols-[minmax(320px,1.8fr)_120px_150px_minmax(170px,0.9fr)_minmax(130px,0.7fr)_40px]";
+  "min-[900px]:grid-cols-[minmax(280px,1.8fr)_185px_minmax(150px,0.9fr)_minmax(120px,0.7fr)_40px] min-[1200px]:grid-cols-[minmax(320px,1.8fr)_185px_150px_minmax(170px,0.9fr)_minmax(130px,0.7fr)_40px]";
 
 const linkButtonClass =
   "inline-flex min-h-[32px] items-center gap-1.5 whitespace-nowrap rounded-lg border border-transparent bg-transparent px-[9px] py-1.5 text-[11px] font-medium text-[#5b2a86] transition-colors hover:border-[#e3d8ec] hover:bg-[#f1eafd] hover:text-[#431d66] disabled:cursor-not-allowed disabled:opacity-60";
@@ -211,7 +211,7 @@ export default function ArticleTableRow({
         <p className="mt-1 truncate text-[11px] text-[#817887]">{article.target_journal || "Nie określono czasopisma"}</p>
       </div>
 
-      <div className="hidden min-[900px]:block">
+      <div className="hidden min-w-0 min-[900px]:flex min-[900px]:items-center">
         <StatusTag status={article.status} />
       </div>
 

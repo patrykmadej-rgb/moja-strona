@@ -166,6 +166,9 @@ html {
 .lab-articles-page .rounded-\[9px\] {
   border-radius: 9px !important;
 }
+.lab-articles-page .rounded-\[8px\] {
+  border-radius: 8px !important;
+}
 .lab-articles-page .rounded-\[7px\] {
   border-radius: 7px !important;
 }
