@@ -10,6 +10,14 @@ import { fetchIcsFeed, parseIcsEvents, type IcsFetchResult } from "@/lib/szkola/
 import { normalizeIcsUrl, maskIcsUrl } from "@/lib/szkola/urlSafety";
 import { decryptToken, encryptToken, CalendarEncryptionConfigError } from "@/lib/szkola/calendarCrypto";
 import { DEFAULT_SESSION_CHECKLIST, DEFAULT_CALENDAR_SETTINGS } from "@/lib/szkola/types";
+import {
+  buildWeekendDetection,
+  createSessionFromWeekendGroup,
+  assignWeekendGroupToExistingSession,
+  skipWeekendGroup,
+  runConfidentWeekendImport,
+  getNextSessionNumber,
+} from "@/lib/szkola/calendarWeekendAutomation";
 
 async function requireUserId(): Promise<string> {
   const supabase = await createClient();
@@ -559,6 +567,136 @@ export async function updateCalendarSettings(formData: FormData) {
     },
     { onConflict: "user_id" },
   );
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/lab/szkola/kalendarz");
+}
+
+async function getUserTimezone(supabase: Awaited<ReturnType<typeof createClient>>, userId: string): Promise<string> {
+  const { data } = await supabase.from("school_calendar_settings").select("default_timezone").eq("user_id", userId).maybeSingle();
+  return data?.default_timezone || DEFAULT_CALENDAR_SETTINGS.default_timezone;
+}
+
+/**
+ * Ponownie wykrywa weekendy szkoleniowe z aktualnego stanu bazy i znajduje
+ * grupę o podanym `weekendStart` — zamiast ufać liście wydarzeń przesłanej
+ * z formularza. Dzięki temu żadna akcja nie działa na nieaktualnych/
+ * spreparowanych danych, tylko zawsze na tym, co faktycznie jest w bazie
+ * w chwili kliknięcia.
+ */
+async function findDetectedGroupOrThrow(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  timezone: string,
+  weekendStart: string,
+) {
+  const detection = await buildWeekendDetection(supabase, userId, timezone);
+  const group = detection.groups.find((g) => g.weekendStart === weekendStart);
+  if (!group) throw new Error("Nie znaleziono wykrytego weekendu — odśwież stronę i spróbuj ponownie.");
+  return group;
+}
+
+/** Tworzy nowy zjazd z wykrytej grupy weekendowej ("Utwórz zjazd" — sekcja 13). */
+export async function createSessionFromWeekendGroupAction(formData: FormData) {
+  const userId = await requireUserId();
+  const supabase = await createClient();
+  const weekendStart = String(formData.get("weekend_start") ?? "");
+  if (!weekendStart) throw new Error("Brak identyfikatora weekendu.");
+
+  const timezone = await getUserTimezone(supabase, userId);
+  const group = await findDetectedGroupOrThrow(supabase, userId, timezone, weekendStart);
+  const sessionNumber = await getNextSessionNumber(supabase);
+  const { session } = await createSessionFromWeekendGroup(supabase, userId, group, timezone, sessionNumber);
+
+  revalidatePath("/lab/szkola");
+  revalidatePath("/lab/szkola/zjazdy");
+  revalidatePath("/lab/szkola/kalendarz");
+  redirect(`/lab/szkola/zjazdy/${session.id}`);
+}
+
+/** Przypisuje wydarzenia wykrytej grupy weekendowej do istniejącego zjazdu ("Przypisz do istniejącego" — sekcja 13). */
+export async function assignWeekendGroupToSessionAction(formData: FormData) {
+  const userId = await requireUserId();
+  const supabase = await createClient();
+  const weekendStart = String(formData.get("weekend_start") ?? "");
+  const sessionId = String(formData.get("session_id") ?? "").trim();
+  if (!weekendStart) throw new Error("Brak identyfikatora weekendu.");
+  if (!sessionId) throw new Error("Wybierz zjazd, do którego przypisać wydarzenia.");
+
+  const timezone = await getUserTimezone(supabase, userId);
+  const group = await findDetectedGroupOrThrow(supabase, userId, timezone, weekendStart);
+  await assignWeekendGroupToExistingSession(supabase, sessionId, group, timezone);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+  revalidatePath("/lab/szkola/kalendarz");
+}
+
+/** "Pomiń" dla całej wykrytej grupy weekendowej — oznacza jej wydarzenia jako zignorowane (sekcja 13). */
+export async function skipWeekendGroupAction(formData: FormData) {
+  const userId = await requireUserId();
+  const supabase = await createClient();
+  const weekendStart = String(formData.get("weekend_start") ?? "");
+  if (!weekendStart) throw new Error("Brak identyfikatora weekendu.");
+
+  const timezone = await getUserTimezone(supabase, userId);
+  const group = await findDetectedGroupOrThrow(supabase, userId, timezone, weekendStart);
+  await skipWeekendGroup(supabase, group);
+
+  revalidatePath("/lab/szkola/kalendarz");
+}
+
+export type CreateAllConfidentWeekendSessionsResult = {
+  sessionsCreated: number;
+  sessionsMatched: number;
+  scheduleItemsCreated: number;
+};
+
+/**
+ * "Utwórz wszystkie pewne zjazdy" (sekcja 9/13) — tworzy/dopasowuje
+ * jednym kliknięciem wszystkie weekendy, które NIE wymagają ręcznej
+ * decyzji. Po pierwszym takim ręcznie zatwierdzonym imporcie wsadowym
+ * włącza tryb automatyczny na przyszłość (sekcja 10) — kolejne
+ * synchronizacje mogą tworzyć pewne zjazdy same, bez czekania na ten
+ * przycisk.
+ */
+export async function createAllConfidentWeekendSessionsAction(): Promise<CreateAllConfidentWeekendSessionsResult> {
+  const userId = await requireUserId();
+  const supabase = await createClient();
+
+  const timezone = await getUserTimezone(supabase, userId);
+  const detection = await buildWeekendDetection(supabase, userId, timezone);
+  const confidentGroups = detection.groups.filter((g) => g.status !== "needs_decision");
+
+  if (confidentGroups.length === 0) {
+    return { sessionsCreated: 0, sessionsMatched: 0, scheduleItemsCreated: 0 };
+  }
+
+  const outcome = await runConfidentWeekendImport(supabase, userId, confidentGroups, timezone);
+
+  await supabase
+    .from("school_calendar_settings")
+    .upsert({ user_id: userId, auto_create_sessions: true, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
+
+  revalidatePath("/lab/szkola");
+  revalidatePath("/lab/szkola/zjazdy");
+  revalidatePath("/lab/szkola/kalendarz");
+
+  return {
+    sessionsCreated: outcome.sessionsCreated,
+    sessionsMatched: outcome.sessionsMatched,
+    scheduleItemsCreated: outcome.scheduleItemsCreated,
+  };
+}
+
+/** Ręczny przełącznik "Automatycznie twórz zjazdy z weekendów szkoleniowych" (sekcja 10). */
+export async function toggleAutoCreateSessions(formData: FormData) {
+  const userId = await requireUserId();
+  const enabled = String(formData.get("auto_create_sessions") ?? "") === "true";
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("school_calendar_settings")
+    .upsert({ user_id: userId, auto_create_sessions: enabled, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
   if (error) throw new Error(error.message);
 
   revalidatePath("/lab/szkola/kalendarz");

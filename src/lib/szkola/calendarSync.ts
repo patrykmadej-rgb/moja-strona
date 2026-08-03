@@ -6,6 +6,8 @@ import { fetchIcsFeed, parseIcsEvents } from "@/lib/szkola/icsCalendar";
 import { diffEventFields, type ComparableEventFields } from "@/lib/szkola/calendarDiff";
 import { matchEventToSession } from "@/lib/szkola/calendarMatching";
 import { assessTravelImpact } from "@/lib/szkola/calendarImpact";
+import { weekendStartForInstant } from "@/lib/szkola/calendarWeekendGrouping";
+import { buildWeekendDetection, runConfidentWeekendImport } from "@/lib/szkola/calendarWeekendAutomation";
 import {
   DEFAULT_CALENDAR_SETTINGS,
   type Accommodation,
@@ -66,6 +68,7 @@ async function processEvents(
   sessions: SchoolSession[],
   normalizedEvents: NormalizedCalendarEvent[],
   isFullSync: boolean,
+  timezone: string,
 ): Promise<ProcessEventsResult> {
   const { data: existingEventsData } = await admin
     .from("school_calendar_events")
@@ -153,6 +156,16 @@ async function processEvents(
       .update({ ...normalized, session_id: sessionId, last_seen_at: new Date().toISOString() })
       .eq("id", existing.id);
 
+    // Wydarzenie już przypisane do zjazdu, którego termin się przesunął na
+    // inny weekend szkoleniowy (sekcja 14) — nie przenosimy nic automatycznie,
+    // tylko podnosimy poziom wpływu, żeby użytkownik zobaczył to na stronie
+    // "Zmiany" i podjął decyzję ręcznie.
+    const oldWeekendStart = existing.start_at ? weekendStartForInstant(existing.start_at, timezone, existing.all_day) : null;
+    const newWeekendStart = normalized.start_at ? weekendStartForInstant(normalized.start_at, timezone, normalized.all_day) : null;
+    const movedToOtherWeekend = Boolean(
+      sessionId && oldWeekendStart && newWeekendStart && oldWeekendStart !== newWeekendStart,
+    );
+
     if (fieldChanges.length > 0) {
       for (const change of fieldChanges) {
         const isMove = change.field_name === "start_at" || change.field_name === "end_at";
@@ -165,7 +178,11 @@ async function processEvents(
           field_name: change.field_name,
           old_value: change.old_value,
           new_value: change.new_value,
-          impact_level: "none",
+          impact_level: isMove && movedToOtherWeekend ? "warning" : "none",
+          impact_summary:
+            isMove && movedToOtherWeekend
+              ? "Wydarzenie zostało przeniesione do innego weekendu. Sprawdź przypisanie do zjazdu."
+              : null,
         });
       }
       eventsUpdated += 1;
@@ -247,6 +264,8 @@ export async function runCalendarSync(userId: string, syncType: CalendarSyncType
   try {
     const { data: sessionsData } = await admin.from("school_sessions").select("*");
     const sessions = (sessionsData as SchoolSession[] | null) ?? [];
+    const settings = await loadOrDefaultSettings(admin, userId);
+    const timezone = settings.default_timezone || DEFAULT_CALENDAR_SETTINGS.default_timezone;
 
     let normalizedEvents: NormalizedCalendarEvent[];
     let isFullSync: boolean;
@@ -327,6 +346,7 @@ export async function runCalendarSync(userId: string, syncType: CalendarSyncType
       sessions,
       normalizedEvents,
       isFullSync,
+      timezone,
     );
     result.eventsCreated = eventsCreated;
     result.eventsUpdated = eventsUpdated;
@@ -335,7 +355,6 @@ export async function runCalendarSync(userId: string, syncType: CalendarSyncType
     // Ocena wpływu na podróż — tylko dla zjazdów, których punkty planu
     // faktycznie się przesunęły/pojawiły/zniknęły w tej synchronizacji.
     if (touchedSessionIds.size > 0) {
-      const settings = await loadOrDefaultSettings(admin, userId);
       for (const sessionId of touchedSessionIds) {
         const impact = await assessSessionImpact(admin, userId, sessionId, settings);
         if (impact.impact_level === "none") continue;
@@ -347,6 +366,36 @@ export async function runCalendarSync(userId: string, syncType: CalendarSyncType
           .eq("sync_run_id", syncRun.id)
           .eq("session_id", sessionId)
           .in("field_name", ["start_at", "end_at"]);
+      }
+    }
+
+    // Tryb automatyczny (sekcja 10) — jeśli włączony, po synchronizacji od
+    // razu tworzymy/dopasowujemy zjazdy dla weekendów o wysokiej pewności,
+    // zamiast czekać na ręczne kliknięcie na stronie /lab/szkola/kalendarz.
+    // Historia trafia do school_calendar_changes (widoczna na stronie
+    // "Zmiany"), tak samo jak każda inna zmiana wykryta w tej synchronizacji —
+    // nic nie dzieje się bez śladu.
+    if (settings.auto_create_sessions) {
+      const detection = await buildWeekendDetection(admin, userId, timezone);
+      const confidentGroups = detection.groups.filter((g) => g.status !== "needs_decision");
+      if (confidentGroups.length > 0) {
+        const outcome = await runConfidentWeekendImport(admin, userId, confidentGroups, timezone);
+        for (const detail of outcome.details) {
+          await admin.from("school_calendar_changes").insert({
+            user_id: userId,
+            calendar_event_id: null,
+            session_id: detail.sessionId,
+            sync_run_id: syncRun.id,
+            change_type: "created",
+            field_name: null,
+            old_value: null,
+            new_value:
+              detail.action === "created"
+                ? `Automatycznie utworzono zjazd z weekendu ${detail.group.weekendStart}–${detail.group.weekendEnd} (${detail.group.events.length} wydarzeń).`
+                : `Automatycznie dopasowano ${detail.group.events.length} wydarzeń weekendu ${detail.group.weekendStart}–${detail.group.weekendEnd} do istniejącego zjazdu.`,
+            impact_level: "information",
+          });
+        }
       }
     }
 

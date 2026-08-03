@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
-import { updateCalendarSettings } from "@/app/lab/szkola/kalendarz/actions";
+import { updateCalendarSettings, toggleAutoCreateSessions } from "@/app/lab/szkola/kalendarz/actions";
 import type { SchoolCalendarSettings } from "@/lib/szkola/types";
 
 const inputClass =
@@ -25,6 +25,8 @@ function SubmitButton() {
 export default function CalendarBufferSettingsCard({ settings }: { settings: SchoolCalendarSettings }) {
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [autoCreate, setAutoCreate] = useState(settings.auto_create_sessions);
+  const [autoCreateError, setAutoCreateError] = useState<string | null>(null);
 
   return (
     <section className="rounded-[16px] border border-[#e8e2ec] bg-white p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
@@ -98,6 +100,34 @@ export default function CalendarBufferSettingsCard({ settings }: { settings: Sch
           {error && <span className="text-xs text-red-600">{error}</span>}
         </div>
       </form>
+
+      <div className="mt-4 flex items-start gap-2 border-t border-[#f0ecf5] pt-4">
+        <input
+          type="checkbox"
+          id="auto_create_sessions"
+          checked={autoCreate}
+          onChange={async (e) => {
+            const next = e.target.checked;
+            setAutoCreate(next);
+            setAutoCreateError(null);
+            const formData = new FormData();
+            formData.set("auto_create_sessions", next ? "true" : "false");
+            try {
+              await toggleAutoCreateSessions(formData);
+            } catch (err) {
+              setAutoCreate(!next);
+              setAutoCreateError(err instanceof Error ? err.message : "Nie udało się zapisać ustawienia.");
+            }
+          }}
+          className="mt-0.5"
+        />
+        <label htmlFor="auto_create_sessions" className="text-xs text-[#4f4758]">
+          <span className="font-medium text-[#201a2b]">Automatycznie twórz zjazdy z weekendów szkoleniowych.</span>{" "}
+          Gdy włączone, kolejne synchronizacje mogą same tworzyć/dopasowywać zjazdy dla pewnych weekendów (bez czekania na
+          kliknięcie „Utwórz wszystkie pewne zjazdy”). Włącza się samo po pierwszym ręcznie zatwierdzonym imporcie.
+        </label>
+        {autoCreateError && <span className="text-xs text-red-600">{autoCreateError}</span>}
+      </div>
     </section>
   );
 }

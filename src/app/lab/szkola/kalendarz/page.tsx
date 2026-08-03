@@ -6,7 +6,9 @@ import SzkolaNav from "@/components/szkola/SzkolaNav";
 import CalendarConnectionCard from "@/components/szkola/CalendarConnectionCard";
 import CalendarBufferSettingsCard from "@/components/szkola/CalendarBufferSettingsCard";
 import UnassignedCalendarEventsCard, { type UnassignedEventRow } from "@/components/szkola/UnassignedCalendarEventsCard";
+import DetectedWeekendsCard from "@/components/szkola/DetectedWeekendsCard";
 import { matchEventToSession } from "@/lib/szkola/calendarMatching";
+import { buildWeekendDetection, type WeekendDetectionSummary } from "@/lib/szkola/calendarWeekendAutomation";
 import {
   DEFAULT_CALENDAR_SETTINGS,
   type CalendarConnectionSummary,
@@ -46,12 +48,20 @@ export default async function KalendarzSzkolaPage({
     updated_at: "",
     ...DEFAULT_CALENDAR_SETTINGS,
   };
+  let weekendDetection: WeekendDetectionSummary | null = null;
 
   if (user) {
     try {
       const lookup = await getCalendarConnectionSummary(user.id);
       connection = lookup.connection;
       adminConfigured = lookup.adminConfigured;
+
+      const { data: settingsRow } = await supabase
+        .from("school_calendar_settings")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (settingsRow) settings = settingsRow as SchoolCalendarSettings;
 
       if (connection) {
         // Od tego miejsca w dół — zwykły klient (RLS "authenticated"), nie admin.
@@ -87,36 +97,23 @@ export default async function KalendarzSzkolaPage({
         conflictsCount = conflictsCountResult ?? 0;
         latestSyncRun = (syncRuns as SchoolCalendarSyncRun[] | null)?.[0] ?? null;
 
-        const [{ data: unassignedData }, { data: sessionsData }] = await Promise.all([
-          supabase
-            .from("school_calendar_events")
-            .select("id, title, location, start_at, end_at")
-            .eq("user_id", user.id)
-            .is("session_id", null)
-            .is("deleted_at", null)
-            .eq("ignored", false)
-            .neq("status", "cancelled")
-            .order("start_at", { ascending: true })
-            .limit(20),
-          supabase.from("school_sessions").select("*"),
-        ]);
+        const { data: sessionsData } = await supabase.from("school_sessions").select("*");
         sessions = (sessionsData as SchoolSession[] | null) ?? [];
-        const rawUnassigned =
-          (unassignedData as
-            | { id: string; title: string | null; location: string | null; start_at: string | null; end_at: string | null }[]
-            | null) ?? [];
+
+        weekendDetection = await buildWeekendDetection(supabase, user.id, settings.default_timezone);
+
+        // "Wydarzenia do przypisania" pokazuje wyłącznie to, czego NIE obejmuje
+        // sekcja "Wykryte weekendy szkoleniowe" (sekcja 8 specyfikacji): sieroty
+        // poniedziałek-czwartek + pojedyncze/niepewne wydarzenia weekendowe.
+        // Grupy o statusie "new_session"/"matched_existing" znikają stąd, bo
+        // mają już własną, dedykowaną kartę z akcjami.
+        const needsDecisionEvents = weekendDetection.groups.filter((g) => g.status === "needs_decision").flatMap((g) => g.events);
+        const rawUnassigned = [...weekendDetection.manualReviewEvents, ...needsDecisionEvents].slice(0, 20);
         unassignedEvents = rawUnassigned.map((event) => {
           const match = matchEventToSession(event, sessions);
-          return { ...event, suggestedSession: match ? match.session : null };
+          return { id: event.id, title: event.title, location: event.location, start_at: event.start_at, suggestedSession: match ? match.session : null };
         });
       }
-
-      const { data: settingsRow } = await supabase
-        .from("school_calendar_settings")
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (settingsRow) settings = settingsRow as SchoolCalendarSettings;
     } catch {
       // Strona kalendarza musi się renderować niezależnie od stanu bazy/konfiguracji —
       // brakująca tabela, sekret albo wiersz nie może wywalić całego widoku.
@@ -127,6 +124,7 @@ export default async function KalendarzSzkolaPage({
       conflictsCount = 0;
       latestSyncRun = null;
       unassignedEvents = [];
+      weekendDetection = null;
     }
   }
 
@@ -158,6 +156,8 @@ export default async function KalendarzSzkolaPage({
             latestSyncRun={latestSyncRun}
             calendarErrorCode={calendarError}
           />
+
+          {connection && weekendDetection && <DetectedWeekendsCard detection={weekendDetection} sessions={sessions} />}
 
           {connection && <UnassignedCalendarEventsCard events={unassignedEvents} sessions={sessions} />}
 

@@ -38,6 +38,8 @@ export type SchoolSession = {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+  /** Czy ten zjazd powstał automatycznie z grupowania weekendów kalendarza (patrz calendarWeekendAutomation.ts). */
+  created_from_calendar: boolean;
 };
 
 export const CURRENCIES = ["PLN", "DKK", "EUR"] as const;
@@ -695,6 +697,14 @@ export type SchoolCalendarSettings = {
   flight_buffer_minutes: number;
   train_buffer_minutes: number;
   default_timezone: string;
+  /**
+   * Tryb automatyczny grupowania weekendów (sekcja 10 specyfikacji ETAP 6):
+   * gdy włączone, nowy weekend z >=2 wydarzeniami i bez dwuznaczności może
+   * automatycznie utworzyć/dopasować zjazd podczas synchronizacji, bez
+   * czekania na ręczne kliknięcie. Domyślnie wyłączone — włącza się samo
+   * dopiero po pierwszym ręcznie zatwierdzonym imporcie wsadowym.
+   */
+  auto_create_sessions: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -705,6 +715,7 @@ export const DEFAULT_CALENDAR_SETTINGS: Omit<SchoolCalendarSettings, "id" | "use
   flight_buffer_minutes: 120,
   train_buffer_minutes: 30,
   default_timezone: "Europe/Warsaw",
+  auto_create_sessions: false,
 };
 
 // ---------------------------------------------------------------------------
