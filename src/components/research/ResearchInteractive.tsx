@@ -5,8 +5,9 @@ import { useCallback, useEffect, useState } from "react";
 import type { LocalizedCurrentWorkItem, LocalizedResearchAxis, ResearchAxisId } from "@/lib/research";
 import ResearchMap from "./ResearchMap";
 import ResearchAxisCards from "./ResearchAxisCards";
-import CurrentWorkCarousel from "./CurrentWorkCarousel";
+import CurrentWorkGrid from "./CurrentWorkGrid";
 import { EXPLORE_AXES_EVENT } from "./ExploreAxesButton";
+import { RESEARCH_CONTAINER_CLASS } from "./constants";
 
 export type ResearchLabels = {
   mapLabel: string;
@@ -15,6 +16,7 @@ export type ResearchLabels = {
   mapCenterLabel: string;
   mapMobileHint: string;
   axesEyebrow: string;
+  featuredBadge: string;
   expand: string;
   selected: string;
   questionsHeading: string;
@@ -22,16 +24,17 @@ export type ResearchLabels = {
   seeRelatedProjects: string;
   currentWorkEyebrow: string;
   currentWorkHeading: string;
-  currentWorkIntro: string;
   filterAll: string;
-  carouselPrev: string;
-  carouselNext: string;
+  seeAll: string;
+  showLess: string;
   noResults: string;
 };
 
 type Props = {
   /** Lewa kolumna hero (eyebrow, H1, opis, CTA) — server-rendered, przekazane jako children. */
   heroLeft: ReactNode;
+  /** Sekcja końcowa ("Jak pracuję badawczo" / pytania badawcze) — server-rendered. */
+  closing: ReactNode;
   axes: LocalizedResearchAxis[];
   currentWork: LocalizedCurrentWorkItem[];
   hasBackgroundImage: boolean;
@@ -40,11 +43,18 @@ type Props = {
 
 /**
  * Cały interaktywny program badawczy w jednym komponencie-kliencie: mapa w hero
- * (prawa kolumna) + karty osi + panel szczegółów + karuzela "Aktualnie pracuję
- * nad". Jeden wspólny stan (wybrana/hover'owana oś, filtr karuzeli), zgodnie z
+ * (prawa kolumna) + karty osi + panel szczegółów + siatka "Aktualnie pracuję
+ * nad". Jeden wspólny stan (wybrana/hover'owana oś, filtr siatki), zgodnie z
  * wymaganiem, że wybór osi aktualizuje mapę, kartę, panel i filtr jednocześnie.
  */
-export default function ResearchInteractive({ heroLeft, axes, currentWork, hasBackgroundImage, labels }: Props) {
+export default function ResearchInteractive({
+  heroLeft,
+  closing,
+  axes,
+  currentWork,
+  hasBackgroundImage,
+  labels,
+}: Props) {
   const [activeAxis, setActiveAxis] = useState<ResearchAxisId | null>(null);
   const [hoveredAxis, setHoveredAxis] = useState<ResearchAxisId | null>(null);
   const [workFilter, setWorkFilter] = useState<ResearchAxisId | "all">("all");
@@ -82,16 +92,15 @@ export default function ResearchInteractive({ heroLeft, axes, currentWork, hasBa
 
   return (
     <>
-      {/* Hero "wyłamuje się" z max-w-6xl na szeroki viewport (tak jak hero strony
-          głównej), żeby mapa dostała dużo więcej miejsca niż połowa zwykłego
-          kontenera. Kolumny w stałej proporcji 38/62 (zbliżonej do mockupu) przez
-          CSS grid z minmax(0, Nfr) — mapa rośnie w ramach SWOJEJ kolumny, nie
-          kosztem tekstu. Górna granica szerokości (max-w-[1600px]) + spory
-          padding poziomy, żeby mapa nie stykała się z krawędzią na szerokich
-          ekranach. items-start (nie items-center), żeby krótsza kolumna tekstu
-          nie była wyśrodkowana w wysokości wyznaczanej przez mapę. */}
-      <section className="relative left-0 w-full min-[720px]:left-[calc(-50vw+50%)] min-[720px]:w-screen">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 pt-14 pb-8 min-[720px]:max-w-[1600px] min-[720px]:grid-cols-[minmax(0,38fr)_minmax(0,62fr)] min-[720px]:items-start min-[720px]:gap-12 min-[720px]:px-12 min-[720px]:pt-16 min-[720px]:pb-10 lg:px-20">
+      {/* Kolumny hero w proporcji ~0.9/1.1 (bliżej równowagi niż poprzednie 38/62),
+          żeby mapa nie dominowała nad treścią. Jeden wspólny kontener
+          (RESEARCH_CONTAINER_CLASS) zamiast pełnego wyłamania na szerokość
+          viewportu — to też usuwa źródło poziomego scrolla przy pasku
+          przewijania (100vw liczone bez uwzględnienia scrollbara). */}
+      <section className="pt-12 lg:pt-16">
+        <div
+          className={`${RESEARCH_CONTAINER_CLASS} grid grid-cols-1 items-center gap-10 min-[1200px]:grid-cols-[minmax(420px,0.9fr)_minmax(520px,1.1fr)] min-[1200px]:gap-16`}
+        >
           <div className="w-full">{heroLeft}</div>
           <div className="w-full">
             <ResearchMap
@@ -119,13 +128,15 @@ export default function ResearchInteractive({ heroLeft, axes, currentWork, hasBa
         highlightPulse={highlightPulse}
       />
 
-      <CurrentWorkCarousel
+      <CurrentWorkGrid
         axes={axes}
         items={currentWork}
         filter={workFilter}
         onFilterChange={setWorkFilter}
         labels={labels}
       />
+
+      {closing}
     </>
   );
 }

@@ -5,9 +5,11 @@ import type { LocalizedResearchAxis, ResearchAxisId } from "@/lib/research";
 import { RESEARCH_AXIS_ICONS } from "./icons";
 import AxisDetailContent from "./AxisDetailContent";
 import { useRevealOnce } from "./useRevealOnce";
+import { RESEARCH_CONTAINER_CLASS } from "./constants";
 
 type Labels = {
   axesEyebrow: string;
+  featuredBadge: string;
   expand: string;
   selected: string;
   questionsHeading: string;
@@ -48,7 +50,7 @@ function AxisCard({
   highlightPulse: boolean;
 }) {
   const Icon = RESEARCH_AXIS_ICONS[axis.id];
-  const isDeepVariant = axis.id === "balkans";
+  const isFeatured = axis.id === "balkans";
 
   return (
     <button
@@ -64,86 +66,62 @@ function AxisCard({
       data-reveal={revealed ? "in" : undefined}
       style={{
         transitionDelay: `${index * 60}ms`,
-        transform: isFocused && !isActive ? "translateY(-6px)" : "translateY(0)",
-        boxShadow: isFocused ? "var(--research-shadow)" : undefined,
+        transform: isFocused ? "translateY(-3px)" : "translateY(0)",
         outline: highlightPulse ? "3px solid var(--research-gold)" : undefined,
         outlineOffset: highlightPulse ? "3px" : undefined,
       }}
-      className={`group relative flex min-h-[250px] flex-col overflow-hidden rounded-research-lg border p-6 text-left transition-[transform,box-shadow,background-color,border-color] duration-[250ms] ${
-        isActive
-          ? isDeepVariant
-            ? "border-transparent bg-[var(--research-plum-800)] text-white"
-            : "border-transparent bg-gradient-to-br from-[var(--research-lavender-soft)] to-[var(--research-lavender)]"
-          : "border-[var(--research-line)] bg-[var(--research-paper)] hover:border-[var(--research-gold)]/50 dark:border-white/10 dark:bg-neutral-900"
+      className={`group relative flex min-h-[200px] flex-col overflow-hidden rounded-research-md border p-6 text-left transition-[transform,box-shadow,border-color] duration-[250ms] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[var(--research-gold)] ${
+        isFeatured
+          ? "border-transparent bg-gradient-to-br from-[var(--research-lavender-soft)] to-[#fbf7ec]"
+          : "border-[var(--research-line)] bg-[var(--research-paper)] dark:border-white/10 dark:bg-neutral-900"
+      } ${isFocused ? "border-[var(--research-gold)]/60 shadow-[var(--research-shadow)]" : ""} ${
+        isActive && !isFeatured ? "border-[var(--research-violet)]/50" : ""
       }`}
     >
-      {/* górny pasek — rośnie z 35% do 100% szerokości na hover/aktywności */}
+      {/* pasek u góry — złoty, stały dla wyróżnionej osi; fioletowy, rosnący na hover dla pozostałych */}
       <span
         aria-hidden="true"
-        className="absolute top-0 left-0 h-1"
+        className="absolute top-0 left-0 h-[3px]"
         style={{
-          width: isFocused ? "100%" : "35%",
-          backgroundColor: isActive && isDeepVariant ? "var(--research-gold)" : "var(--research-violet)",
+          width: isFeatured ? "100%" : isFocused ? "100%" : "35%",
+          backgroundColor: isFeatured ? "var(--research-gold)" : "var(--research-violet)",
           transition: "width 250ms var(--research-ease)",
         }}
       />
 
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-2">
         <span
-          className={`text-xs font-semibold tracking-[0.2em] ${isActive ? (isDeepVariant ? "text-white/60" : "text-[var(--research-violet)]") : "text-[var(--research-amethyst)]"}`}
-        >
-          {axis.number}
-        </span>
-        <span
-          className="flex h-10 w-10 items-center justify-center rounded-full"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
           style={{
-            color: isActive && isDeepVariant ? "white" : "var(--research-violet)",
-            backgroundColor: isActive && isDeepVariant ? "rgba(255,255,255,.12)" : "var(--research-lavender-soft)",
+            color: "var(--research-violet)",
+            backgroundColor: isFeatured ? "rgba(255,255,255,.6)" : "var(--research-lavender-soft)",
             transform: isFocused ? "rotate(2deg) scale(1.05)" : undefined,
             transition: "transform 250ms var(--research-ease)",
           }}
         >
           <Icon className="h-5 w-5" />
         </span>
+        {isFeatured && (
+          <span className="rounded-research-sm mt-1 px-2 py-1 text-[10px] font-semibold tracking-[0.14em] whitespace-nowrap text-[var(--research-gold)] uppercase">
+            {labels.featuredBadge}
+          </span>
+        )}
       </div>
 
-      <p
-        className={`mt-4 line-clamp-3 text-base font-bold leading-snug ${isActive && isDeepVariant ? "text-white" : "text-[#1C1028] dark:text-white"}`}
-      >
-        {axis.title}
+      <p className="mt-4 line-clamp-2 text-base font-bold leading-snug text-[#1C1028] dark:text-white">
+        {axis.shortTitle}
       </p>
-      <p
-        className={`mt-2 line-clamp-3 text-sm leading-relaxed ${
-          isActive && isDeepVariant ? "text-white/75" : "text-[#4A3360] dark:text-neutral-300"
-        }`}
-      >
+      <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[#4A3360] dark:text-neutral-300">
         {axis.description}
       </p>
 
-      <div className="mt-4 flex flex-wrap gap-1.5">
-        {axis.tags.slice(0, 3).map((tag) => (
-          <span
-            key={tag}
-            className={`rounded-research-md px-2.5 py-1 text-[11px] font-medium ${
-              isActive
-                ? isDeepVariant
-                  ? "bg-white/15 text-white"
-                  : "bg-white/70 text-[var(--research-plum-800)]"
-                : "bg-[var(--research-lavender-soft)] text-[var(--research-plum-700)] dark:bg-purple-900/20 dark:text-purple-200"
-            }`}
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-
       <span
-        className={`mt-auto pt-5 text-sm font-semibold uppercase tracking-wide ${
-          isActive && isDeepVariant ? "text-[var(--research-gold)]" : "text-[var(--research-violet)] dark:text-purple-300"
-        }`}
+        aria-hidden="true"
+        className="mt-auto pt-4 text-[var(--research-violet)] transition-transform duration-200 group-hover:translate-x-[3px] dark:text-purple-300"
       >
-        {isActive ? labels.selected : `${labels.expand} →`}
+        →
       </span>
+      <span className="sr-only">{isActive ? labels.selected : labels.expand}</span>
     </button>
   );
 }
@@ -175,25 +153,21 @@ export default function ResearchAxisCards({
   }, [activeAxis]);
 
   return (
-    <section id="osie-badawcze" className="mx-auto hidden max-w-6xl px-6 pt-10 pb-20 min-[720px]:block">
-      <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] dark:text-purple-400">
+    <section id="osie-badawcze" className={`${RESEARCH_CONTAINER_CLASS} hidden pt-12 lg:pt-16 min-[720px]:block`}>
+      <h2 className="text-xs font-semibold tracking-[0.22em] uppercase text-[#4A1D6E] dark:text-purple-400">
         {labels.axesEyebrow}
-      </p>
+      </h2>
 
       <div
         ref={ref}
-        className="mt-6 grid grid-cols-1 gap-5 min-[640px]:grid-cols-2 min-[900px]:grid-cols-3 min-[1280px]:grid-cols-5"
+        className="mt-5 grid grid-cols-1 gap-5 min-[640px]:grid-cols-2 min-[900px]:grid-cols-3 min-[1280px]:grid-cols-5"
       >
         {axes.map((axis, index) => (
           <AxisCard
             key={axis.id}
             axis={axis}
             index={index}
-            // Zanim użytkownik cokolwiek wybierze (activeAxis === null), pierwsza
-            // karta (01 — Bałkany) ma domyślnie wygląd .is-active, zgodnie z
-            // mockupem — czysto wizualnie, nie otwiera panelu ani nie podświetla
-            // węzła mapy (te trzymają się prawdziwego activeAxis, patrz niżej).
-            isActive={activeAxis !== null ? activeAxis === axis.id : index === 0}
+            isActive={activeAxis === axis.id}
             isFocused={(hoveredAxis ?? activeAxis) === axis.id}
             onSelect={() => onSelect(axis.id)}
             onHover={(v) => onHover(v ? axis.id : null)}

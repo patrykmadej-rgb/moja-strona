@@ -160,13 +160,15 @@
     "h1Line1": "Człowiek. System.",
     "h1Line2": "Bezpieczeństwo.",
     "intro": "Łączę psychologię, kryminologię, wiktymologię i nauki o bezpieczeństwie, badając człowieka w relacji z traumą, przestępczością, instytucjami i konfliktem.",
-    "ctaExplore": "Poznaj moje obszary",
+    "ctaExplore": "Poznaj obszary badawcze",
+    "ctaPublications": "Zobacz publikacje",
     "mapAriaLabel": "Interaktywna mapa obszarów badawczych",
     "mapNodeOpenDetails": "zobacz szczegóły",
     "mapCenterLabel": "Człowiek · System · Bezpieczeństwo",
     "mapLabel": "Mapa badań",
     "mapMobileHint": "Dotknij węzła, aby rozwinąć szczegóły obszaru.",
-    "axesEyebrow": "Osie badawcze",
+    "axesEyebrow": "Obszary badawcze",
+    "featuredBadge": "Obszar wyróżniony",
     "expand": "Rozwiń",
     "selected": "Wybrany obszar",
     "questionsHeading": "Pytania badawcze",
@@ -174,11 +176,21 @@
     "seeRelatedProjects": "Zobacz powiązane projekty →",
     "currentWorkEyebrow": "W toku",
     "currentWorkHeading": "Aktualnie pracuję nad",
-    "currentWorkIntro": "Tematy w różnych fazach analizy i pisania — jeszcze nie gotowe publikacje.",
     "filterAll": "Wszystkie",
-    "carouselPrev": "Poprzednie projekty",
-    "carouselNext": "Następne projekty",
+    "seeAll": "Zobacz wszystkie",
+    "showLess": "Pokaż mniej",
     "inPreparation": "W opracowaniu",
-    "noResults": "Brak tematów w tej kategorii."
+    "noResults": "Brak tematów w tej kategorii.",
+    "approachEyebrow": "Jak pracuję badawczo",
+    "approachHeading": "Łączę rygor metodologiczny z wrażliwością na kontekst.",
+    "approachBody": "Opieram się na triangulacji danych, krytycznej analizie źródeł i podejściu interdyscyplinarnym. Pytam o mechanizmy, nie tylko o korelacje — i zawsze o znaczenie wyników dla praktyki.",
+    "approachLink": "Czytaj więcej o podejściu",
+    "questionsEyebrow": "Wybrane kierunki i pytania badawcze",
+    "researchQuestions": [
+      "Jak instytucje mogą skuteczniej chronić, nie reprodukując krzywdy?",
+      "Jak identyfikować zagrożenia bez naruszania praw jednostki?",
+      "Jak trauma kształtuje decyzje, relacje i zachowania społeczne?",
+      "Jak wspierać zdrowienie i odporność w społecznościach po konflikcie?"
+    ]
   }
 }

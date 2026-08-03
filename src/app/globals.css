@@ -53,6 +53,14 @@ html {
   --research-radius-lg: 22px;
   --research-radius-md: 16px;
   --research-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  font-family: var(--font-research-manrope), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Nagłówki tej podstrony (H1 hero + "lead" w sekcji końcowej) używają
+   Cormorant Garamond zamiast bazowego Manrope powyżej — zawężone przez klasę
+   zamiast selektora tagów, żeby nie dotykać np. h2/h3 w kartach interfejsu. */
+.research-page .research-font-display {
+  font-family: var(--font-research-cormorant), Georgia, serif;
 }
 
 /* Wyjątek od globalnej zasady "kwadratowych" rogów, celowy i ograniczony do tej
@@ -67,6 +75,9 @@ html {
 }
 .research-page .rounded-research-md {
   border-radius: var(--research-radius-md) !important;
+}
+.research-page .rounded-research-sm {
+  border-radius: 8px !important;
 }
 
 @keyframes research-breathe {
