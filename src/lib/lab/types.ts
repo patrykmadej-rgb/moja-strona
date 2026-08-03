@@ -25,6 +25,32 @@ export const ARTICLE_STATUS_LABELS: Record<ArticleStatus, string> = {
   published: "Opublikowano",
 };
 
+// Priorytet jest NIEZALEŻNY od statusu (ARTICLE_STATUSES powyżej) — służy
+// wyłącznie do porządkowania kolejności pracy, nie do śledzenia postępu.
+// Kolejność w tej tablicy to kolejność w dropdownach/formularzach (nie
+// sortować alfabetycznie) — kolejność SORTOWANIA listy artykułów jest inna,
+// patrz ARTICLE_PRIORITY_SORT_ORDER.
+export const ARTICLE_PRIORITIES = ["top", "medium", "low", "on_hold"] as const;
+export type ArticlePriorityValue = (typeof ARTICLE_PRIORITIES)[number];
+export type ArticlePriority = ArticlePriorityValue | null;
+
+export const ARTICLE_PRIORITY_LABELS: Record<ArticlePriorityValue, string> = {
+  top: "Top Priority",
+  medium: "Medium Priority",
+  low: "Low Priority",
+  on_hold: "On hold",
+};
+
+export const NO_PRIORITY_LABEL = "Bez priorytetu";
+
+/**
+ * Kolejność sortowania listy po priorytecie (nie kolejność w dropdownach —
+ * ta jest w ARTICLE_PRIORITIES powyżej). "Bez priorytetu" ląduje przed
+ * "On hold": artykuły wstrzymane są świadomie odłożone, więc trafiają na
+ * sam koniec, za artykułami bez ustalonego priorytetu.
+ */
+export const ARTICLE_PRIORITY_SORT_ORDER: ArticlePriority[] = ["top", "medium", "low", null, "on_hold"];
+
 export const LANGUAGES = ["pl", "en"] as const;
 export type LanguageCode = (typeof LANGUAGES)[number];
 export const LANGUAGE_LABELS: Record<LanguageCode, string> = {
@@ -50,6 +76,7 @@ export type Article = {
   keywords: string[];
   abstract: string | null;
   status: ArticleStatus;
+  priority: ArticlePriority;
   progress_percent: number;
   deadline: string | null;
   is_private: boolean;

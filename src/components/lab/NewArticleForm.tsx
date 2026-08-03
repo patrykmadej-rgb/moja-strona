@@ -4,7 +4,15 @@ import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { createArticle } from "@/app/lab/artykuly/actions";
 import DisciplinesField from "@/components/lab/DisciplinesField";
-import { ARTICLE_STATUSES, ARTICLE_STATUS_LABELS, LANGUAGES, LANGUAGE_LABELS } from "@/lib/lab/types";
+import {
+  ARTICLE_PRIORITIES,
+  ARTICLE_PRIORITY_LABELS,
+  ARTICLE_STATUSES,
+  ARTICLE_STATUS_LABELS,
+  LANGUAGES,
+  LANGUAGE_LABELS,
+  NO_PRIORITY_LABEL,
+} from "@/lib/lab/types";
 
 const inputClass =
   "border border-[#4A1D6E]/25 bg-white px-3 py-2 text-sm text-[#1C1028] outline-none focus:border-[#4A1D6E]";
@@ -42,7 +50,7 @@ export default function NewArticleForm() {
         <input id="title" name="title" required className={inputClass} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="status" className={labelClass}>
             Status
@@ -51,6 +59,19 @@ export default function NewArticleForm() {
             {ARTICLE_STATUSES.map((s) => (
               <option key={s} value={s}>
                 {ARTICLE_STATUS_LABELS[s]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="priority" className={labelClass}>
+            Priorytet
+          </label>
+          <select id="priority" name="priority" defaultValue="" className={inputClass}>
+            <option value="">{NO_PRIORITY_LABEL}</option>
+            {ARTICLE_PRIORITIES.map((p) => (
+              <option key={p} value={p}>
+                {ARTICLE_PRIORITY_LABELS[p]}
               </option>
             ))}
           </select>

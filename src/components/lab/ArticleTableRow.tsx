@@ -6,6 +6,7 @@ import Link from "next/link";
 import { IconDots } from "@tabler/icons-react";
 import { Download, MessageSquare } from "lucide-react";
 import StatusTag from "@/components/lab/StatusTag";
+import PriorityTag from "@/components/lab/PriorityTag";
 import { deleteArticle } from "@/app/lab/artykuly/actions";
 import { fileKindLabel, formatDateMedium, formatTimeOnly } from "@/lib/lab/format";
 import type { Article, LatestArticleVersion } from "@/lib/lab/types";
@@ -188,8 +189,9 @@ export default function ArticleTableRow({
       <div className="min-[900px]:hidden">
         <p className="line-clamp-2 text-[13px] font-semibold leading-[1.4] text-[#282130]">{article.title}</p>
         <p className="mt-1 truncate text-[11px] text-[#817887]">{article.target_journal || "Nie określono czasopisma"}</p>
-        <div className="mt-2.5">
+        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
           <StatusTag status={article.status} />
+          <PriorityTag priority={article.priority} compact={article.priority === "medium" || article.priority === "low"} />
         </div>
         <p className="mt-2.5 text-[11px] text-[#62596b]">
           Aktualizacja: {formatDateMedium(article.updated_at)}, {formatTimeOnly(article.updated_at)}
@@ -209,6 +211,11 @@ export default function ArticleTableRow({
           {article.title}
         </p>
         <p className="mt-1 truncate text-[11px] text-[#817887]">{article.target_journal || "Nie określono czasopisma"}</p>
+        {article.priority && (
+          <div className="mt-1">
+            <PriorityTag priority={article.priority} compact={article.priority === "medium" || article.priority === "low"} />
+          </div>
+        )}
       </div>
 
       <div className="hidden min-w-0 min-[900px]:flex min-[900px]:items-center">

@@ -3,12 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import {
+  ARTICLE_PRIORITIES,
   ARTICLE_STATUSES,
   ARTICLE_STATUS_LABELS,
   DISCIPLINES,
   LANGUAGES,
   READING_STATUSES,
   EVENT_TYPES,
+  type ArticlePriority,
   type ArticleStatus,
   type Discipline,
   type EventType,
@@ -51,6 +53,16 @@ function parseDisciplines(formData: FormData): Discipline[] {
     throw new Error("Wybierz przynajmniej jedną dyscyplinę.");
   }
   return unique as Discipline[];
+}
+
+/** Priorytet jest opcjonalny — pusta wartość formularza ("Bez priorytetu") to null, nie błąd. */
+function parsePriority(formData: FormData): ArticlePriority {
+  const raw = String(formData.get("priority") ?? "").trim();
+  if (!raw) return null;
+  if (!ARTICLE_PRIORITIES.includes(raw as (typeof ARTICLE_PRIORITIES)[number])) {
+    throw new Error("Nieprawidłowy priorytet.");
+  }
+  return raw as ArticlePriority;
 }
 
 /**
@@ -116,6 +128,36 @@ export async function updateArticleStatus(
 }
 
 /**
+ * Szybka zmiana priorytetu z nagłówka artykułu — analogicznie do
+ * updateArticleStatus, ale priorytet jest niezależnym wymiarem od statusu
+ * (nie loguje wpisu w osi czasu — to niższej wagi metadana porządkująca
+ * kolejność pracy, nie kamień milowy postępu artykułu).
+ */
+export async function updateArticlePriority(
+  articleId: string,
+  priority: ArticlePriority,
+): Promise<{ error: string } | { updated_at: string }> {
+  if (priority !== null && !ARTICLE_PRIORITIES.includes(priority)) {
+    return { error: "Nieprawidłowy priorytet." };
+  }
+
+  const supabase = await createClient();
+  const updated_at = new Date().toISOString();
+
+  const { error } = await supabase.from("articles").update({ priority, updated_at }).eq("id", articleId);
+
+  if (error) {
+    console.error("updateArticlePriority: zapis nie powiódł się", error);
+    return { error: "Nie udało się zmienić priorytetu." };
+  }
+
+  revalidatePath(`/lab/artykuly/${articleId}`);
+  revalidatePath("/lab/artykuly");
+
+  return { updated_at };
+}
+
+/**
  * Zwraca błąd jako wartość zamiast go rzucać — Next.js w buildzie
  * produkcyjnym zamienia treść RZUCONYCH wyjątków z akcji serwerowych na
  * ogólny komunikat ("An error occurred in the Server Components render…"),
@@ -151,6 +193,7 @@ export async function updateArticle(formData: FormData): Promise<{ error: string
     }
 
     const disciplines = parseDisciplines(formData);
+    const priority = parsePriority(formData);
 
     const chatgpt_link = parseOptionalHttpUrl(String(formData.get("chatgpt_link") ?? ""), "Link do ChatGPT");
 
@@ -164,6 +207,7 @@ export async function updateArticle(formData: FormData): Promise<{ error: string
         abstract: String(formData.get("abstract") ?? "").trim() || null,
         keywords,
         status,
+        priority,
         progress_percent,
         deadline: String(formData.get("deadline") ?? "").trim() || null,
         is_private: formData.get("is_private") === "on",

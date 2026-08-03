@@ -3,7 +3,16 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { ARTICLE_STATUSES, DISCIPLINES, LANGUAGES, type ArticleStatus, type Discipline, type LanguageCode } from "@/lib/lab/types";
+import {
+  ARTICLE_PRIORITIES,
+  ARTICLE_STATUSES,
+  DISCIPLINES,
+  LANGUAGES,
+  type ArticlePriority,
+  type ArticleStatus,
+  type Discipline,
+  type LanguageCode,
+} from "@/lib/lab/types";
 
 function parseDisciplines(formData: FormData): Discipline[] | { error: string } {
   const raw = formData.getAll("disciplines").map((v) => String(v));
@@ -17,6 +26,16 @@ function parseDisciplines(formData: FormData): Discipline[] | { error: string } 
     return { error: "Wybierz przynajmniej jedną dyscyplinę." };
   }
   return unique as Discipline[];
+}
+
+/** Priorytet jest opcjonalny — pusta wartość formularza ("Bez priorytetu") to null, nie błąd. */
+function parsePriority(formData: FormData): ArticlePriority | { error: string } {
+  const raw = String(formData.get("priority") ?? "").trim();
+  if (!raw) return null;
+  if (!ARTICLE_PRIORITIES.includes(raw as (typeof ARTICLE_PRIORITIES)[number])) {
+    return { error: "Nieprawidłowy priorytet." };
+  }
+  return raw as ArticlePriority;
 }
 
 /**
@@ -46,6 +65,10 @@ export async function createArticle(formData: FormData): Promise<{ error: string
   if (!Array.isArray(disciplinesResult)) return disciplinesResult;
   const disciplines = disciplinesResult;
 
+  const priorityResult = parsePriority(formData);
+  if (priorityResult !== null && typeof priorityResult === "object") return priorityResult;
+  const priority = priorityResult;
+
   const statusInput = String(formData.get("status") ?? "");
   const status: ArticleStatus = ARTICLE_STATUSES.includes(statusInput as ArticleStatus)
     ? (statusInput as ArticleStatus)
@@ -63,6 +86,7 @@ export async function createArticle(formData: FormData): Promise<{ error: string
     .insert({
       title,
       status,
+      priority,
       language_code,
       target_journal,
       disciplines,

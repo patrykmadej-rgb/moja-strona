@@ -2,13 +2,32 @@
 
 import { useEffect, useRef, useState } from "react";
 import { IconChevronDown, IconSearch } from "@tabler/icons-react";
+import { ARTICLE_PRIORITIES, ARTICLE_PRIORITY_LABELS, NO_PRIORITY_LABEL, type ArticlePriorityValue } from "@/lib/lab/types";
 
-export type SortKey = "updated_desc" | "title_asc" | "deadline_asc";
+export type SortKey = "updated_desc" | "title_asc" | "deadline_asc" | "priority";
 
 const SORT_LABELS: Record<SortKey, string> = {
   updated_desc: "Data aktualizacji",
   title_asc: "Tytuł A-Z",
   deadline_asc: "Deadline",
+  priority: "Priorytet",
+};
+
+/**
+ * Osobny wymiar filtrowania od paska statusów (ArticleStatusFilterBar) —
+ * priorytet i status to dwa niezależne osie organizacji (sekcja 9
+ * specyfikacji), więc ten filtr nie zastępuje ani nie miesza się z paskiem
+ * statusów.
+ */
+export type PriorityFilterValue = "all" | ArticlePriorityValue | "none";
+
+// Kolejność dokładnie jak w specyfikacji (sekcja 7) — "Bez priorytetu" na końcu.
+const PRIORITY_FILTER_OPTIONS: PriorityFilterValue[] = ["all", ...ARTICLE_PRIORITIES, "none"];
+
+const PRIORITY_FILTER_LABELS: Record<PriorityFilterValue, string> = {
+  all: "Wszystkie priorytety",
+  ...ARTICLE_PRIORITY_LABELS,
+  none: NO_PRIORITY_LABEL,
 };
 
 function DropdownButton({
@@ -91,11 +110,15 @@ export default function ArticlesToolbar({
   onQueryChange,
   sort,
   onSortChange,
+  priorityFilter,
+  onPriorityFilterChange,
 }: {
   query: string;
   onQueryChange: (value: string) => void;
   sort: SortKey;
   onSortChange: (value: SortKey) => void;
+  priorityFilter: PriorityFilterValue;
+  onPriorityFilterChange: (value: PriorityFilterValue) => void;
 }) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -114,6 +137,25 @@ export default function ArticlesToolbar({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
+        <DropdownButton label={PRIORITY_FILTER_LABELS[priorityFilter]}>
+          {(close) => (
+            <>
+              {PRIORITY_FILTER_OPTIONS.map((value) => (
+                <MenuItem
+                  key={value}
+                  active={priorityFilter === value}
+                  onClick={() => {
+                    onPriorityFilterChange(value);
+                    close();
+                  }}
+                >
+                  {PRIORITY_FILTER_LABELS[value]}
+                </MenuItem>
+              ))}
+            </>
+          )}
+        </DropdownButton>
+
         <DropdownButton label={`Sortuj: ${SORT_LABELS[sort]}`}>
           {(close) => (
             <>

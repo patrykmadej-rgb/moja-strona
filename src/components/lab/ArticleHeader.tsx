@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { IconArrowLeft, IconDots, IconEdit, IconLock, IconTrash } from "@tabler/icons-react";
 import ArticleStatusSelector from "@/components/lab/ArticleStatusSelector";
+import ArticlePrioritySelector from "@/components/lab/ArticlePrioritySelector";
 import QuickActionsToolbar from "@/components/lab/QuickActionsToolbar";
 import { deleteArticle } from "@/app/lab/artykuly/actions";
 import { formatDate } from "@/lib/lab/format";
@@ -47,6 +48,7 @@ export default function ArticleHeader({
 
         <div className="mt-3 flex flex-wrap items-center gap-4">
           <ArticleStatusSelector articleId={article.id} status={article.status} />
+          <ArticlePrioritySelector articleId={article.id} priority={article.priority} />
           {article.is_private && (
             <span className="flex items-center gap-1 text-xs text-[#706878]">
               <IconLock className="h-3.5 w-3.5" stroke={1.75} />
