@@ -10,19 +10,23 @@ import { useRevealOnce } from "./useRevealOnce";
 
 const NODE_ORDER: ResearchAxisId[] = ["balkans", "security", "profiling", "victimology", "clinical"];
 
-// Viewbox 900x580, centrum (450,290) r=86, węzły r=38 — patrz komentarz przy
+// Viewbox 900x580, centrum (450,290) r=95, węzły r=43 — patrz komentarz przy
 // RESEARCH_MAP_NODE_POSITIONS w research.ts dla pełnej geometrii. Każda krzywa
 // to kwadratowy Bézier (Q) liczony tak, żeby zaczynać się DOKŁADNIE na obwodzie
 // centralnego koła i kończyć DOKŁADNIE na obwodzie węzła (nie w jego środku, nie
 // w powietrzu przed nim) — punkt kontrolny przesunięty prostopadle do cięciwy o
 // ~10% jej długości, naprzemiennie w lewo/prawo, żeby linie miały organiczny,
-// lekko "wachlarzowy" wygląd zamiast sztywnych prostych.
+// lekko "wachlarzowy" wygląd zamiast sztywnych prostych. Promienie r=95/r=43
+// odzwierciedlają powiększone koło centralne (19%→21% szerokości) i węzły
+// (40-58px→45-65px) — przy zmianie rozmiaru okręgów w JSX niżej te krzywe
+// MUSZĄ zostać przeliczone na nowo, inaczej linie zaczną się urywać przed
+// nowymi (większymi) krawędziami okręgów.
 const CONNECTIONS: { axis: ResearchAxisId; d: string }[] = [
-  { axis: "balkans", d: "M378 242Q352 199 302 191" },
-  { axis: "security", d: "M522 242Q548 199 598 191" },
-  { axis: "profiling", d: "M371 325Q287 331 225 390" },
-  { axis: "clinical", d: "M529 325Q613 331 675 390" },
-  { axis: "victimology", d: "M450 376Q432 402 450 427" },
+  { axis: "balkans", d: "M372 236Q345 188 290 179" },
+  { axis: "security", d: "M526 233Q547 189 596 181" },
+  { axis: "profiling", d: "M362 327Q277 330 215 388" },
+  { axis: "clinical", d: "M538 327Q623 330 685 388" },
+  { axis: "victimology", d: "M450 385Q434 395 450 405" },
 ];
 
 // Dwie szerokie orbity (górna, dolna) — czysto dekoracyjne, nie łączą
@@ -32,11 +36,11 @@ const BOTTOM_ORBIT = "M90 385C260 560 640 560 810 385";
 
 // Środek każdej krzywej z CONNECTIONS (t=0.5 na Q), jeden świecący punkt na linię.
 const CONNECTION_DOTS = [
-  { cx: 346, cy: 208, duration: 3.8 },
-  { cx: 554, cy: 208, duration: 4.2 },
-  { cx: 292, cy: 344, duration: 4.6 },
-  { cx: 608, cy: 344, duration: 5 },
-  { cx: 441, cy: 402, duration: 5.2 },
+  { cx: 338, cy: 198, duration: 3.8 },
+  { cx: 554, cy: 198, duration: 4.2 },
+  { cx: 283, cy: 344, duration: 4.6 },
+  { cx: 617, cy: 344, duration: 5 },
+  { cx: 442, cy: 395, duration: 5.2 },
 ];
 
 type Labels = {
@@ -97,7 +101,7 @@ export default function ResearchMap({
   return (
     <div data-reveal={revealed ? "in" : undefined} style={{ transitionDelay: "100ms" }}>
       {/* ============ DESKTOP / TABLET: scena z warstwami ============ */}
-      <p className="mb-3 hidden text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] min-[720px]:block dark:text-purple-400">
+      <p className="mb-4 hidden text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] min-[720px]:block dark:text-purple-400">
         {labels.mapLabel}
       </p>
       <div
@@ -115,8 +119,8 @@ export default function ResearchMap({
         <div
           className="absolute inset-0"
           style={{
-            maskImage: "radial-gradient(ellipse 72% 78% at 50% 52%, black 45%, transparent 94%)",
-            WebkitMaskImage: "radial-gradient(ellipse 72% 78% at 50% 52%, black 45%, transparent 94%)",
+            maskImage: "radial-gradient(ellipse 72% 78% at 50% 52%, black 48%, transparent 94%)",
+            WebkitMaskImage: "radial-gradient(ellipse 72% 78% at 50% 52%, black 48%, transparent 94%)",
           }}
         >
           {hasBackgroundImage ? (
@@ -147,7 +151,7 @@ export default function ResearchMap({
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(circle at 50% 51%, rgba(107,58,145,0.16), transparent 58%)",
+                "radial-gradient(circle at 50% 51%, rgba(107,58,145,0.19), transparent 58%)",
             }}
           />
         </div>
@@ -197,12 +201,12 @@ export default function ResearchMap({
           </g>
         </svg>
 
-        {/* Warstwa 4: centralny medalion (dekoracyjny) — 19% szerokości kontenera,
-            czyli promień r≈86 w jednostkach viewBox 900×580 (2 * (0.19*900/2) / 900
-            = 0.19), spójne z promieniem Rc użytym do liczenia CONNECTIONS. */}
+        {/* Warstwa 4: centralny medalion (dekoracyjny) — 21% szerokości kontenera,
+            czyli promień r≈95 w jednostkach viewBox 900×580 (2 * (0.21*900/2) / 900
+            = 0.21), spójne z promieniem Rc użytym do liczenia CONNECTIONS. */}
         <div
           aria-hidden="true"
-          className="absolute top-1/2 left-1/2 w-[19%] -translate-x-1/2 -translate-y-1/2"
+          className="absolute top-1/2 left-1/2 w-[21%] -translate-x-1/2 -translate-y-1/2"
           style={{ animation: "research-breathe 5.5s ease-in-out infinite" }}
         >
           <Image
@@ -244,19 +248,20 @@ export default function ResearchMap({
                 opacity: isDimmed ? 0.38 : 1,
                 transform: isFocused ? "translate(-50%, calc(-50% - 3px)) scale(1.04)" : "translate(-50%, -50%) scale(1)",
                 transition: "opacity 250ms var(--research-ease), transform 250ms var(--research-ease)",
-                // Odstęp ikona→etykieta ~10-16px (docelowe 10-18px z mockupu), żeby
-                // etykieta "przywierała" do węzła zamiast wyglądać jak osobny napis.
-                gap: "clamp(10px, 1.8cqw, 16px)",
+                // Odstęp ikona→etykieta ~10-14px, żeby etykieta "przywierała" do węzła
+                // zamiast wyglądać jak osobny napis.
+                gap: "clamp(10px, 1.6cqw, 14px)",
               }}
               className="group absolute flex flex-col items-center rounded-research-md p-1.5 text-center outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2 focus-visible:ring-[var(--research-gold)]"
             >
               <span
                 className="flex items-center justify-center rounded-full bg-[var(--research-paper)]"
                 style={{
-                  // ~48-58px na desktopie (kontener query ok. 600-700px szerokości),
-                  // lekko mniejsze na tablecie dzięki mniejszemu cqw, nigdy poniżej 40px.
-                  width: "clamp(40px, 8cqw, 58px)",
-                  height: "clamp(40px, 8cqw, 58px)",
+                  // ~45-65px na desktopie (kontener query ok. 600-700px szerokości, +~12%
+                  // względem poprzedniej wersji), lekko mniejsze na tablecie dzięki
+                  // mniejszemu cqw, nigdy poniżej 45px.
+                  width: "clamp(45px, 9cqw, 65px)",
+                  height: "clamp(45px, 9cqw, 65px)",
                   border: "1.5px solid",
                   borderColor: isFocused ? "var(--research-gold)" : "var(--research-amethyst)",
                   boxShadow: isFocused
@@ -266,10 +271,10 @@ export default function ResearchMap({
                   transition: "border-color 250ms var(--research-ease), box-shadow 250ms var(--research-ease), color 250ms var(--research-ease)",
                 }}
               >
-                <Icon style={{ width: "clamp(20px, 4cqw, 30px)", height: "clamp(20px, 4cqw, 30px)" }} />
+                <Icon style={{ width: "clamp(22px, 4.5cqw, 34px)", height: "clamp(22px, 4.5cqw, 34px)" }} />
               </span>
               <span
-                className="max-w-[9rem] leading-tight font-semibold text-[var(--research-plum-800)] dark:text-white"
+                className="max-w-[10.5rem] leading-tight font-semibold text-[var(--research-plum-800)] dark:text-white"
                 style={{ fontSize: "clamp(10px, 2cqw, 15px)" }}
               >
                 {axis.shortTitle}

@@ -56,24 +56,24 @@ export type CurrentWorkItem = {
 /**
  * Pozycje węzłów na mapie badań (desktop), w procentach kontenera 900×580.
  * Wyprowadzone geometrycznie z viewBox-owych współrzędnych (patrz niżej):
- *   center: (450,290) r=86
- *   balkans: (270,170)   security: (630,170)
- *   profiling: (190,405) clinical: (710,405)
- *   victimology: (450,465)
- * Elipsoidalny, symetryczny wokół pionowej osi x=450 układ — dwa węzły u góry,
- * dwa po bokach niżej, jeden na dole na środku. Odległości od centrum dobrane
- * tak, żeby każde połączenie (patrz CONNECTIONS w ResearchMap.tsx) miało
- * widoczny, niezerowy odcinek między obwodem centralnego koła (r=86) a
- * obwodem węzła (r=38), a etykieta pod węzłem mieściła się w viewBoksie.
- * Musi zostać spójne z CONNECTIONS/CONNECTION_DOTS/TOP_ORBIT/BOTTOM_ORBIT
- * w ResearchMap.tsx, które są liczone z tych samych współrzędnych viewBox.
+ *   center: (450,290) r=95
+ *   balkans: (255,155)   security: (630,155)
+ *   profiling: (175,405) clinical: (725,405)
+ *   victimology: (450,448)
+ * Delikatnie "rozsunięty" wariant poprzedniego układu — balkans wyżej i bardziej
+ * w lewo, security wyżej, profiling bardziej w lewo, clinical bardziej w prawo,
+ * victimology wyżej (żeby jego etykieta nie kończyła się tuż przy dolnej
+ * krawędzi wrappera). Centralne koło i węzły powiększone (r=95/r=43, wcześniej
+ * r=86/r=38) — patrz CONNECTIONS w ResearchMap.tsx, które MUSZĄ pozostać
+ * spójne z tymi samymi współrzędnymi viewBox (podobnie CONNECTION_DOTS/
+ * TOP_ORBIT/BOTTOM_ORBIT).
  */
 export const RESEARCH_MAP_NODE_POSITIONS: Record<ResearchAxisId, { x: number; y: number }> = {
-  balkans: { x: 30, y: 29.31 },
-  security: { x: 70, y: 29.31 },
-  profiling: { x: 21.11, y: 69.83 },
-  victimology: { x: 50, y: 80.17 },
-  clinical: { x: 78.89, y: 69.83 },
+  balkans: { x: 28.33, y: 26.72 },
+  security: { x: 70, y: 26.72 },
+  profiling: { x: 19.44, y: 69.83 },
+  victimology: { x: 50, y: 77.24 },
+  clinical: { x: 80.56, y: 69.83 },
 };
 
 export const researchAxes: ResearchAxis[] = [

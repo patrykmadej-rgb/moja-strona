@@ -102,7 +102,13 @@ export default function ResearchInteractive({
           className={`${RESEARCH_CONTAINER_CLASS} grid grid-cols-1 items-center gap-10 min-[1200px]:grid-cols-[minmax(420px,0.9fr)_minmax(520px,1.1fr)] min-[1200px]:gap-16`}
         >
           <div className="w-full">{heroLeft}</div>
-          <div className="w-full">
+          {/* items-center centruje kolumnę mapy w wysokości wiersza (mapa jest wyższa
+              niż tekst), zostawiając pas pustej przestrzeni nad i pod nią w równych
+              częściach. Drobne przesunięcie w górę/lewo — tylko w układzie
+              dwukolumnowym (≥1200px) — zjada część górnego zapasu, żeby diagram
+              wizualnie zbliżył się do wysokości nagłówka po lewej, nie wychodząc poza
+              wiersz (zapas nad kolumną jest większy niż przesunięcie). */}
+          <div className="w-full min-[1200px]:translate-x-[-15px] min-[1200px]:translate-y-[-25px]">
             <ResearchMap
               axes={axes}
               activeAxis={activeAxis}

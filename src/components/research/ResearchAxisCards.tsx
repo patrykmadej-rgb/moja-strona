@@ -70,7 +70,7 @@ function AxisCard({
         outline: highlightPulse ? "3px solid var(--research-gold)" : undefined,
         outlineOffset: highlightPulse ? "3px" : undefined,
       }}
-      className={`group relative flex min-h-[200px] flex-col overflow-hidden rounded-research-md border p-6 text-left transition-[transform,box-shadow,border-color] duration-[250ms] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[var(--research-gold)] ${
+      className={`group relative flex min-h-[220px] flex-col overflow-hidden rounded-research-md border p-6 text-left transition-[transform,box-shadow,border-color] duration-[250ms] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[var(--research-gold)] ${
         isFeatured
           ? "border-transparent bg-gradient-to-br from-[var(--research-lavender-soft)] to-[#fbf7ec]"
           : "border-[var(--research-line)] bg-[var(--research-paper)] dark:border-white/10 dark:bg-neutral-900"
@@ -111,7 +111,7 @@ function AxisCard({
       <p className="mt-4 line-clamp-2 text-base font-bold leading-snug text-[#1C1028] dark:text-white">
         {axis.shortTitle}
       </p>
-      <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[#4A3360] dark:text-neutral-300">
+      <p className="mt-2 line-clamp-4 text-sm leading-relaxed text-[#4A3360] dark:text-neutral-300">
         {axis.description}
       </p>
 
@@ -153,7 +153,10 @@ export default function ResearchAxisCards({
   }, [activeAxis]);
 
   return (
-    <section id="osie-badawcze" className={`${RESEARCH_CONTAINER_CLASS} hidden pt-12 lg:pt-16 min-[720px]:block`}>
+    <section
+      id="osie-badawcze"
+      className={`${RESEARCH_CONTAINER_CLASS} hidden pt-7 min-[1200px]:pt-5 min-[720px]:block`}
+    >
       <h2 className="text-xs font-semibold tracking-[0.22em] uppercase text-[#4A1D6E] dark:text-purple-400">
         {labels.axesEyebrow}
       </h2>
