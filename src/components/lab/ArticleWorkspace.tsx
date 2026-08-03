@@ -39,8 +39,6 @@ export default function ArticleWorkspace({
   const [tab, setTab] = useState<TabKey>(isValidTab(tabParam) ? tabParam : "przeglad");
   const [editing, setEditing] = useState(searchParams.get("edit") === "1");
 
-  const latestVersion = versions[0] ?? null;
-
   return (
     <div className="lab-article-page min-h-full bg-[#f7f4ef]">
       <div className="mx-auto max-w-[1180px] px-8 pt-9 pb-16">
@@ -63,12 +61,7 @@ export default function ArticleWorkspace({
 
             <div className="mt-6">
               {tab === "przeglad" && (
-                <ArticleOverview
-                  article={article}
-                  latestVersion={latestVersion}
-                  events={events}
-                  onNavigateTab={setTab}
-                />
+                <ArticleOverview article={article} versions={versions} onNavigateTab={setTab} />
               )}
               {tab === "wersje" && <VersionsTab articleId={article.id} versions={versions} />}
               {tab === "zrodla" && <SourcesTab articleId={article.id} sources={sources} />}
