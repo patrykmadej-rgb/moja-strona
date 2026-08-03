@@ -4,14 +4,17 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import {
   ARTICLE_STATUSES,
+  ARTICLE_STATUS_LABELS,
   DISCIPLINES,
   LANGUAGES,
   READING_STATUSES,
   EVENT_TYPES,
+  type ArticleStatus,
   type Discipline,
   type EventType,
   type LanguageCode,
 } from "@/lib/lab/types";
+import { todayDateString } from "@/lib/lab/format";
 
 const VERSIONS_BUCKET = "article-versions";
 
@@ -48,6 +51,68 @@ function parseDisciplines(formData: FormData): Discipline[] {
     throw new Error("Wybierz przynajmniej jedną dyscyplinę.");
   }
   return unique as Discipline[];
+}
+
+/**
+ * Szybka zmiana statusu z nagłówka artykułu (bez otwierania pełnego
+ * formularza edycji) — ta sama autoryzacja co updateArticle: klient
+ * cookie-based (@/lib/supabase/server), nie service role, więc RLS nadal
+ * obowiązuje. Prawdziwy błąd logowany po stronie serwera, użytkownikowi
+ * pokazywany tylko ogólny komunikat (patrz komentarz przy updateArticle).
+ */
+export async function updateArticleStatus(
+  articleId: string,
+  status: ArticleStatus,
+): Promise<{ error: string } | { updated_at: string }> {
+  if (!ARTICLE_STATUSES.includes(status)) {
+    return { error: "Nieprawidłowy status." };
+  }
+
+  const supabase = await createClient();
+
+  const { data: current, error: fetchError } = await supabase
+    .from("articles")
+    .select("status")
+    .eq("id", articleId)
+    .single();
+
+  if (fetchError) {
+    console.error("updateArticleStatus: nie udało się odczytać artykułu", fetchError);
+    return { error: "Nie udało się zmienić statusu." };
+  }
+
+  const previousStatus = current.status as ArticleStatus;
+  const updated_at = new Date().toISOString();
+
+  const { error } = await supabase
+    .from("articles")
+    .update({ status, updated_at })
+    .eq("id", articleId);
+
+  if (error) {
+    console.error("updateArticleStatus: zapis nie powiódł się", error);
+    return { error: "Nie udało się zmienić statusu." };
+  }
+
+  if (previousStatus !== status) {
+    const { error: eventError } = await supabase.from("article_events").insert({
+      article_id: articleId,
+      title: `Status zmieniono z ${ARTICLE_STATUS_LABELS[previousStatus] ?? previousStatus} na ${ARTICLE_STATUS_LABELS[status]}`,
+      event_type: "milestone" satisfies EventType,
+      event_date: todayDateString(),
+      is_completed: true,
+    });
+    // Wpis w osi czasu jest funkcją pomocniczą — jego ewentualna awaria nie
+    // powinna cofać już udanej zmiany statusu, tylko trafić do logów.
+    if (eventError) {
+      console.error("updateArticleStatus: nie udało się dodać wpisu w osi czasu", eventError);
+    }
+  }
+
+  revalidatePath(`/lab/artykuly/${articleId}`);
+  revalidatePath("/lab/artykuly");
+
+  return { updated_at };
 }
 
 /**

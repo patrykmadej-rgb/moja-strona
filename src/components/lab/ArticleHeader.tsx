@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { IconArrowLeft, IconDots, IconEdit, IconLock, IconTrash } from "@tabler/icons-react";
-import StatusTag from "@/components/lab/StatusTag";
+import ArticleStatusSelector from "@/components/lab/ArticleStatusSelector";
 import QuickActionsToolbar from "@/components/lab/QuickActionsToolbar";
 import { deleteArticle } from "@/app/lab/artykuly/actions";
 import { formatDate } from "@/lib/lab/format";
@@ -46,7 +46,7 @@ export default function ArticleHeader({
         </h1>
 
         <div className="mt-3 flex flex-wrap items-center gap-4">
-          <StatusTag status={article.status} />
+          <ArticleStatusSelector articleId={article.id} status={article.status} />
           {article.is_private && (
             <span className="flex items-center gap-1 text-xs text-[#706878]">
               <IconLock className="h-3.5 w-3.5" stroke={1.75} />
