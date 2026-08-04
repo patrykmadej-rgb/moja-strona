@@ -10,37 +10,40 @@ import { useRevealOnce } from "./useRevealOnce";
 
 const NODE_ORDER: ResearchAxisId[] = ["balkans", "security", "profiling", "victimology", "clinical"];
 
-// Viewbox 900x580, centrum (450,290) r=95, węzły r=43 — patrz komentarz przy
-// RESEARCH_MAP_NODE_POSITIONS w research.ts dla pełnej geometrii. Każda krzywa
-// to kwadratowy Bézier (Q) liczony tak, żeby zaczynać się DOKŁADNIE na obwodzie
+// Viewbox 900x580, centrum (450,276) r=95, węzły r=43 — patrz komentarz przy
+// RESEARCH_MAP_NODE_POSITIONS w research.ts dla pełnej geometrii (centrum
+// przesunięte ~14 jednostek wyżej, boczne węzły ściągnięte bliżej środka —
+// bardziej zwarta, mniej rozciągnięta pozioma kompozycja). Każda krzywa to
+// kwadratowy Bézier (Q) liczony tak, żeby zaczynać się DOKŁADNIE na obwodzie
 // centralnego koła i kończyć DOKŁADNIE na obwodzie węzła (nie w jego środku, nie
 // w powietrzu przed nim) — punkt kontrolny przesunięty prostopadle do cięciwy o
 // ~10% jej długości, naprzemiennie w lewo/prawo, żeby linie miały organiczny,
-// lekko "wachlarzowy" wygląd zamiast sztywnych prostych. Promienie r=95/r=43
-// odzwierciedlają powiększone koło centralne (19%→21% szerokości) i węzły
-// (40-58px→45-65px) — przy zmianie rozmiaru okręgów w JSX niżej te krzywe
-// MUSZĄ zostać przeliczone na nowo, inaczej linie zaczną się urywać przed
-// nowymi (większymi) krawędziami okręgów.
+// lekko "wachlarzowy" wygląd zamiast sztywnych prostych. Promienie r=95/r=43 BEZ
+// ZMIAN względem poprzedniej wersji — przy zmianie pozycji węzłów w
+// RESEARCH_MAP_NODE_POSITIONS te krzywe MUSZĄ zostać przeliczone na nowo,
+// inaczej linie zaczną się urywać przed (lub za) nowymi pozycjami okręgów.
 const CONNECTIONS: { axis: ResearchAxisId; d: string }[] = [
-  { axis: "balkans", d: "M372 236Q345 188 290 179" },
-  { axis: "security", d: "M526 233Q547 189 596 181" },
-  { axis: "profiling", d: "M362 327Q277 330 215 388" },
-  { axis: "clinical", d: "M538 327Q623 330 685 388" },
-  { axis: "victimology", d: "M450 385Q434 395 450 405" },
+  { axis: "balkans", d: "M372 222Q354 183 311 180" },
+  { axis: "security", d: "M527 220Q542 184 581 180" },
+  { axis: "profiling", d: "M365 319Q285 326 231 386" },
+  { axis: "clinical", d: "M537 315Q614 318 669 373" },
+  { axis: "victimology", d: "M450 371Q434 380 450 388" },
 ];
 
 // Dwie szerokie orbity (górna, dolna) — czysto dekoracyjne, nie łączą
 // konkretnych węzłów, tylko "obejmują" całą kompozycję łagodnym łukiem.
-const TOP_ORBIT = "M100 205C255 65 645 65 800 205";
-const BOTTOM_ORBIT = "M90 385C260 560 640 560 810 385";
+// Szerokość zwężona o ~5% (skalowana wokół x=450) razem ze ściągniętą do
+// środka kompozycją węzłów.
+const TOP_ORBIT = "M118 205C265 65 635 65 783 205";
+const BOTTOM_ORBIT = "M108 385C270 560 631 560 792 385";
 
 // Środek każdej krzywej z CONNECTIONS (t=0.5 na Q), jeden świecący punkt na linię.
 const CONNECTION_DOTS = [
-  { cx: 338, cy: 198, duration: 3.8 },
-  { cx: 554, cy: 198, duration: 4.2 },
-  { cx: 283, cy: 344, duration: 4.6 },
-  { cx: 617, cy: 344, duration: 5 },
-  { cx: 442, cy: 395, duration: 5.2 },
+  { cx: 348, cy: 192, duration: 3.8 },
+  { cx: 548, cy: 192, duration: 4.2 },
+  { cx: 292, cy: 339, duration: 4.6 },
+  { cx: 608, cy: 331, duration: 5 },
+  { cx: 442, cy: 380, duration: 5.2 },
 ];
 
 type Labels = {
@@ -202,11 +205,14 @@ export default function ResearchMap({
         </svg>
 
         {/* Warstwa 4: centralny medalion (dekoracyjny) — 21% szerokości kontenera,
-            czyli promień r≈95 w jednostkach viewBox 900×580 (2 * (0.21*900/2) / 900
-            = 0.21), spójne z promieniem Rc użytym do liczenia CONNECTIONS. */}
+            czyli promień r≈95 w jednostkach viewBox 900×580, spójne z promieniem Rc
+            użytym do liczenia CONNECTIONS. top-[47.59%] zamiast top-1/2 (środek 276
+            zamiast 290 w skali 580) — to jest to samo przesunięcie w górę, które
+            dostały współrzędne w RESEARCH_MAP_NODE_POSITIONS/CONNECTIONS, rozmiar
+            koła bez zmian. */}
         <div
           aria-hidden="true"
-          className="absolute top-1/2 left-1/2 w-[21%] -translate-x-1/2 -translate-y-1/2"
+          className="absolute top-[47.59%] left-1/2 w-[21%] -translate-x-1/2 -translate-y-1/2"
           style={{ animation: "research-breathe 5.5s ease-in-out infinite" }}
         >
           <Image
@@ -248,9 +254,9 @@ export default function ResearchMap({
                 opacity: isDimmed ? 0.38 : 1,
                 transform: isFocused ? "translate(-50%, calc(-50% - 3px)) scale(1.04)" : "translate(-50%, -50%) scale(1)",
                 transition: "opacity 250ms var(--research-ease), transform 250ms var(--research-ease)",
-                // Odstęp ikona→etykieta ~10-14px, żeby etykieta "przywierała" do węzła
-                // zamiast wyglądać jak osobny napis.
-                gap: "clamp(10px, 1.6cqw, 14px)",
+                // Odstęp ikona→etykieta ~8-12px, żeby etykieta jeszcze bliżej
+                // "przywierała" do węzła zamiast wyglądać jak osobny napis.
+                gap: "clamp(8px, 1.3cqw, 12px)",
               }}
               className="group absolute flex flex-col items-center rounded-research-md p-1.5 text-center outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2 focus-visible:ring-[var(--research-gold)]"
             >

@@ -8,6 +8,10 @@ export type LocalizedResearchAxis = {
   icon: string;
   title: string;
   shortTitle: string;
+  /** Krótki, 1-zdaniowy opis na front karty w sekcji "Obszary badawcze" — nie
+   * mylić z `description` (pełniejszy tekst używany w rozwiniętym panelu
+   * szczegółów), który jest zbyt długi, żeby zmieścić się bez ucinania. */
+  cardDescription: string;
   description: string;
   tags: string[];
   questions: string[];
@@ -30,6 +34,9 @@ export type ResearchAxis = {
   shortTitlePl: string;
   shortTitleEn: string;
   shortTitleIt: string;
+  cardDescriptionPl: string;
+  cardDescriptionEn: string;
+  cardDescriptionIt: string;
   descriptionPl: string;
   descriptionEn: string;
   descriptionIt: string;
@@ -56,24 +63,24 @@ export type CurrentWorkItem = {
 /**
  * Pozycje węzłów na mapie badań (desktop), w procentach kontenera 900×580.
  * Wyprowadzone geometrycznie z viewBox-owych współrzędnych (patrz niżej):
- *   center: (450,290) r=95
- *   balkans: (255,155)   security: (630,155)
- *   profiling: (175,405) clinical: (725,405)
- *   victimology: (450,448)
- * Delikatnie "rozsunięty" wariant poprzedniego układu — balkans wyżej i bardziej
- * w lewo, security wyżej, profiling bardziej w lewo, clinical bardziej w prawo,
- * victimology wyżej (żeby jego etykieta nie kończyła się tuż przy dolnej
- * krawędzi wrappera). Centralne koło i węzły powiększone (r=95/r=43, wcześniej
- * r=86/r=38) — patrz CONNECTIONS w ResearchMap.tsx, które MUSZĄ pozostać
- * spójne z tymi samymi współrzędnymi viewBox (podobnie CONNECTION_DOTS/
- * TOP_ORBIT/BOTTOM_ORBIT).
+ *   center: (450,276) r=95
+ *   balkans: (276,155)   security: (616,155)
+ *   profiling: (193,405) clinical: (708,391)
+ *   victimology: (450,431)
+ * Bardziej zwarty, "ściągnięty do środka" wariant poprzedniego układu — boczne
+ * węzły przysunięte bliżej centrum (mniej rozciągnięty poziomo), centrum i dolny
+ * węzeł (wiktymologia) przesunięte wyżej, clinical dodatkowo lekko wyżej.
+ * Rozmiar centralnego koła (r=95) i węzłów (r=43) BEZ ZMIAN — to tylko
+ * przesunięcie pozycji, nie skalowanie. CONNECTIONS w ResearchMap.tsx MUSZĄ
+ * pozostać spójne z tymi samymi współrzędnymi viewBox (podobnie
+ * CONNECTION_DOTS/TOP_ORBIT/BOTTOM_ORBIT).
  */
 export const RESEARCH_MAP_NODE_POSITIONS: Record<ResearchAxisId, { x: number; y: number }> = {
-  balkans: { x: 28.33, y: 26.72 },
-  security: { x: 70, y: 26.72 },
-  profiling: { x: 19.44, y: 69.83 },
-  victimology: { x: 50, y: 77.24 },
-  clinical: { x: 80.56, y: 69.83 },
+  balkans: { x: 30.67, y: 26.72 },
+  security: { x: 68.44, y: 26.72 },
+  profiling: { x: 21.44, y: 69.83 },
+  victimology: { x: 50, y: 74.31 },
+  clinical: { x: 78.67, y: 67.41 },
 };
 
 export const researchAxes: ResearchAxis[] = [
@@ -91,6 +98,11 @@ export const researchAxes: ResearchAxis[] = [
     shortTitleEn: "Bałkany i separatyzmy",
     // TODO: przetłumaczyć na IT
     shortTitleIt: "Bałkany i separatyzmy",
+    cardDescriptionPl: "Badania nad mniejszościami, wielokulturowością i tendencjami separatystycznymi.",
+    // TODO: przetłumaczyć na EN
+    cardDescriptionEn: "Badania nad mniejszościami, wielokulturowością i tendencjami separatystycznymi.",
+    // TODO: przetłumaczyć na IT
+    cardDescriptionIt: "Badania nad mniejszościami, wielokulturowością i tendencjami separatystycznymi.",
     descriptionPl:
       "Badania nad mniejszościami, wielokulturowością, tożsamością, tendencjami separatystycznymi oraz ich wpływem na bezpieczeństwo państw i regionów.",
     // TODO: przetłumaczyć na EN
@@ -136,6 +148,11 @@ export const researchAxes: ResearchAxis[] = [
     shortTitleEn: "Psychologia bezpieczeństwa",
     // TODO: przetłumaczyć na IT
     shortTitleIt: "Psychologia bezpieczeństwa",
+    cardDescriptionPl: "Wykorzystanie psychologii do identyfikowania zagrożeń i wspierania prewencji.",
+    // TODO: przetłumaczyć na EN
+    cardDescriptionEn: "Wykorzystanie psychologii do identyfikowania zagrożeń i wspierania prewencji.",
+    // TODO: przetłumaczyć na IT
+    cardDescriptionIt: "Wykorzystanie psychologii do identyfikowania zagrożeń i wspierania prewencji.",
     descriptionPl:
       "Wykorzystanie psychologii do identyfikowania zagrożeń, zapobiegania przemocy i wspierania decyzji służących zwiększaniu bezpieczeństwa.",
     // TODO: przetłumaczyć na EN
@@ -181,6 +198,11 @@ export const researchAxes: ResearchAxis[] = [
     shortTitleEn: "Profilowanie i kryminologia",
     // TODO: przetłumaczyć na IT
     shortTitleIt: "Profilowanie i kryminologia",
+    cardDescriptionPl: "Krytyczna ocena profilowania, diagnostyki sądowej i zachowań przestępczych.",
+    // TODO: przetłumaczyć na EN
+    cardDescriptionEn: "Krytyczna ocena profilowania, diagnostyki sądowej i zachowań przestępczych.",
+    // TODO: przetłumaczyć na IT
+    cardDescriptionIt: "Krytyczna ocena profilowania, diagnostyki sądowej i zachowań przestępczych.",
     descriptionPl:
       "Krytyczna ocena profilowania, diagnostyki sądowej oraz wykorzystania temperamentu, osobowości i psychopatologii w analizie zachowań przestępczych.",
     // TODO: przetłumaczyć na EN
@@ -226,6 +248,11 @@ export const researchAxes: ResearchAxis[] = [
     shortTitleEn: "Wiktymologia, trauma i zdrowienie",
     // TODO: przetłumaczyć na IT
     shortTitleIt: "Wiktymologia, trauma i zdrowienie",
+    cardDescriptionPl: "Klasyfikacja ofiar, mechanizmy wiktymizacji i procesy zdrowienia.",
+    // TODO: przetłumaczyć na EN
+    cardDescriptionEn: "Klasyfikacja ofiar, mechanizmy wiktymizacji i procesy zdrowienia.",
+    // TODO: przetłumaczyć na IT
+    cardDescriptionIt: "Klasyfikacja ofiar, mechanizmy wiktymizacji i procesy zdrowienia.",
     descriptionPl:
       "Klasyfikacja ofiar, mechanizmy wiktymizacji, trauma oraz czynniki wspierające odbudowę sprawczości, dobrostanu i poczucia bezpieczeństwa.",
     // TODO: przetłumaczyć na EN
@@ -271,6 +298,11 @@ export const researchAxes: ResearchAxis[] = [
     shortTitleEn: "Psychologia kliniczna",
     // TODO: przetłumaczyć na IT
     shortTitleIt: "Psychologia kliniczna",
+    cardDescriptionPl: "Badania nad ograniczeniami diagnostyki, depresją, ADHD i lękiem.",
+    // TODO: przetłumaczyć na EN
+    cardDescriptionEn: "Badania nad ograniczeniami diagnostyki, depresją, ADHD i lękiem.",
+    // TODO: przetłumaczyć na IT
+    cardDescriptionIt: "Badania nad ograniczeniami diagnostyki, depresją, ADHD i lękiem.",
     descriptionPl:
       "Badania nad ograniczeniami diagnostyki, depresją atypową, ADHD, zaburzeniami lękowymi oraz relacją między psychopatologią, sprawstwem i wiktymizacją.",
     // TODO: przetłumaczyć na EN
@@ -458,6 +490,7 @@ export function localizeAxis(axis: ResearchAxis, locale: string): LocalizedResea
     icon: axis.icon,
     title: pick(locale, axis.titlePl, axis.titleEn, axis.titleIt),
     shortTitle: pick(locale, axis.shortTitlePl, axis.shortTitleEn, axis.shortTitleIt),
+    cardDescription: pick(locale, axis.cardDescriptionPl, axis.cardDescriptionEn, axis.cardDescriptionIt),
     description: pick(locale, axis.descriptionPl, axis.descriptionEn, axis.descriptionIt),
     tags: pick(locale, axis.tagsPl, axis.tagsEn, axis.tagsIt),
     questions: pick(locale, axis.questionsPl, axis.questionsEn, axis.questionsIt),

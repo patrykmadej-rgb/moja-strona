@@ -112,7 +112,7 @@ function AxisCard({
         {axis.shortTitle}
       </p>
       <p className="mt-2 line-clamp-4 text-sm leading-relaxed text-[#4A3360] dark:text-neutral-300">
-        {axis.description}
+        {axis.cardDescription}
       </p>
 
       <span
@@ -155,7 +155,7 @@ export default function ResearchAxisCards({
   return (
     <section
       id="osie-badawcze"
-      className={`${RESEARCH_CONTAINER_CLASS} hidden pt-7 min-[1200px]:pt-5 min-[720px]:block`}
+      className={`${RESEARCH_CONTAINER_CLASS} hidden pt-7 min-[1200px]:pt-1 min-[720px]:block`}
     >
       <h2 className="text-xs font-semibold tracking-[0.22em] uppercase text-[#4A1D6E] dark:text-purple-400">
         {labels.axesEyebrow}
