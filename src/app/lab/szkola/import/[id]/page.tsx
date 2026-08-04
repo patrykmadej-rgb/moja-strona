@@ -8,9 +8,10 @@ import ImportDetailView from "@/components/szkola/ImportDetailView";
 import type { ImportInboxItem, ImportedReservation, SchoolSession } from "@/lib/szkola/types";
 
 export const metadata: Metadata = { title: "Import" };
-// Patrz komentarz w ../page.tsx — reprocessImport (wywoływany z tej trasy)
-// też potrzebuje pełnego Node API, więc ta sama jawna deklaracja.
+// Patrz komentarz w ../page.tsx — reprocessImport/tryOcr (wywoływane z tej
+// trasy) też potrzebują pełnego Node API i tego samego marginesu czasu.
 export const runtime = "nodejs";
+export const maxDuration = 90;
 
 export default async function ImportDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

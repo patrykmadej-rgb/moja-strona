@@ -25,6 +25,7 @@ import {
   type ExtractionOutcome,
 } from "@/lib/szkola/import/textExtractionWithOcr";
 import { isOcrEligibleMimeType } from "@/lib/szkola/import/ocr";
+import { isStuckProcessing } from "@/lib/szkola/import/staleness";
 import {
   CURRENCIES,
   IMPORT_DETECTED_TYPES,
@@ -581,7 +582,15 @@ export async function reprocessImport(formData: FormData) {
 
   const supabase = await createClient();
   logImportStage("reprocess-start", { inboxItemId });
-  await supabase.from("import_inbox_items").update({ status: "processing" }).eq("id", inboxItemId);
+  // updated_at musi być tu jawnie ustawione (brak triggera bazodanowego) —
+  // inaczej wykrywanie zakleszczonych importów (isStuckProcessing, oparte
+  // o wiek updated_at) widziałoby stary, nieaktualny czas i albo od razu
+  // uznawałoby świeżo rozpoczęte przetwarzanie za zawieszone, albo (gorzej)
+  // nigdy nie wykryłoby faktycznie zawieszonego rekordu.
+  await supabase
+    .from("import_inbox_items")
+    .update({ status: "processing", updated_at: new Date().toISOString() })
+    .eq("id", inboxItemId);
 
   try {
     await reprocessInboxItem(supabase, userId, inboxItemId, { forceOcr: false });
@@ -614,7 +623,10 @@ export async function tryOcr(formData: FormData) {
 
   const supabase = await createClient();
   logImportStage("manual-ocr-start", { inboxItemId });
-  await supabase.from("import_inbox_items").update({ status: "processing", ocr_status: "processing" }).eq("id", inboxItemId);
+  await supabase
+    .from("import_inbox_items")
+    .update({ status: "processing", ocr_status: "processing", updated_at: new Date().toISOString() })
+    .eq("id", inboxItemId);
 
   try {
     await reprocessInboxItem(supabase, userId, inboxItemId, { forceOcr: true });
@@ -638,6 +650,52 @@ export async function tryOcr(formData: FormData) {
   }
 
   logImportStage("manual-ocr-done", { inboxItemId });
+  revalidatePath("/lab/szkola/import");
+  revalidatePath(`/lab/szkola/import/${inboxItemId}`);
+}
+
+/**
+ * Ręczny reset zawieszonego importu — WYŁĄCZNIE zmiana stanu w bazie: bez
+ * ponownego przesyłania pliku, bez nowego rekordu, bez uruchamiania OCR.
+ * Dostępne, gdy isStuckProcessing() wykryje rekord w "processing" (status
+ * albo ocr_status) z updated_at starszym niż 5 minut — czyli dokładnie
+ * sytuację, w której oryginalny request (upload/reprocess/OCR) nigdy nie
+ * dotarł do własnego try/catch, bo proces serverless został ubity z
+ * zewnątrz (Vercel maxDuration) zanim zdążył zaktualizować rekord. Po
+ * resecie użytkownik może osobno kliknąć "Spróbuj OCR ponownie" albo
+ * uzupełnić dane ręcznie — ten reset tylko odblokowuje UI, niczego sam
+ * nie próbuje przetworzyć ponownie.
+ */
+export async function resetStuckImport(formData: FormData) {
+  await requireUserId();
+  const inboxItemId = String(formData.get("id") ?? "");
+  if (!inboxItemId) throw new Error("Brak identyfikatora elementu.");
+
+  const supabase = await createClient();
+
+  const { data: item, error: itemError } = await supabase
+    .from("import_inbox_items")
+    .select("status, ocr_status, updated_at")
+    .eq("id", inboxItemId)
+    .single();
+  if (itemError) throw new Error(itemError.message);
+  if (!isStuckProcessing(item)) {
+    throw new Error("Ten import nie jest zawieszony — reset nie jest potrzebny.");
+  }
+
+  logImportStage("reset-stuck-import", { inboxItemId });
+  await supabase
+    .from("import_inbox_items")
+    .update({
+      status: "needs_review",
+      ocr_status: "failed",
+      processing_stage: "ocr_error",
+      processing_error:
+        "Automatyczne przetwarzanie zostało przerwane (proces nie odpowiadał). Możesz spróbować ponownie lub uzupełnić dane ręcznie.",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", inboxItemId);
+
   revalidatePath("/lab/szkola/import");
   revalidatePath(`/lab/szkola/import/${inboxItemId}`);
 }

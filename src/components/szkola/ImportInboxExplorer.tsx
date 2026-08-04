@@ -6,6 +6,7 @@ import { Inbox, Search } from "lucide-react";
 import EmptyState from "@/components/lab/EmptyState";
 import { formatDateTime } from "@/lib/lab/format";
 import { formatMoney } from "@/lib/szkola/money";
+import { isStuckProcessing } from "@/lib/szkola/import/staleness";
 import {
   IMPORT_DETECTED_TYPE_LABELS,
   IMPORT_DETECTED_TYPES,
@@ -13,12 +14,15 @@ import {
   type Currency,
   type ImportDetectedType,
   type ImportStatus,
+  type OcrStatus,
   type SchoolSession,
 } from "@/lib/szkola/types";
 
 export type ImportListRow = {
   id: string;
   status: ImportStatus;
+  ocrStatus: OcrStatus | null;
+  updatedAt: string;
   detectedType: ImportDetectedType | null;
   confidenceScore: number | null;
   originalFilename: string | null;
@@ -183,9 +187,13 @@ export default function ImportInboxExplorer({ items, sessions }: { items: Import
                     <span className="truncate text-sm font-medium text-[#201a2b]">
                       {item.originalFilename ?? item.rawEmailSubject ?? "Import bez nazwy"}
                     </span>
-                    <span className={`rounded-full px-2 py-0.5 text-[11px] ${STATUS_BADGE_CLASS[item.status]}`}>
-                      {IMPORT_STATUS_LABELS[item.status]}
-                    </span>
+                    {isStuckProcessing({ status: item.status, ocr_status: item.ocrStatus, updated_at: item.updatedAt }) ? (
+                      <span className="rounded-full bg-[#fdf1de] px-2 py-0.5 text-[11px] text-[#8a5a12]">Przerwane</span>
+                    ) : (
+                      <span className={`rounded-full px-2 py-0.5 text-[11px] ${STATUS_BADGE_CLASS[item.status]}`}>
+                        {IMPORT_STATUS_LABELS[item.status]}
+                      </span>
+                    )}
                     {item.detectedType && (
                       <span className="rounded-full bg-[#f1eafd] px-2 py-0.5 text-[11px] text-[#5b2a86]">
                         {IMPORT_DETECTED_TYPE_LABELS[item.detectedType]}

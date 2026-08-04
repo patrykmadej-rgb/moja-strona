@@ -9,12 +9,14 @@ import {
   approveImport,
   rejectImport,
   reprocessImport,
+  resetStuckImport,
   resolveDuplicate,
   tryOcr,
   updateImportFields,
 } from "@/app/lab/szkola/import/actions";
 import { getImportDownloadUrl } from "@/lib/szkola/importStorage";
 import { formatBytes, formatDateTime } from "@/lib/lab/format";
+import { isStuckProcessing } from "@/lib/szkola/import/staleness";
 import type { DuplicateMatch } from "@/lib/szkola/importDuplicates";
 import {
   CURRENCIES,
@@ -37,6 +39,24 @@ const OCR_ELIGIBLE_MIME_TYPES = new Set(["application/pdf", "image/jpeg", "image
 const inputClass =
   "h-9 w-full rounded-[10px] border border-[#e8e2ec] bg-white px-3 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
 const labelClass = "text-xs font-medium text-[#201a2b]";
+
+// Trochę powyżej maxDuration serwera (90s, patrz page.tsx) — jeśli serwer
+// naprawdę odpowie w swoim limicie, ten wyścig nigdy się nie aktywuje.
+// Zabezpiecza WYŁĄCZNIE lokalny stan przycisku ("Przetwarzanie…"): nawet
+// gdyby zapytanie sieciowe do Server Action zawisło bez odpowiedzi (co samo
+// w sobie nie powinno się już zdarzać po stronie serwera dzięki
+// bezwzględnemu timeoutowi w localOcrProvider.ts), blok finally i tak
+// zwolni przycisk w skończonym czasie zamiast wisieć w nieskończoność.
+const CLIENT_ACTION_TIMEOUT_MS = 100_000;
+
+function withClientTimeout<T>(promise: Promise<T>): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error("CLIENT_TIMEOUT")), CLIENT_ACTION_TIMEOUT_MS);
+    }),
+  ]);
+}
 
 function SubmitButton({ label, pendingLabel, className }: { label: string; pendingLabel: string; className: string }) {
   const { pending } = useFormStatus();
@@ -73,7 +93,12 @@ export default function ImportDetailView({
   const [error, setError] = useState<string | null>(null);
   const [isReprocessing, setIsReprocessing] = useState(false);
   const [isRunningOcr, setIsRunningOcr] = useState(false);
+  const [isResettingStuck, setIsResettingStuck] = useState(false);
   const isImage = item.mime_type?.startsWith("image/");
+  // Serwerowa prawda o stanie ("processing" bez ruchu w updated_at od 5+
+  // minut) — działa nawet po świeżym wczytaniu strony/w nowej karcie,
+  // niezależnie od lokalnego stanu Reacta w TEJ konkretnej sesji przeglądarki.
+  const stuck = isStuckProcessing(item);
 
   useEffect(() => {
     if (isImage && item.storage_path) {
@@ -93,17 +118,29 @@ export default function ImportDetailView({
     }
   };
 
+  const CLIENT_TIMEOUT_MESSAGE =
+    "Przetwarzanie trwa dłużej niż zwykle i mogło zostać przerwane. Odśwież stronę za chwilę, żeby sprawdzić aktualny stan, albo spróbuj ponownie.";
+
+  function describeActionError(err: unknown, fallback: string): string {
+    if (err instanceof Error && err.message === "CLIENT_TIMEOUT") return CLIENT_TIMEOUT_MESSAGE;
+    return err instanceof Error ? err.message : fallback;
+  }
+
   const handleReprocess = async () => {
     setError(null);
     setIsReprocessing(true);
     const formData = new FormData();
     formData.set("id", item.id);
     try {
-      await reprocessImport(formData);
+      await withClientTimeout(reprocessImport(formData));
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Nie udało się przetworzyć ponownie.");
+      setError(describeActionError(err, "Nie udało się przetworzyć ponownie."));
     } finally {
+      // Ten blok ZAWSZE się wykona w skończonym czasie — withClientTimeout
+      // gwarantuje, że awaitowana obietnica rozstrzygnie się (sukcesem albo
+      // odrzuceniem) najpóźniej po CLIENT_ACTION_TIMEOUT_MS, więc lokalny
+      // spinner nigdy nie zostaje "wyłącznie stanem React" wiszącym bez końca.
       setIsReprocessing(false);
     }
   };
@@ -114,16 +151,32 @@ export default function ImportDetailView({
     const formData = new FormData();
     formData.set("id", item.id);
     try {
-      await tryOcr(formData);
+      await withClientTimeout(tryOcr(formData));
       router.refresh();
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : "Nie udało się odczytać dokumentu automatycznie. Plik został bezpiecznie zapisany. Możesz uzupełnić dane ręcznie lub ponowić OCR.",
+        describeActionError(
+          err,
+          "Nie udało się odczytać dokumentu automatycznie. Plik został bezpiecznie zapisany. Możesz uzupełnić dane ręcznie lub ponowić OCR.",
+        ),
       );
     } finally {
       setIsRunningOcr(false);
+    }
+  };
+
+  const handleResetStuck = async () => {
+    setError(null);
+    setIsResettingStuck(true);
+    const formData = new FormData();
+    formData.set("id", item.id);
+    try {
+      await withClientTimeout(resetStuckImport(formData));
+      router.refresh();
+    } catch (err) {
+      setError(describeActionError(err, "Nie udało się zresetować importu."));
+    } finally {
+      setIsResettingStuck(false);
     }
   };
 
@@ -237,6 +290,43 @@ export default function ImportDetailView({
 
       {/* PRAWA KOLUMNA */}
       <div className="flex min-w-0 flex-col gap-5">
+        {/* Zakleszczony import: "processing" bez ruchu w updated_at od 5+ minut
+            — pokazujemy to zamiast bezterminowego "Przetwarzanie…", z dwiema
+            drogami wyjścia (ponów OCR wprost, albo tylko odblokuj i uzupełnij
+            ręcznie), zamiast zostawiać użytkownika bez żadnej akcji. */}
+        {stuck && (
+          <section className="rounded-[16px] border border-amber-200 bg-amber-50 p-5">
+            <p className="flex items-center gap-1.5 text-sm font-medium text-amber-900">
+              <AlertTriangle className="h-4 w-4" strokeWidth={1.75} />
+              Przetwarzanie zostało przerwane
+            </p>
+            <p className="mt-1.5 text-xs leading-relaxed text-amber-800">
+              Automatyczne odczytywanie tego dokumentu trwa niezwykle długo i najpewniej zostało przerwane po stronie
+              serwera. Plik pozostał bezpiecznie zapisany. Możesz spróbować ponownie albo uzupełnić dane ręcznie.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {canTryOcr && (
+                <button
+                  type="button"
+                  onClick={handleTryOcr}
+                  disabled={isRunningOcr || isResettingStuck}
+                  className="rounded-[9px] border border-amber-300 bg-white px-3 py-1.5 text-xs font-medium text-amber-900 hover:bg-amber-100 disabled:opacity-50"
+                >
+                  {isRunningOcr ? "Rozpoznawanie…" : "Spróbuj OCR ponownie"}
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={handleResetStuck}
+                disabled={isResettingStuck || isRunningOcr}
+                className="rounded-[9px] border border-amber-300 bg-white px-3 py-1.5 text-xs font-medium text-amber-900 hover:bg-amber-100 disabled:opacity-50"
+              >
+                {isResettingStuck ? "Resetowanie…" : "Zresetuj (uzupełnię ręcznie)"}
+              </button>
+            </div>
+          </section>
+        )}
+
         <section className="rounded-[16px] border border-[#e8e2ec] bg-white p-5 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
           <div className="flex items-center justify-between gap-2">
             <span className="rounded-full bg-[#f1eafd] px-2.5 py-1 text-xs font-medium text-[#5b2a86]">

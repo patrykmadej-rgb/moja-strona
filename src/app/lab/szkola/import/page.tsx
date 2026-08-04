@@ -3,17 +3,27 @@ import { createClient } from "@/lib/supabase/server";
 import SzkolaNav from "@/components/szkola/SzkolaNav";
 import ImportIntakeForms from "@/components/szkola/ImportIntakeForms";
 import ImportInboxExplorer, { type ImportListRow } from "@/components/szkola/ImportInboxExplorer";
-import type { Currency, ImportDetectedType, ImportStatus, SchoolSession } from "@/lib/szkola/types";
+import type { Currency, ImportDetectedType, ImportStatus, OcrStatus, SchoolSession } from "@/lib/szkola/types";
 
 export const metadata: Metadata = { title: "Skrzynka importu" };
 // Import PDF/DOCX/EML (pdf-parse, mammoth, mailparser) potrzebuje pełnego
 // Node API — jawnie wykluczamy Edge Runtime (i tak jest domyślny, ale
 // deklarujemy to na wypadek przyszłych zmian konfiguracji tras).
 export const runtime = "nodejs";
+// Bez tego Vercel zabija funkcję po swoim DOMYŚLNYM limicie (może być
+// krótszy niż wewnętrzny timeout OCR w localOcrProvider.ts!), a wtedy
+// żaden kod aplikacji — łącznie z try/catch/finally, aktualizacją statusu
+// w bazie i worker.terminate() — nie zdąży się wykonać, bo proces zostaje
+// zabity z zewnątrz. 90s daje margines nad wewnętrznym budżetem OCR (75s).
+// Jeśli plan Vercela ma niższy sufit (np. Hobby = 60s), platforma i tak
+// przytnie do swojego maksimum — to nadal lepsze niż brak deklaracji.
+export const maxDuration = 90;
 
 type InboxRow = {
   id: string;
   status: ImportStatus;
+  ocr_status: OcrStatus | null;
+  updated_at: string;
   detected_type: ImportDetectedType | null;
   confidence_score: number | null;
   original_filename: string | null;
@@ -43,7 +53,7 @@ export default async function ImportSzkolaPage() {
       supabase
         .from("import_inbox_items")
         .select(
-          "id, status, detected_type, confidence_score, original_filename, raw_email_subject, sender_name, received_at, imported_reservations(id, session_id, amount, currency, session:school_sessions(title))",
+          "id, status, ocr_status, updated_at, detected_type, confidence_score, original_filename, raw_email_subject, sender_name, received_at, imported_reservations(id, session_id, amount, currency, session:school_sessions(title))",
         )
         .eq("user_id", user.id)
         .order("received_at", { ascending: false }),
@@ -56,6 +66,8 @@ export default async function ImportSzkolaPage() {
       return {
         id: row.id,
         status: row.status,
+        ocrStatus: row.ocr_status,
+        updatedAt: row.updated_at,
         detectedType: row.detected_type,
         confidenceScore: row.confidence_score,
         originalFilename: row.original_filename,

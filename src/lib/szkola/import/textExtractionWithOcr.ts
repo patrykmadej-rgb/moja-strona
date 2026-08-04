@@ -50,8 +50,10 @@ async function runOcrStep(buffer: Buffer, mimeType: string): Promise<OcrOutcome>
   } catch (err) {
     // Błąd OCR nie może wywalić całej strony (sekcja 12) — plik i rekord
     // zostają, użytkownik dostaje jasny komunikat i może uzupełnić ręcznie
-    // albo ponowić OCR.
-    logImportStage("ocr-error");
+    // albo ponowić OCR. Timeout (mur obronny w localOcrProvider.ts) ma
+    // osobny, konkretniejszy komunikat niż generyczny błąd OCR.
+    const isTimeout = err instanceof Error && err.message.startsWith("OCR_TIMEOUT");
+    logImportStage(isTimeout ? "ocr-timeout" : "ocr-error");
     return {
       text: "",
       extractionMethod: "none",
@@ -59,10 +61,12 @@ async function runOcrStep(buffer: Buffer, mimeType: string): Promise<OcrOutcome>
       ocrConfidence: null,
       ocrPagesProcessed: null,
       ocrWarnings: [
-        safeErrorMessage(
-          err,
-          "Nie udało się odczytać dokumentu automatycznie. Plik został bezpiecznie zapisany. Możesz uzupełnić dane ręcznie lub ponowić OCR.",
-        ),
+        isTimeout
+          ? "Automatyczne odczytywanie dokumentu trwało zbyt długo i zostało przerwane. Możesz spróbować ponownie lub uzupełnić dane ręcznie."
+          : safeErrorMessage(
+              err,
+              "Nie udało się odczytać dokumentu automatycznie. Plik został bezpiecznie zapisany. Możesz uzupełnić dane ręcznie lub ponowić OCR.",
+            ),
       ],
       processingStage: "ocr_error",
     };
