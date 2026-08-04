@@ -4,12 +4,11 @@ import mammoth from "mammoth";
 import { logImportStage } from "./importLogging";
 
 /**
- * Wyciąganie tekstu z przesłanych plików — czysto tekstowe/regułowe, bez AI
- * (patrz importClassifier.ts). Dla obrazów (JPG/PNG/WEBP) CELOWO brak
- * ekstrakcji — to wymagałoby OCR (np. Tesseract/Google Vision), którego ten
- * projekt nie ma skonfigurowanego. Zdjęcia paragonów/biletów da się przesłać
- * i podejrzeć, ale nie są automatycznie klasyfikowane na podstawie treści —
- * użytkownik uzupełnia dane ręcznie. To świadome ograniczenie, nie atrapa.
+ * Wyciąganie tekstu z przesłanych plików — czysto tekstowe/regułowe parsery
+ * (bez AI, patrz importClassifier.ts). Obrazy (JPG/PNG/WEBP) i skanowane
+ * PDF-y bez warstwy tekstowej NIE są obsługiwane tutaj — dla nich
+ * `extractTextWithOcrFallback` (src/lib/szkola/import/textExtractionWithOcr.ts)
+ * przełącza się na lokalny OCR (tesseract.js), patrz src/lib/szkola/import/ocr/.
  */
 
 export type ParsedEmailContent = {

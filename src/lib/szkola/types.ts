@@ -787,6 +787,58 @@ export const IMPORT_DETECTED_TYPE_LABELS: Record<ImportDetectedType, string> = {
   other: "Inne",
 };
 
+/** Skąd pochodzi raw_text — migracja 018. "none" = brak treści (parser i OCR nie dały rady / nie próbowano). */
+export const EXTRACTION_METHODS = ["text_layer", "ocr", "manual", "none"] as const;
+export type ExtractionMethod = (typeof EXTRACTION_METHODS)[number];
+export const EXTRACTION_METHOD_LABELS: Record<ExtractionMethod, string> = {
+  text_layer: "Warstwa tekstowa dokumentu",
+  ocr: "OCR",
+  manual: "Wpisane ręcznie",
+  none: "Brak treści",
+};
+
+/** Stan procesu OCR (osobny od ogólnego ImportStatus) — migracja 018. */
+export const OCR_STATUSES = ["not_needed", "pending", "processing", "completed", "partial", "failed"] as const;
+export type OcrStatus = (typeof OCR_STATUSES)[number];
+export const OCR_STATUS_LABELS: Record<OcrStatus, string> = {
+  not_needed: "OCR niepotrzebny",
+  pending: "OCR oczekuje",
+  processing: "Rozpoznawanie OCR w toku",
+  completed: "OCR zakończony",
+  partial: "OCR częściowy",
+  failed: "OCR nieudany",
+};
+
+/**
+ * Etap przetwarzania — bez CHECK constraintu w bazie (celowo elastyczne pole
+ * tekstowe, migracja 018), ale ten zestaw kluczy pokrywa cały przepływ z
+ * OCR-em, żeby UI miało spójne etykiety. Nieznana wartość po prostu wyświetla
+ * się jako surowy string zamiast psuć render.
+ */
+export const PROCESSING_STAGES = [
+  "uploading",
+  "reading_pdf",
+  "no_text_layer",
+  "ocr_preparing",
+  "ocr_recognizing",
+  "analyzing",
+  "ready_for_review",
+  "needs_manual_review",
+  "ocr_error",
+] as const;
+export type ProcessingStage = (typeof PROCESSING_STAGES)[number];
+export const PROCESSING_STAGE_LABELS: Record<ProcessingStage, string> = {
+  uploading: "Przesyłanie pliku",
+  reading_pdf: "Odczytywanie PDF",
+  no_text_layer: "Dokument bez warstwy tekstowej",
+  ocr_preparing: "Przygotowanie OCR",
+  ocr_recognizing: "Rozpoznawanie tekstu (OCR)",
+  analyzing: "Analiza rozpoznanego tekstu",
+  ready_for_review: "Gotowe do sprawdzenia",
+  needs_manual_review: "Wymaga ręcznego uzupełnienia",
+  ocr_error: "Błąd OCR",
+};
+
 export type ImportInboxItem = {
   id: string;
   user_id: string | null;
@@ -809,6 +861,13 @@ export type ImportInboxItem = {
   notes: string | null;
   created_at: string;
   updated_at: string;
+  extraction_method: ExtractionMethod | null;
+  ocr_status: OcrStatus | null;
+  ocr_confidence: number | null;
+  ocr_pages_processed: number | null;
+  ocr_warnings: string[];
+  processing_stage: string | null;
+  processed_at: string | null;
 };
 
 /**

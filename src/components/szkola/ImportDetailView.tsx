@@ -10,6 +10,7 @@ import {
   rejectImport,
   reprocessImport,
   resolveDuplicate,
+  tryOcr,
   updateImportFields,
 } from "@/app/lab/szkola/import/actions";
 import { getImportDownloadUrl } from "@/lib/szkola/importStorage";
@@ -20,10 +21,18 @@ import {
   IMPORT_DETECTED_TYPE_LABELS,
   IMPORT_DETECTED_TYPES,
   IMPORT_STATUS_LABELS,
+  PROCESSING_STAGE_LABELS,
   type ImportInboxItem,
   type ImportedReservation,
+  type ProcessingStage,
   type SchoolSession,
 } from "@/lib/szkola/types";
+
+// Powielone celowo (nie importowane z @/lib/szkola/import/ocr — ten moduł ma
+// "server-only" na górze i wysadziłby ten Client Component). Ta sama lista
+// co ALLOWED_IMPORT_MIME_TYPES minus DOCX/TXT/EML, dla których OCR nie ma
+// zastosowania.
+const OCR_ELIGIBLE_MIME_TYPES = new Set(["application/pdf", "image/jpeg", "image/png", "image/webp"]);
 
 const inputClass =
   "h-9 w-full rounded-[10px] border border-[#e8e2ec] bg-white px-3 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
@@ -63,6 +72,7 @@ export default function ImportDetailView({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isReprocessing, setIsReprocessing] = useState(false);
+  const [isRunningOcr, setIsRunningOcr] = useState(false);
   const isImage = item.mime_type?.startsWith("image/");
 
   useEffect(() => {
@@ -98,6 +108,25 @@ export default function ImportDetailView({
     }
   };
 
+  const handleTryOcr = async () => {
+    setError(null);
+    setIsRunningOcr(true);
+    const formData = new FormData();
+    formData.set("id", item.id);
+    try {
+      await tryOcr(formData);
+      router.refresh();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Nie udało się odczytać dokumentu automatycznie. Plik został bezpiecznie zapisany. Możesz uzupełnić dane ręcznie lub ponowić OCR.",
+      );
+    } finally {
+      setIsRunningOcr(false);
+    }
+  };
+
   const handleReject = async () => {
     const reason = prompt("Powód odrzucenia (opcjonalnie):") ?? "";
     setError(null);
@@ -114,6 +143,11 @@ export default function ImportDetailView({
 
   const isLowConfidence = (item.confidence_score ?? 0) < 0.35;
   const isFinal = item.status === "assigned" || item.status === "rejected";
+  // Sekcja 11 briefu: dostępne, gdy zwykłe odczytanie nie znalazło tekstu,
+  // poprzedni OCR się nie udał, albo użytkownik chce ponowić — czyli zawsze,
+  // dopóki plik nadaje się do OCR i import nie jest już zamknięty.
+  const canTryOcr = !isFinal && Boolean(item.storage_path) && OCR_ELIGIBLE_MIME_TYPES.has(item.mime_type ?? "");
+  const wasOcrUsed = item.extraction_method === "ocr";
 
   return (
     <div className="grid grid-cols-1 gap-5 min-[900px]:grid-cols-[minmax(0,1fr)_360px] min-[900px]:items-start">
@@ -149,6 +183,21 @@ export default function ImportDetailView({
               {item.raw_text || "Brak treści."}
             </div>
           )}
+
+          {/* Sekcja 15 briefu: subtelna informacja o OCR, bez surowych logów technicznych. */}
+          {wasOcrUsed && (
+            <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-[#706878]">
+              <span className="rounded-full bg-[#f1eafd] px-2.5 py-1 font-medium text-[#5b2a86]">
+                Treść odczytana za pomocą OCR
+              </span>
+              {item.ocr_pages_processed != null && (
+                <span>
+                  {item.ocr_pages_processed} {item.ocr_pages_processed === 1 ? "strona" : "stron"}
+                </span>
+              )}
+              {item.ocr_confidence != null && <span>· pewność {Math.round(item.ocr_confidence)}%</span>}
+            </div>
+          )}
         </section>
 
         <section className="rounded-[16px] border border-[#e8e2ec] bg-white p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
@@ -174,7 +223,14 @@ export default function ImportDetailView({
             </div>
           </dl>
           {item.processing_error && (
-            <p className="mt-3 text-xs text-red-600">Ostatni błąd przetwarzania: {item.processing_error}</p>
+            <p className={`mt-3 text-xs ${item.status === "error" ? "text-red-600" : "text-amber-700"}`}>
+              {item.processing_error}
+            </p>
+          )}
+          {item.processing_stage && (
+            <p className="mt-2 text-xs text-[#9a919f]">
+              Etap: {PROCESSING_STAGE_LABELS[item.processing_stage as ProcessingStage] ?? item.processing_stage}
+            </p>
           )}
         </section>
       </div>
@@ -390,31 +446,38 @@ export default function ImportDetailView({
           </section>
         )}
 
-        {!isFinal && reservation && (
+        {!isFinal && (
           <section className="rounded-[16px] border border-[#e8e2ec] bg-white p-5 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
             <h2 className="text-sm font-semibold text-[#201a2b]">Akcje</h2>
             <div className="mt-3 flex flex-col gap-2">
-              <form
-                action={async (formData) => {
-                  setError(null);
-                  try {
-                    await approveImport(formData);
-                    router.push("/lab/szkola/import");
-                  } catch (err) {
-                    setError(err instanceof Error ? err.message : "Nie udało się zatwierdzić.");
-                  }
-                }}
-              >
-                <input type="hidden" name="inbox_item_id" value={item.id} />
-                <input type="hidden" name="reservation_id" value={reservation.id} />
-                <SubmitButton
-                  label="Zatwierdź i utwórz"
-                  pendingLabel="Zatwierdzanie…"
-                  className="flex w-full items-center justify-center gap-1.5 rounded-[10px] bg-[#5b2a86] px-4 py-2 text-sm font-medium text-white hover:bg-[#32134f] disabled:opacity-50"
-                />
-              </form>
+              {/* Zatwierdzenie wymaga istniejącej rozpoznanej rezerwacji — przy
+                  całkowitej awarii pipeline'u (patrz recordFailedImport w
+                  actions.ts) jej może nie być, ale reprocess/OCR/odrzucenie
+                  poniżej działają zawsze, żeby użytkownik nigdy nie utknął
+                  bez żadnej akcji na zepsutym imporcie. */}
+              {reservation && (
+                <form
+                  action={async (formData) => {
+                    setError(null);
+                    try {
+                      await approveImport(formData);
+                      router.push("/lab/szkola/import");
+                    } catch (err) {
+                      setError(err instanceof Error ? err.message : "Nie udało się zatwierdzić.");
+                    }
+                  }}
+                >
+                  <input type="hidden" name="inbox_item_id" value={item.id} />
+                  <input type="hidden" name="reservation_id" value={reservation.id} />
+                  <SubmitButton
+                    label="Zatwierdź i utwórz"
+                    pendingLabel="Zatwierdzanie…"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-[10px] bg-[#5b2a86] px-4 py-2 text-sm font-medium text-white hover:bg-[#32134f] disabled:opacity-50"
+                  />
+                </form>
+              )}
 
-              {item.storage_path && (
+              {item.storage_path && reservation && (
                 <form
                   action={async (formData) => {
                     setError(null);
@@ -436,10 +499,22 @@ export default function ImportDetailView({
                 </form>
               )}
 
+              {canTryOcr && (
+                <button
+                  type="button"
+                  onClick={handleTryOcr}
+                  disabled={isRunningOcr || isReprocessing}
+                  className="flex items-center justify-center gap-1.5 rounded-[10px] border border-[#e8e2ec] px-4 py-2 text-sm text-[#5b2a86] hover:border-[#d9cde5] hover:bg-[#f1eafd] disabled:opacity-50"
+                >
+                  {isRunningOcr ? <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.75} /> : null}
+                  {isRunningOcr ? "Rozpoznawanie…" : wasOcrUsed ? "Ponów OCR" : "Spróbuj OCR"}
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={handleReprocess}
-                disabled={isReprocessing}
+                disabled={isReprocessing || isRunningOcr}
                 className="flex items-center justify-center gap-1.5 rounded-[10px] border border-[#e8e2ec] px-4 py-2 text-sm text-[#706878] hover:border-[#d9cde5] disabled:opacity-50"
               >
                 {isReprocessing ? <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.75} /> : null}
