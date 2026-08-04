@@ -14,10 +14,11 @@ export const runtime = "nodejs";
 // krótszy niż wewnętrzny timeout OCR w localOcrProvider.ts!), a wtedy
 // żaden kod aplikacji — łącznie z try/catch/finally, aktualizacją statusu
 // w bazie i worker.terminate() — nie zdąży się wykonać, bo proces zostaje
-// zabity z zewnątrz. 90s daje margines nad wewnętrznym budżetem OCR (75s).
-// Jeśli plan Vercela ma niższy sufit (np. Hobby = 60s), platforma i tak
-// przytnie do swojego maksimum — to nadal lepsze niż brak deklaracji.
-export const maxDuration = 90;
+// zabity z zewnątrz. 60 to najniższy typowy sufit planu Vercela (Hobby) —
+// deklarujemy dokładnie tyle, bo deklarowanie więcej byłoby złudne (platforma
+// i tak przytnie do własnego maksimum). Sam OCR ma teraz wewnętrzny twardy
+// limit 45s (localOcrProvider.ts), wyraźnie poniżej tych 60s.
+export const maxDuration = 60;
 
 type InboxRow = {
   id: string;

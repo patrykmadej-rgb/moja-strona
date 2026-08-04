@@ -11,7 +11,6 @@ import {
   reprocessImport,
   resetStuckImport,
   resolveDuplicate,
-  tryOcr,
   updateImportFields,
 } from "@/app/lab/szkola/import/actions";
 import { getImportDownloadUrl } from "@/lib/szkola/importStorage";
@@ -40,14 +39,14 @@ const inputClass =
   "h-9 w-full rounded-[10px] border border-[#e8e2ec] bg-white px-3 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
 const labelClass = "text-xs font-medium text-[#201a2b]";
 
-// Trochę powyżej maxDuration serwera (90s, patrz page.tsx) — jeśli serwer
+// Trochę powyżej maxDuration serwera (60s, patrz page.tsx) — jeśli serwer
 // naprawdę odpowie w swoim limicie, ten wyścig nigdy się nie aktywuje.
 // Zabezpiecza WYŁĄCZNIE lokalny stan przycisku ("Przetwarzanie…"): nawet
 // gdyby zapytanie sieciowe do Server Action zawisło bez odpowiedzi (co samo
 // w sobie nie powinno się już zdarzać po stronie serwera dzięki
 // bezwzględnemu timeoutowi w localOcrProvider.ts), blok finally i tak
 // zwolni przycisk w skończonym czasie zamiast wisieć w nieskończoność.
-const CLIENT_ACTION_TIMEOUT_MS = 100_000;
+const CLIENT_ACTION_TIMEOUT_MS = 70_000;
 
 function withClientTimeout<T>(promise: Promise<T>): Promise<T> {
   return Promise.race([
@@ -56,6 +55,39 @@ function withClientTimeout<T>(promise: Promise<T>): Promise<T> {
       setTimeout(() => reject(new Error("CLIENT_TIMEOUT")), CLIENT_ACTION_TIMEOUT_MS);
     }),
   ]);
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// OCR jest teraz uruchamiany przez dedykowaną trasę API (POST wystarczy
+// wywołać raz — dalsza praca dzieje się w tle przez after(), patrz
+// /api/szkola/import/[id]/ocr/route.ts), a UI tylko odpytuje status zamiast
+// czekać na jedną, potencjalnie długą odpowiedź. Odpytywanie kończy się,
+// gdy status przestaje być "processing" (czyli: completed/needs_review/
+// failed/recognized — cokolwiek innego niż "w trakcie"), albo po przekroczeniu
+// bezpiecznego limitu czasu odpytywania (nieco powyżej maxDuration trasy OCR).
+const OCR_POLL_INTERVAL_MS = 2_000;
+const OCR_POLL_TIMEOUT_MS = 70_000;
+
+type OcrStatusResponse = { status: string; error?: string };
+
+async function pollOcrStatus(inboxItemId: string): Promise<void> {
+  const deadline = Date.now() + OCR_POLL_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    await sleep(OCR_POLL_INTERVAL_MS);
+    const res = await fetch(`/api/szkola/import/${inboxItemId}/status`, { cache: "no-store" });
+    if (!res.ok) continue; // przejściowy błąd sieci — spróbuj przy kolejnym ticku
+    const data = (await res.json()) as OcrStatusResponse;
+    if (data.status && data.status !== "processing") return;
+  }
+  // Limit odpytywania minął bez zaobserwowania zmiany statusu — nie
+  // traktujemy tego jako błąd (serwerowy twardy timeout OCR i tak zapisze
+  // ostateczny stan w bazie w swoim czasie); router.refresh() poniżej pokaże
+  // to, co jest w bazie NAJPÓŹNIEJ przy kolejnym odświeżeniu, a mechanizm
+  // wykrywania zawieszonych importów (staleness.ts) jest ostateczną siatką
+  // bezpieczeństwa niezależnie od tego pollingu.
 }
 
 function SubmitButton({ label, pendingLabel, className }: { label: string; pendingLabel: string; className: string }) {
@@ -148,10 +180,13 @@ export default function ImportDetailView({
   const handleTryOcr = async () => {
     setError(null);
     setIsRunningOcr(true);
-    const formData = new FormData();
-    formData.set("id", item.id);
     try {
-      await withClientTimeout(tryOcr(formData));
+      const startRes = await fetch(`/api/szkola/import/${item.id}/ocr`, { method: "POST" });
+      if (!startRes.ok) {
+        const body = (await startRes.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(body?.error ?? "Nie udało się uruchomić OCR.");
+      }
+      await withClientTimeout(pollOcrStatus(item.id));
       router.refresh();
     } catch (err) {
       setError(

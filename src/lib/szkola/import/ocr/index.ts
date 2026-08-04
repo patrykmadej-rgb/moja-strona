@@ -4,9 +4,10 @@ import type { OcrDecision, OcrProvider, OcrResult } from "./types";
 
 export type { OcrDecision, OcrLanguage, OcrProvider, OcrResult } from "./types";
 export { OCR_LANGUAGES } from "./types";
-export { createLocalOcrProvider } from "./localOcrProvider";
-export { renderPdfPagesToImages, MAX_OCR_PAGES } from "./pdfToImages";
+export { createLocalOcrProvider, AUTO_OCR_PAGE_CAP } from "./localOcrProvider";
+export { getPdfInfo, renderPdfPageToImage } from "./pdfToImages";
 export { preprocessImageForOcr } from "./imagePreprocessing";
+export { hasEnoughSignalToStopEarly } from "./earlyExit";
 
 const MIN_MEANINGFUL_CHARS = 60; // środek zakresu 40-80 z briefu
 

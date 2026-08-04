@@ -14,7 +14,7 @@ import sharp from "sharp";
  * zmniejszane, żeby nie eksplodować pamięcią/czasem w funkcji serverless.
  */
 
-const MAX_DIMENSION_PX = 2500;
+const MAX_DIMENSION_PX = 2000;
 
 export async function preprocessImageForOcr(input: Buffer): Promise<Buffer> {
   const metadata = await sharp(input, { failOn: "none" }).metadata();

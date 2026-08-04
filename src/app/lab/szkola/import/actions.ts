@@ -24,7 +24,7 @@ import {
   buildProcessingNote,
   type ExtractionOutcome,
 } from "@/lib/szkola/import/textExtractionWithOcr";
-import { isOcrEligibleMimeType } from "@/lib/szkola/import/ocr";
+import { reprocessInboxItem } from "@/lib/szkola/import/reprocessCore";
 import { isStuckProcessing } from "@/lib/szkola/import/staleness";
 import {
   CURRENCIES,
@@ -426,154 +426,6 @@ export async function createImportFromPastedEmail(formData: FormData) {
   }
 }
 
-/**
- * Rdzeń "Przetwórz ponownie" / "Spróbuj OCR" (sekcja 11 briefu) — jedna
- * wspólna implementacja, tylko forceOcr różni te dwie akcje. Aktualizuje
- * ISTNIEJĄCY rekord (żaden nowy wiersz, żadna nowa kopia pliku).
- *
- * Bez forceOcr: jeśli rekord ma już raw_text, ponowna klasyfikacja działa na
- * nim bez ponownego pobierania pliku (szybkie — przydatne po zmianie reguł
- * klasyfikatora). Z forceOcr: zawsze pobiera plik na nowo i wymusza OCR,
- * niezależnie od tego, czy zwykły parser już coś znalazł.
- */
-async function reprocessInboxItem(
-  supabase: SupabaseClient,
-  userId: string,
-  inboxItemId: string,
-  options: { forceOcr: boolean },
-): Promise<void> {
-  const { data: item, error: itemError } = await supabase
-    .from("import_inbox_items")
-    .select("*")
-    .eq("id", inboxItemId)
-    .single();
-  if (itemError) throw new Error(itemError.message);
-
-  let outcome: ExtractionOutcome;
-  if (options.forceOcr) {
-    if (!item.storage_path) throw new Error("Ten import nie ma pliku, więc nie można ponowić OCR.");
-    if (!isOcrEligibleMimeType(item.mime_type)) {
-      throw new Error("OCR nie jest dostępny dla tego typu pliku (obsługiwane: PDF, JPG, PNG, WEBP).");
-    }
-    const { data: blob, error: downloadError } = await supabase.storage.from(IMPORTS_BUCKET).download(item.storage_path);
-    if (downloadError) throw new Error(downloadError.message);
-    const buffer = Buffer.from(await blob.arrayBuffer());
-    outcome = await extractTextWithOcrFallback(item.mime_type ?? "", buffer, { forceOcr: true });
-  } else if (item.raw_text) {
-    outcome = {
-      text: item.raw_text,
-      senderName: item.sender_name,
-      subject: item.raw_email_subject,
-      receivedAt: null,
-      extractionMethod: (item.extraction_method as ExtractionMethod | null) ?? "text_layer",
-      ocrStatus: (item.ocr_status as OcrStatus | null) ?? "not_needed",
-      ocrConfidence: item.ocr_confidence,
-      ocrPagesProcessed: item.ocr_pages_processed,
-      ocrWarnings: [],
-      processingStage: "analyzing",
-    };
-  } else if (item.storage_path) {
-    const { data: blob, error: downloadError } = await supabase.storage.from(IMPORTS_BUCKET).download(item.storage_path);
-    if (downloadError) throw new Error(downloadError.message);
-    const buffer = Buffer.from(await blob.arrayBuffer());
-    outcome = await extractTextWithOcrFallback(item.mime_type ?? "", buffer);
-  } else {
-    outcome = {
-      text: "",
-      senderName: item.sender_name,
-      subject: item.raw_email_subject,
-      receivedAt: null,
-      extractionMethod: "none",
-      ocrStatus: "not_needed",
-      ocrConfidence: null,
-      ocrPagesProcessed: null,
-      ocrWarnings: [],
-      processingStage: "needs_manual_review",
-    };
-  }
-
-  const classification = classifyImportContent({
-    text: outcome.text,
-    subject: item.raw_email_subject,
-    filename: item.original_filename,
-    senderName: item.sender_name,
-  });
-  const extracted = extractReservationFields(classification.detectedType, outcome.text);
-
-  const { data: sessionsData } = await supabase.from("school_sessions").select("*");
-  const sessions = (sessionsData as SchoolSession[] | null) ?? [];
-  const sessionMatch = matchImportToSession(
-    { text: outcome.text, startAt: extracted.start_at, checkIn: extracted.check_in, checkOut: extracted.check_out },
-    sessions,
-  );
-
-  const duplicates = await findDuplicateReservation(supabase, userId, {
-    reservationType: classification.detectedType,
-    bookingReference: extracted.booking_reference,
-    amount: extracted.amount,
-    currency: extracted.currency,
-    startAt: extracted.start_at,
-  });
-  const status = duplicates.length > 0 || isLowConfidence(classification.confidence) ? "needs_review" : "recognized";
-  const finalStage: ProcessingStage =
-    outcome.processingStage === "ocr_error" ? "ocr_error" : status === "recognized" ? "ready_for_review" : "needs_manual_review";
-
-  await supabase
-    .from("import_inbox_items")
-    .update({
-      raw_text: outcome.text.slice(0, 20000),
-      status,
-      detected_type: classification.detectedType,
-      confidence_score: Math.round(classification.confidence * 1000) / 1000,
-      proposed_session_id: sessionMatch?.confidence === "high" ? sessionMatch.session.id : null,
-      processing_error: buildProcessingNote(outcome, Boolean(item.storage_path)),
-      extraction_method: outcome.extractionMethod,
-      ocr_status: outcome.ocrStatus,
-      ocr_confidence: outcome.ocrConfidence,
-      ocr_pages_processed: outcome.ocrPagesProcessed,
-      ocr_warnings: outcome.ocrWarnings,
-      processing_stage: finalStage,
-      processed_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", inboxItemId);
-
-  const { data: reservation } = await supabase
-    .from("imported_reservations")
-    .select("id")
-    .eq("inbox_item_id", inboxItemId)
-    .maybeSingle();
-
-  if (reservation) {
-    await supabase
-      .from("imported_reservations")
-      .update({
-        reservation_type: classification.detectedType,
-        provider: extracted.provider,
-        booking_reference: extracted.booking_reference,
-        origin: extracted.origin,
-        destination: extracted.destination,
-        start_at: extracted.start_at,
-        end_at: extracted.end_at,
-        check_in: extracted.check_in,
-        check_out: extracted.check_out,
-        amount: extracted.amount,
-        currency: extracted.currency,
-        passenger_name: extracted.passenger_name,
-        seat: extracted.seat,
-        cancellation_deadline: extracted.cancellation_deadline,
-        parsed_data: extracted.extra,
-        confidence_score: Math.round(classification.confidence * 1000) / 1000,
-        status,
-        // undefined => pole pominięte w zapytaniu, nie nadpisujemy już przypisanego
-        // zjazdu, jeśli ponowne przetworzenie nie znalazło jednoznacznego dopasowania.
-        session_id: sessionMatch?.confidence === "high" ? sessionMatch.session.id : undefined,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", reservation.id);
-  }
-}
-
 /** Ponawia klasyfikację/ekstrakcję dla istniejącego elementu skrzynki (sekcja 3: "processing" nie może być stanem bez wyjścia). */
 export async function reprocessImport(formData: FormData) {
   const userId = await requireUserId();
@@ -605,51 +457,6 @@ export async function reprocessImport(formData: FormData) {
   }
 
   logImportStage("reprocess-done", { inboxItemId });
-  revalidatePath("/lab/szkola/import");
-  revalidatePath(`/lab/szkola/import/${inboxItemId}`);
-}
-
-/**
- * "Spróbuj OCR" (sekcja 11 briefu) — dostępne, gdy zwykłe odczytanie nie
- * znalazło tekstu, poprzedni OCR się nie udał, albo użytkownik chce ponowić
- * mimo wszystko. Zawsze wymusza OCR (forceOcr: true), niezależnie od tego,
- * co wcześniej znalazł zwykły parser. Nie tworzy nowego rekordu ani nowej
- * kopii pliku — aktualizuje istniejący import.
- */
-export async function tryOcr(formData: FormData) {
-  const userId = await requireUserId();
-  const inboxItemId = String(formData.get("id") ?? "");
-  if (!inboxItemId) throw new Error("Brak identyfikatora elementu.");
-
-  const supabase = await createClient();
-  logImportStage("manual-ocr-start", { inboxItemId });
-  await supabase
-    .from("import_inbox_items")
-    .update({ status: "processing", ocr_status: "processing", updated_at: new Date().toISOString() })
-    .eq("id", inboxItemId);
-
-  try {
-    await reprocessInboxItem(supabase, userId, inboxItemId, { forceOcr: true });
-  } catch (err) {
-    const message = safeErrorMessage(
-      err,
-      "Nie udało się odczytać dokumentu automatycznie. Plik został bezpiecznie zapisany. Możesz uzupełnić dane ręcznie lub ponowić OCR.",
-    );
-    logImportStage("manual-ocr-failed", { inboxItemId });
-    await supabase
-      .from("import_inbox_items")
-      .update({
-        status: "error",
-        ocr_status: "failed",
-        processing_stage: "ocr_error",
-        processing_error: message,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", inboxItemId);
-    throw new Error(message);
-  }
-
-  logImportStage("manual-ocr-done", { inboxItemId });
   revalidatePath("/lab/szkola/import");
   revalidatePath(`/lab/szkola/import/${inboxItemId}`);
 }
