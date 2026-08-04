@@ -1,7 +1,7 @@
 import "server-only";
 import { simpleParser } from "mailparser";
 import mammoth from "mammoth";
-import { PDFParse } from "pdf-parse";
+import { logImportStage } from "./importLogging";
 
 /**
  * Wyciąganie tekstu z przesłanych plików — czysto tekstowe/regułowe, bez AI
@@ -39,7 +39,20 @@ export async function extractFromEml(buffer: Buffer): Promise<ParsedEmailContent
   };
 }
 
+/**
+ * Import DYNAMICZNY (nie statyczny top-level) celowo: pdf-parse ciągnie za
+ * sobą pdfjs-dist + @napi-rs/canvas (natywny dodatek NAPI, prebuild
+ * per-platforma). Gdyby ten import był statyczny na górze pliku, a natywna
+ * binarka nie załadowała się poprawnie w danym środowisku (znany problem
+ * przy bundlowaniu natywnych zależności na Vercelu), całe module load tego
+ * pliku (a przez to i actions.ts, które go importuje) padłoby PRZED
+ * wejściem do jakiegokolwiek try/catch — dokładnie tak wyglądałaby awaria
+ * całego Server Component/Action bez czytelnego komunikatu. Dynamiczny
+ * import() zwraca odrzuconą obietnicę zamiast rzucać przy load module,
+ * więc błąd łapiemy tutaj, w miejscu użycia.
+ */
 export async function extractFromPdf(buffer: Buffer): Promise<string> {
+  const { PDFParse } = await import("pdf-parse");
   const parser = new PDFParse({ data: buffer });
   try {
     const result = await parser.getText();
@@ -75,20 +88,27 @@ export function isTextExtractable(mimeType: string): boolean {
  * wywołujący kod traktuje to jako "brak treści do klasyfikacji regułowej".
  */
 export async function extractTextFromUpload(mimeType: string, buffer: Buffer): Promise<string | null> {
+  logImportStage("text-extraction-start", { mimeType, bufferBytes: buffer.length });
   try {
-    if (mimeType === "application/pdf") return await extractFromPdf(buffer);
-    if (mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-      return await extractFromDocx(buffer);
-    }
-    if (mimeType === "text/plain") return extractFromTxt(buffer);
-    if (mimeType === "message/rfc822") {
-      const parsed = await extractFromEml(buffer);
-      return parsed.text;
-    }
-    return null;
-  } catch {
-    // Uszkodzony/niestandardowy plik — brak treści, nie blokujemy uploadu.
-    // Element trafia do "Wymaga sprawdzenia" zamiast zostać odrzucony.
+    let text: string | null;
+    if (mimeType === "application/pdf") text = await extractFromPdf(buffer);
+    else if (mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+      text = await extractFromDocx(buffer);
+    } else if (mimeType === "text/plain") text = extractFromTxt(buffer);
+    else if (mimeType === "message/rfc822") text = (await extractFromEml(buffer)).text;
+    else text = null;
+
+    logImportStage("text-extraction-done", { mimeType, textLength: text?.length ?? 0 });
+    return text;
+  } catch (err) {
+    // Uszkodzony/niestandardowy/zaszyfrowany plik ALBO błąd samego parsera
+    // (np. brakująca natywna zależność w danym środowisku) — brak treści,
+    // nie blokujemy uploadu. Element trafia do "Wymaga sprawdzenia" zamiast
+    // zostać odrzucony albo — gorzej — wywalić cały Server Action.
+    logImportStage("text-extraction-failed", {
+      mimeType,
+      errorName: err instanceof Error ? err.name : typeof err,
+    });
     return null;
   }
 }

@@ -6,6 +6,10 @@ import ImportInboxExplorer, { type ImportListRow } from "@/components/szkola/Imp
 import type { Currency, ImportDetectedType, ImportStatus, SchoolSession } from "@/lib/szkola/types";
 
 export const metadata: Metadata = { title: "Skrzynka importu" };
+// Import PDF/DOCX/EML (pdf-parse, mammoth, mailparser) potrzebuje pełnego
+// Node API — jawnie wykluczamy Edge Runtime (i tak jest domyślny, ale
+// deklarujemy to na wypadek przyszłych zmian konfiguracji tras).
+export const runtime = "nodejs";
 
 type InboxRow = {
   id: string;

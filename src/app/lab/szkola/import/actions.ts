@@ -1,5 +1,13 @@
 "use server";
 
+// Uwaga: pliki "use server" mogą eksportować WYŁĄCZNIE async function (Server
+// Actions) — `export const runtime` tutaj psuje cały moduł ("module has no
+// exports"). Jawna deklaracja runtime = "nodejs" (wymagana przez
+// pdf-parse/mammoth/mailparser — pełne Node API, node:crypto, natywne
+// dodatki, niedostępne w Edge Runtime) siedzi więc w page.tsx/[id]/page.tsx
+// tej trasy zamiast tutaj. Node.js i tak jest domyślnym runtime dla Server
+// Actions (nigdzie w drzewie /lab/szkola nie ma `export const runtime = "edge"`).
+
 import { revalidatePath } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
@@ -11,6 +19,7 @@ import { findDuplicateInboxItem, findDuplicateReservation, hashFileBuffer } from
 import { IMPORTS_BUCKET } from "@/lib/szkola/importStorage";
 import { DOCUMENTS_BUCKET } from "@/lib/szkola/documentsStorage";
 import { sanitizeStorageFilename } from "@/lib/storageFilename";
+import { logImportStage, safeErrorMessage } from "@/lib/szkola/importLogging";
 import {
   CURRENCIES,
   IMPORT_DETECTED_TYPES,
@@ -78,6 +87,12 @@ const DOCUMENT_TYPE_BY_DETECTED_TYPE: Record<ImportDetectedType, string> = {
 // Wspólny rdzeń przyjęcia importu (klasyfikacja -> ekstrakcja -> duplikaty ->
 // dopasowanie zjazdu -> zapis). Używany przez upload/wklejenie/EML, żeby nie
 // duplikować tej samej logiki trzy razy.
+//
+// WAŻNE: ta funkcja celowo NIE łapie własnych błędów — robi to wywołujący
+// (createImportFromUpload/createImportFromPastedEmail), który zna kontekst
+// (czy jest plik w Storage do ewentualnego posprzątania) i potrafi w razie
+// błędu i tak utworzyć rekord ze statusem "error" zamiast dać wyjątkowi
+// uciec do poziomu całego Server Action (sekcja 2/3 briefu).
 // ---------------------------------------------------------------------------
 async function runIntakePipeline(params: {
   userId: string;
@@ -93,6 +108,8 @@ async function runIntakePipeline(params: {
   text: string;
 }) {
   const supabase = await createClient();
+
+  logImportStage("classification-start", { source: params.source, mimeType: params.mimeType });
 
   const duplicateInboxMatches = await findDuplicateInboxItem(supabase, params.userId, {
     fileHash: params.fileHash,
@@ -127,6 +144,18 @@ async function runIntakePipeline(params: {
   const lowConfidence = isLowConfidence(classification.confidence);
   const status = hasDuplicates || lowConfidence ? "needs_review" : "recognized";
 
+  // Dokument bez treści (parser padł ALBO PDF to skan bez warstwy tekstowej)
+  // — sekcja 2 i 6: to nie jest fatalny błąd, tylko sygnał dla użytkownika.
+  const hasSourceFile = params.source === "upload" || params.source === "eml";
+  const isEmptyContent = hasSourceFile && params.text.trim().length === 0;
+  const processingNote = isEmptyContent
+    ? params.mimeType === "application/pdf"
+      ? "Plik został zapisany, ale nie udało się automatycznie odczytać jego treści (dokument może być skanem bez warstwy tekstowej). Możesz uzupełnić dane ręcznie lub spróbować ponownie."
+      : "Plik został zapisany, ale nie udało się automatycznie odczytać jego treści. Możesz uzupełnić dane ręcznie lub spróbować ponownie."
+    : null;
+
+  logImportStage("inbox-record-create", { status, detectedType: classification.detectedType, isEmptyContent });
+
   const { data: inboxItem, error: inboxError } = await supabase
     .from("import_inbox_items")
     .insert({
@@ -146,6 +175,7 @@ async function runIntakePipeline(params: {
       detected_type: classification.detectedType,
       confidence_score: Math.round(classification.confidence * 1000) / 1000,
       proposed_session_id: sessionMatch?.confidence === "high" ? sessionMatch.session.id : null,
+      processing_error: processingNote,
     })
     .select()
     .single();
@@ -176,6 +206,8 @@ async function runIntakePipeline(params: {
   });
   if (reservationError) throw new Error(reservationError.message);
 
+  logImportStage("redirect", { inboxItemId: inboxItem.id as string });
+
   revalidatePath("/lab/szkola/import");
   revalidatePath("/lab/szkola");
 
@@ -188,6 +220,78 @@ async function runIntakePipeline(params: {
   };
 }
 
+/**
+ * Ostatnia linia obrony (sekcja 2/3 briefu): plik JUŻ jest bezpiecznie w
+ * Storage, ale klasyfikacja/ekstrakcja/zapis rozpoznanej rezerwacji się nie
+ * udały. Zamiast dać wyjątkowi uciec do poziomu Server Action (dokładnie tak
+ * wyglądała pierwotna awaria — plik w buckecie, zero śladu w bazie), zawsze
+ * tworzy (albo aktualizuje istniejący, żeby nie duplikować przy ponownej
+ * próbie tego samego pliku) rekord `import_inbox_items` ze statusem "error"
+ * i bezpiecznym komunikatem. Tylko jeśli TEN zapis też się nie uda, sprząta
+ * osierocony plik i rzuca czytelny błąd do wyświetlenia w formularzu.
+ */
+async function recordFailedImport(params: {
+  userId: string;
+  source: "upload" | "eml";
+  originalFilename: string | null;
+  storagePath: string;
+  mimeType: string | null;
+  fileSize: number | null;
+  fileHash: string;
+  err: unknown;
+}) {
+  const supabase = await createClient();
+  const message = safeErrorMessage(params.err, "Nie udało się przetworzyć przesłanego pliku.");
+  logImportStage("intake-pipeline-failed", { source: params.source, mimeType: params.mimeType });
+
+  const { data: existing } = await supabase
+    .from("import_inbox_items")
+    .select("id")
+    .eq("user_id", params.userId)
+    .eq("file_hash", params.fileHash)
+    .eq("status", "error")
+    .maybeSingle();
+
+  if (existing) {
+    await supabase
+      .from("import_inbox_items")
+      .update({ storage_path: params.storagePath, processing_error: message, updated_at: new Date().toISOString() })
+      .eq("id", existing.id);
+    revalidatePath("/lab/szkola/import");
+    return { inboxItemId: existing.id as string, detectedType: null, confidence: 0, duplicates: [], sessionMatch: null };
+  }
+
+  const { data: inboxItem, error: insertError } = await supabase
+    .from("import_inbox_items")
+    .insert({
+      user_id: params.userId,
+      source: params.source,
+      original_filename: params.originalFilename,
+      storage_path: params.storagePath,
+      mime_type: params.mimeType,
+      file_size: params.fileSize,
+      file_hash: params.fileHash,
+      received_at: new Date().toISOString(),
+      status: "error",
+      processing_error: message,
+    })
+    .select("id")
+    .single();
+
+  if (insertError) {
+    logImportStage("intake-fallback-insert-failed", { code: insertError.code });
+    try {
+      await supabase.storage.from(IMPORTS_BUCKET).remove([params.storagePath]);
+    } catch {
+      // best-effort — nie maskuj oryginalnego błędu niepowodzeniem sprzątania
+    }
+    throw new Error("Nie udało się zapisać danych importu. Spróbuj przesłać plik ponownie.");
+  }
+
+  revalidatePath("/lab/szkola/import");
+  return { inboxItemId: inboxItem.id as string, detectedType: null, confidence: 0, duplicates: [], sessionMatch: null };
+}
+
 export async function createImportFromUpload(formData: FormData) {
   const userId = await requireUserId();
   const storagePath = String(formData.get("storage_path") ?? "").trim();
@@ -196,41 +300,56 @@ export async function createImportFromUpload(formData: FormData) {
   const fileSize = Number(formData.get("file_size") ?? 0) || null;
   if (!storagePath) throw new Error("Brak przesłanego pliku.");
 
+  logImportStage("upload-intake-start", { mimeType });
+
   const supabase = await createClient();
   const { data: blob, error: downloadError } = await supabase.storage.from(IMPORTS_BUCKET).download(storagePath);
-  if (downloadError) throw new Error(downloadError.message);
+  if (downloadError) {
+    logImportStage("storage-download-failed");
+    throw new Error("Plik został przesłany, ale nie udało się go odczytać z magazynu. Spróbuj ponownie.");
+  }
+  logImportStage("storage-download-success");
 
   const buffer = Buffer.from(await blob.arrayBuffer());
   const fileHash = hashFileBuffer(buffer);
+  const source = mimeType === "message/rfc822" ? "eml" : "upload";
 
-  let text = "";
-  let senderName: string | null = null;
-  let subject: string | null = null;
-  let receivedAt: string | null = null;
+  // Od tego miejsca plik już bezpiecznie istnieje w Storage — każdy kolejny
+  // błąd (parser, klasyfikacja, zapis do bazy) MUSI skończyć się rekordem ze
+  // statusem "error" (patrz recordFailedImport), a nie nieobsłużonym
+  // wyjątkiem, żeby plik nigdy nie został osierocony bez śladu.
+  try {
+    let text = "";
+    let senderName: string | null = null;
+    let subject: string | null = null;
+    let receivedAt: string | null = null;
 
-  if (mimeType === "message/rfc822") {
-    const parsed = await extractFromEml(buffer);
-    text = parsed.text;
-    senderName = parsed.senderName;
-    subject = parsed.subject;
-    receivedAt = parsed.sentAt;
-  } else {
-    text = (await extractTextFromUpload(mimeType, buffer)) ?? "";
+    if (mimeType === "message/rfc822") {
+      const parsed = await extractFromEml(buffer);
+      text = parsed.text;
+      senderName = parsed.senderName;
+      subject = parsed.subject;
+      receivedAt = parsed.sentAt;
+    } else {
+      text = (await extractTextFromUpload(mimeType, buffer)) ?? "";
+    }
+
+    return await runIntakePipeline({
+      userId,
+      source,
+      originalFilename,
+      storagePath,
+      mimeType,
+      fileSize,
+      fileHash,
+      senderName,
+      subject,
+      receivedAt,
+      text,
+    });
+  } catch (err) {
+    return recordFailedImport({ userId, source, originalFilename, storagePath, mimeType, fileSize, fileHash, err });
   }
-
-  return runIntakePipeline({
-    userId,
-    source: mimeType === "message/rfc822" ? "eml" : "upload",
-    originalFilename,
-    storagePath,
-    mimeType,
-    fileSize,
-    fileHash,
-    senderName,
-    subject,
-    receivedAt,
-    text,
-  });
 }
 
 export async function createImportFromPastedEmail(formData: FormData) {
@@ -241,19 +360,29 @@ export async function createImportFromPastedEmail(formData: FormData) {
   const body = String(formData.get("body") ?? "").trim();
   if (!body) throw new Error("Treść wiadomości jest wymagana.");
 
-  return runIntakePipeline({
-    userId,
-    source: "pasted_email",
-    originalFilename: null,
-    storagePath: null,
-    mimeType: "text/plain",
-    fileSize: body.length,
-    fileHash: null,
-    senderName,
-    subject,
-    receivedAt: receivedAt ? new Date(receivedAt).toISOString() : null,
-    text: [subject, body].filter(Boolean).join("\n\n"),
-  });
+  logImportStage("pasted-email-intake-start");
+
+  try {
+    return await runIntakePipeline({
+      userId,
+      source: "pasted_email",
+      originalFilename: null,
+      storagePath: null,
+      mimeType: "text/plain",
+      fileSize: body.length,
+      fileHash: null,
+      senderName,
+      subject,
+      receivedAt: receivedAt ? new Date(receivedAt).toISOString() : null,
+      text: [subject, body].filter(Boolean).join("\n\n"),
+    });
+  } catch (err) {
+    // Brak pliku w Storage do posprzątania (wklejony tekst), więc nie ma
+    // czego "osierocić" — ale nadal nie chcemy, żeby wyjątek uciekł
+    // nieobsłużony do poziomu Server Action (ta sama zasada co przy uploadzie).
+    logImportStage("pasted-email-intake-failed");
+    throw new Error(safeErrorMessage(err, "Nie udało się zapisać wiadomości."));
+  }
 }
 
 /** Ponawia klasyfikację/ekstrakcję dla istniejącego elementu skrzynki (sekcja 3: "processing" nie może być stanem bez wyjścia). */
@@ -263,6 +392,7 @@ export async function reprocessImport(formData: FormData) {
   if (!inboxItemId) throw new Error("Brak identyfikatora elementu.");
 
   const supabase = await createClient();
+  logImportStage("reprocess-start", { inboxItemId });
   await supabase.from("import_inbox_items").update({ status: "processing" }).eq("id", inboxItemId);
 
   try {
@@ -357,6 +487,7 @@ export async function reprocessImport(formData: FormData) {
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : "Nie udało się przetworzyć ponownie.";
+    logImportStage("reprocess-failed", { inboxItemId });
     await supabase
       .from("import_inbox_items")
       .update({ status: "error", processing_error: message, updated_at: new Date().toISOString() })
@@ -364,6 +495,7 @@ export async function reprocessImport(formData: FormData) {
     throw new Error(message);
   }
 
+  logImportStage("reprocess-done", { inboxItemId });
   revalidatePath("/lab/szkola/import");
 }
 
