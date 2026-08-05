@@ -92,23 +92,31 @@ export default function ResearchInteractive({
 
   return (
     <>
-      {/* Kolumny hero w proporcji ~0.9/1.1 (bliżej równowagi niż poprzednie 38/62),
-          żeby mapa nie dominowała nad treścią. Jeden wspólny kontener
-          (RESEARCH_CONTAINER_CLASS) zamiast pełnego wyłamania na szerokość
-          viewportu — to też usuwa źródło poziomego scrolla przy pasku
-          przewijania (100vw liczone bez uwzględnienia scrollbara). */}
+      {/* Kolumny hero w proporcji ~0.88/1.12 (lewa ~44%, prawa ~56% na szerokich
+          ekranach) — prawa kolumna z mapą wyraźnie szersza i mniej ściśnięta niż
+          poprzednio (0.9/1.1 ≈ 45/55, ale efektywnie mapa wyglądała ciasno przez
+          przesunięcie translate, usunięte poniżej). Gap zwiększony (16→20 od
+          min-[1200px]), żeby między tekstem a mapą było wyraźnie więcej poziomego
+          oddechu. Jeden wspólny kontener (RESEARCH_CONTAINER_CLASS) zamiast
+          pełnego wyłamania na szerokość viewportu — to też usuwa źródło poziomego
+          scrolla przy pasku przewijania (100vw liczone bez uwzględnienia scrollbara). */}
       <section className="pt-12 lg:pt-16">
         <div
-          className={`${RESEARCH_CONTAINER_CLASS} grid grid-cols-1 items-center gap-10 min-[1200px]:grid-cols-[minmax(420px,0.9fr)_minmax(520px,1.1fr)] min-[1200px]:gap-16`}
+          className={`${RESEARCH_CONTAINER_CLASS} grid grid-cols-1 items-center gap-10 min-[1200px]:grid-cols-[minmax(420px,0.88fr)_minmax(560px,1.12fr)] min-[1200px]:gap-20`}
         >
           <div className="w-full">{heroLeft}</div>
           {/* items-center centruje kolumnę mapy w wysokości wiersza (mapa jest wyższa
               niż tekst), zostawiając pas pustej przestrzeni nad i pod nią w równych
-              częściach. Drobne przesunięcie w górę/lewo — tylko w układzie
-              dwukolumnowym (≥1200px) — zjada część górnego zapasu, żeby diagram
-              wizualnie zbliżył się do wysokości nagłówka po lewej, nie wychodząc poza
-              wiersz (zapas nad kolumną jest większy niż przesunięcie). */}
-          <div className="w-full min-[1200px]:translate-x-[-15px] min-[1200px]:translate-y-[-25px]">
+              częściach. Bez ręcznego przesunięcia (translate) — poprzednia wersja
+              ciągnęła mapę w górę/lewo, czyli DO tekstu, co bezpośrednio przeczyło
+              celowi "więcej oddechu wokół mapy"; teraz kolumna zostaje dokładnie
+              tam, gdzie umieszcza ją grid. overflow-x-clip: rozlane tło mapy
+              (ResearchMap) celowo wychodzi poza sam box diagramu (ujemny inset) —
+              bez tego ograniczenia, przy układzie jednokolumnowym (<1200px), gdzie
+              ta kolumna jest już pełnej szerokości kontenera, rozlanie dokładałoby
+              realną szerokość do layoutu i psuło stronę poziomym scrollem. Oś Y
+              zostaje bez ograniczenia, żeby pionowy "oddech" tła nie był ucinany. */}
+          <div className="w-full overflow-x-clip">
             <ResearchMap
               axes={axes}
               activeAxis={activeAxis}

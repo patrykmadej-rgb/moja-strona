@@ -11,39 +11,41 @@ import { useRevealOnce } from "./useRevealOnce";
 const NODE_ORDER: ResearchAxisId[] = ["balkans", "security", "profiling", "victimology", "clinical"];
 
 // Viewbox 900x580, centrum (450,276) r=95, węzły r=43 — patrz komentarz przy
-// RESEARCH_MAP_NODE_POSITIONS w research.ts dla pełnej geometrii (centrum
-// przesunięte ~14 jednostek wyżej, boczne węzły ściągnięte bliżej środka —
-// bardziej zwarta, mniej rozciągnięta pozioma kompozycja). Każda krzywa to
-// kwadratowy Bézier (Q) liczony tak, żeby zaczynać się DOKŁADNIE na obwodzie
-// centralnego koła i kończyć DOKŁADNIE na obwodzie węzła (nie w jego środku, nie
-// w powietrzu przed nim) — punkt kontrolny przesunięty prostopadle do cięciwy o
-// ~10% jej długości, naprzemiennie w lewo/prawo, żeby linie miały organiczny,
-// lekko "wachlarzowy" wygląd zamiast sztywnych prostych. Promienie r=95/r=43 BEZ
-// ZMIAN względem poprzedniej wersji — przy zmianie pozycji węzłów w
-// RESEARCH_MAP_NODE_POSITIONS te krzywe MUSZĄ zostać przeliczone na nowo,
-// inaczej linie zaczną się urywać przed (lub za) nowymi pozycjami okręgów.
+// RESEARCH_MAP_NODE_POSITIONS w research.ts dla pełnej geometrii i dla
+// wyjaśnienia, dlaczego promienie orbit węzłów zostały zwiększone (naprawa
+// "linie za krótkie / nie dochodzą do węzłów", najbardziej widoczna wcześniej
+// przy wiktymologii — patrz tamten komentarz). Każda krzywa to kwadratowy
+// Bézier (Q) liczony tak, żeby zaczynać się DOKŁADNIE na obwodzie centralnego
+// koła i kończyć DOKŁADNIE na obwodzie węzła (nie w jego środku, nie w
+// powietrzu przed nim) — punkt kontrolny przesunięty prostopadle do cięciwy o
+// 9% jej długości (subtelniej niż poprzednio, bliżej niemal prostych linii z
+// mockupu), naprzemiennie w lewo/prawo, żeby linie miały organiczny,
+// lekko "wachlarzowy" wygląd zamiast sztywnych prostych. Promienie r=95/r=43
+// BEZ ZMIAN — przy zmianie pozycji węzłów w RESEARCH_MAP_NODE_POSITIONS te
+// krzywe MUSZĄ zostać przeliczone na nowo, inaczej linie zaczną się urywać
+// przed (lub za) nowymi pozycjami okręgów.
 const CONNECTIONS: { axis: ResearchAxisId; d: string }[] = [
-  { axis: "balkans", d: "M372 222Q354 183 311 180" },
-  { axis: "security", d: "M527 220Q542 184 581 180" },
-  { axis: "profiling", d: "M365 319Q285 326 231 386" },
-  { axis: "clinical", d: "M537 315Q614 318 669 373" },
-  { axis: "victimology", d: "M450 371Q434 380 450 388" },
+  { axis: "balkans", d: "M372 222Q337 187 292 166" },
+  { axis: "security", d: "M527 220Q558 187 599 167" },
+  { axis: "profiling", d: "M365 319Q286 342 220 391" },
+  { axis: "clinical", d: "M537 315Q614 334 680 379" },
+  { axis: "victimology", d: "M450 371Q444 405 450 438" },
 ];
 
 // Dwie szerokie orbity (górna, dolna) — czysto dekoracyjne, nie łączą
 // konkretnych węzłów, tylko "obejmują" całą kompozycję łagodnym łukiem.
-// Szerokość zwężona o ~5% (skalowana wokół x=450) razem ze ściągniętą do
-// środka kompozycją węzłów.
-const TOP_ORBIT = "M118 205C265 65 635 65 783 205";
-const BOTTOM_ORBIT = "M108 385C270 560 631 560 792 385";
+// Poszerzone o ~6% (skalowane wokół x=450) razem z rozsuniętą na zewnątrz
+// kompozycją węzłów, żeby nadal wizualnie "obejmowały" cały diagram z zapasem.
+const TOP_ORBIT = "M98 205C254 65 646 65 803 205";
+const BOTTOM_ORBIT = "M87 385C259 560 642 560 813 385";
 
 // Środek każdej krzywej z CONNECTIONS (t=0.5 na Q), jeden świecący punkt na linię.
 const CONNECTION_DOTS = [
-  { cx: 348, cy: 192, duration: 3.8 },
-  { cx: 548, cy: 192, duration: 4.2 },
-  { cx: 292, cy: 339, duration: 4.6 },
-  { cx: 608, cy: 331, duration: 5 },
-  { cx: 442, cy: 380, duration: 5.2 },
+  { cx: 335, cy: 190, duration: 3.8 },
+  { cx: 561, cy: 190, duration: 4.2 },
+  { cx: 289, cy: 349, duration: 4.6 },
+  { cx: 611, cy: 341, duration: 5 },
+  { cx: 447, cy: 405, duration: 5.2 },
 ];
 
 type Labels = {
@@ -107,23 +109,28 @@ export default function ResearchMap({
       <p className="mb-4 hidden text-xs font-semibold tracking-[0.25em] uppercase text-[#4A1D6E] min-[720px]:block dark:text-purple-400">
         {labels.mapLabel}
       </p>
-      <div
-        ref={ref}
-        role="group"
-        aria-label={labels.mapAriaLabel}
-        className="@container relative mx-auto hidden aspect-[900/580] w-full min-[720px]:block"
-      >
-        {/* Warstwa 1: tło — bez twardej ramki/karty; maska radialna rozmywa krawędzie
-            tak, żeby akwarela organicznie wtapiała się w tło strony (fallback
-            gradientowy, dopóki nie podmienisz na research-map-background.png).
-            Elipsa maski powiększona i wycentrowana bliżej środka kompozycji (50% 52%,
-            czyli mniej więcej środek ciężkości węzłów), żeby plama obejmowała
-            centralny węzeł i większość połączeń zamiast kończyć się tuż przy nim. */}
+      {/* Wrapper "sceny" — hidden/min-[720px]:block tutaj (zamiast na samym
+          ref-boxie poniżej), bo Warstwa 0 (tło) musi być SIOSTRĄ ref-boxa, nie
+          jego dzieckiem: to jedyny sposób, żeby tło mogło być WIĘKSZE niż sam
+          box mapy (900:580) i rozlewać się w przestrzeń wokół diagramu, zamiast
+          kończyć się dokładnie na jego krawędzi (naprawa "tło wygląda jak
+          osobny obrazek / ostro odcięty prostokąt pod samą mapą"). */}
+      <div className="relative mx-auto hidden w-full min-[720px]:block">
+        {/* Warstwa 0: tło — rozlane WYRAŹNIE szerzej niż ref-box mapy (ujemny
+            inset), żeby wypełniało realną przestrzeń całej prawej kolumny hero,
+            a nie tylko wąski prostokąt diagramu. Bez twardej ramki/karty; maska
+            radialna rozmywa krawędzie na całym tym większym obszarze, więc
+            NIGDZIE (nawet przy nowych, dalszych krawędziach) nie ma twardego
+            odcięcia prostokąta — akwarela gaśnie do przezroczystości, zanim
+            dotrze do brzegu tej rozszerzonej warstwy.
+            pointer-events-none, bo to czysto dekoracyjna warstwa pod
+            interaktywnym diagramem (guziki węzłów są w ref-boxie obok/nad nią). */}
         <div
-          className="absolute inset-0"
+          aria-hidden="true"
+          className="pointer-events-none absolute -inset-x-[9%] -inset-y-[15%] sm:-inset-x-[13%] sm:-inset-y-[19%]"
           style={{
-            maskImage: "radial-gradient(ellipse 72% 78% at 50% 52%, black 48%, transparent 94%)",
-            WebkitMaskImage: "radial-gradient(ellipse 72% 78% at 50% 52%, black 48%, transparent 94%)",
+            maskImage: "radial-gradient(ellipse 56% 56% at 50% 52%, black 20%, transparent 82%)",
+            WebkitMaskImage: "radial-gradient(ellipse 56% 56% at 50% 52%, black 20%, transparent 82%)",
           }}
         >
           {hasBackgroundImage ? (
@@ -133,7 +140,7 @@ export default function ResearchMap({
               fill
               priority
               loading="eager"
-              sizes="(min-width: 1200px) 700px, 100vw"
+              sizes="(min-width: 1200px) 900px, 100vw"
               aria-hidden="true"
               className="object-cover"
             />
@@ -154,11 +161,17 @@ export default function ResearchMap({
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(circle at 50% 51%, rgba(107,58,145,0.19), transparent 58%)",
+                "radial-gradient(circle at 50% 51%, rgba(107,58,145,0.19), transparent 62%)",
             }}
           />
         </div>
 
+        <div
+          ref={ref}
+          role="group"
+          aria-label={labels.mapAriaLabel}
+          className="@container relative mx-auto aspect-[900/580] w-full"
+        >
         {/* Warstwa 2: linie orbitalne (pod liniami połączeń) + Warstwa 3: linie połączeń */}
         <svg
           viewBox="0 0 900 580"
@@ -166,7 +179,7 @@ export default function ResearchMap({
           aria-hidden="true"
           className="absolute inset-0 h-full w-full"
         >
-          <g stroke="var(--research-gold)" strokeWidth={1.2} opacity={0.55} strokeDasharray="4 8" strokeLinecap="round">
+          <g stroke="var(--research-gold)" strokeWidth={1.4} opacity={0.55} strokeDasharray="5 9" strokeLinecap="round">
             <path d={TOP_ORBIT} />
             <path d={BOTTOM_ORBIT} />
           </g>
@@ -288,6 +301,7 @@ export default function ResearchMap({
             </button>
           );
         })}
+        </div>
       </div>
 
       {/* ============ MOBILE (<720px): medalion + accordion pionowy ============ */}
