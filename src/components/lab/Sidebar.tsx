@@ -27,7 +27,7 @@ type NavItem = {
 };
 
 const PRIMARY_ITEMS: NavItem[] = [
-  { key: "pulpit", href: "/lab", label: "Pulpit", icon: LayoutDashboard, enabled: false },
+  { key: "pulpit", href: "/lab", label: "Pulpit", icon: LayoutDashboard, enabled: true },
   { key: "artykuly", href: "/lab/artykuly", label: "Artykuły", icon: FileText, enabled: true },
   { key: "szkola", href: "/lab/szkola", label: "Szkoła psychoterapii", icon: GraduationCap, enabled: true },
 ];

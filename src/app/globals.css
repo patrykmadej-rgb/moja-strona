@@ -209,6 +209,32 @@ html {
 }
 
 /* ============================================================
+   /lab — nowy połączony pulpit (Szkoła + Artykuły), zawężony do
+   .lab-pulpit-page. Ten sam mechanizm i powód co .lab-szkola-page
+   powyżej — dashboard reużywa też StatusTag/PriorityTag/EmptyState z
+   modułu artykułów (stąd rounded-[8px], normalnie zdefiniowany tylko w
+   zakresie .lab-article(s)-page).
+   ============================================================ */
+.lab-pulpit-page .rounded-full {
+  border-radius: 9999px !important;
+}
+.lab-pulpit-page .rounded-\[16px\] {
+  border-radius: 16px !important;
+}
+.lab-pulpit-page .rounded-\[12px\] {
+  border-radius: 12px !important;
+}
+.lab-pulpit-page .rounded-\[10px\] {
+  border-radius: 10px !important;
+}
+.lab-pulpit-page .rounded-\[8px\] {
+  border-radius: 8px !important;
+}
+.lab-pulpit-page .rounded-\[7px\] {
+  border-radius: 7px !important;
+}
+
+/* ============================================================
    Wspólny sidebar /lab.
 
    Przyczyna dawnego "urywania się" tła: sidebar był zwykłym flex-

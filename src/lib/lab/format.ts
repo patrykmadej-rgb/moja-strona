@@ -55,6 +55,19 @@ export function formatShortDate(dateOnly: string): string {
   });
 }
 
+/** "18 min temu" itp. — dla feedu Ostatniej aktywności pulpitu (sekcja 11 briefu). */
+export function formatRelativeTime(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const diffMinutes = Math.round(diffMs / 60_000);
+  if (diffMinutes < 1) return "przed chwilą";
+  if (diffMinutes < 60) return `${diffMinutes} min temu`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours} godz. temu`;
+  const diffDays = Math.round(diffHours / 24);
+  if (diffDays < 7) return `${diffDays} ${diffDays === 1 ? "dzień" : "dni"} temu`;
+  return formatDateOnly(iso.slice(0, 10));
+}
+
 export function todayDateString(): string {
   const now = new Date();
   const month = String(now.getMonth() + 1).padStart(2, "0");
