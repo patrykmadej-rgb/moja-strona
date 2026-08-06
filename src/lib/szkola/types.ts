@@ -71,11 +71,14 @@ export const SEGMENT_TYPE_LABELS: Record<SegmentType, string> = {
   inne: "Inne",
 };
 
-export const SEGMENT_DIRECTIONS = ["tam", "powrot"] as const;
+/** lokalny/inny dodane w migracji 020 (sekcja 2 briefu) — CHECK constraint na travel_segments.direction rozszerzony w tej samej migracji. */
+export const SEGMENT_DIRECTIONS = ["tam", "powrot", "lokalny", "inny"] as const;
 export type SegmentDirection = (typeof SEGMENT_DIRECTIONS)[number];
 export const SEGMENT_DIRECTION_LABELS: Record<SegmentDirection, string> = {
-  tam: "Tam",
-  powrot: "Powrót",
+  tam: "Podróż na zjazd",
+  powrot: "Podróż powrotna",
+  lokalny: "Przejazd lokalny",
+  inny: "Inny",
 };
 
 export const SEGMENT_STATUSES = [
@@ -107,7 +110,10 @@ export type TravelItinerary = {
 
 export type TravelSegment = {
   id: string;
-  itinerary_id: string;
+  /** Nullable od migracji 020 — odcinek dodany z ogólnej zakładki Podróże bez wskazania zjazdu jeszcze nie ma itinerary. */
+  itinerary_id: string | null;
+  /** Bezpośrednie powiązanie ze zjazdem (migracja 020), niezależne od itinerary_id — źródło prawdy dla "czy ten odcinek jest przypisany". */
+  session_id: string | null;
   segment_type: SegmentType;
   direction: SegmentDirection | null;
   departure_date: string | null;
@@ -125,6 +131,8 @@ export type TravelSegment = {
   currency: Currency | null;
   status: SegmentStatus;
   link: string | null;
+  /** Migracja 020 — sekcja 2 briefu. */
+  notes: string | null;
   sort_order: number;
   created_at: string;
 };
@@ -149,9 +157,12 @@ export const ACCOMMODATION_STATUS_LABELS: Record<AccommodationStatus, string> = 
 
 export type Accommodation = {
   id: string;
-  session_id: string;
+  /** Nullable od migracji 020 — pozwala dodać nocleg z ogólnej zakładki Zakwaterowanie bez wskazania zjazdu. */
+  session_id: string | null;
   name: string;
   address: string | null;
+  /** Migracja 020 — osobne pole (nie parsowane z address), potrzebne do dopasowania lokalizacji przy sugerowaniu zjazdu. */
+  city: string | null;
   check_in: string | null;
   check_out: string | null;
   price: number | null;
@@ -164,6 +175,8 @@ export type Accommodation = {
   distance_to_venue: string | null;
   travel_time_to_venue: string | null;
   link: string | null;
+  /** Migracja 020 — sekcja 3 briefu. */
+  notes: string | null;
   created_at: string;
 };
 

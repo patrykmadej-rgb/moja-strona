@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { getOrCreateItinerary } from "@/lib/szkola/travelItinerary";
 import {
   ACCOMMODATION_STATUSES,
   ACTIVITY_TO_HOUR_CATEGORY,
@@ -82,25 +82,6 @@ function computeHoursBetween(start: string, end: string): number | null {
   const minutes = eh * 60 + em - (sh * 60 + sm);
   if (minutes <= 0) return null;
   return Math.round((minutes / 60) * 100) / 100;
-}
-
-async function getOrCreateItinerary(supabase: SupabaseClient, sessionId: string): Promise<string> {
-  const { data: existing } = await supabase
-    .from("travel_itineraries")
-    .select("id")
-    .eq("session_id", sessionId)
-    .maybeSingle();
-
-  if (existing) return existing.id as string;
-
-  const { data: created, error } = await supabase
-    .from("travel_itineraries")
-    .insert({ session_id: sessionId })
-    .select("id")
-    .single();
-
-  if (error) throw new Error(error.message);
-  return created.id as string;
 }
 
 export async function updateSession(formData: FormData) {
@@ -271,6 +252,7 @@ export async function addSegment(formData: FormData) {
     currency,
     status,
     link: optionalString(formData, "link"),
+    notes: optionalString(formData, "notes"),
     sort_order: (maxRow?.sort_order ?? -1) + 1,
   });
 
@@ -316,6 +298,7 @@ export async function updateSegment(formData: FormData) {
       currency,
       status,
       link: optionalString(formData, "link"),
+      notes: optionalString(formData, "notes"),
     })
     .eq("id", id);
 
@@ -354,6 +337,7 @@ export async function addAccommodation(formData: FormData) {
     session_id: sessionId,
     name,
     address: optionalString(formData, "address"),
+    city: optionalString(formData, "city"),
     check_in: optionalString(formData, "check_in"),
     check_out: optionalString(formData, "check_out"),
     price,
@@ -366,6 +350,7 @@ export async function addAccommodation(formData: FormData) {
     distance_to_venue: optionalString(formData, "distance_to_venue"),
     travel_time_to_venue: optionalString(formData, "travel_time_to_venue"),
     link: optionalString(formData, "link"),
+    notes: optionalString(formData, "notes"),
   });
 
   if (error) throw new Error(error.message);
@@ -391,6 +376,7 @@ export async function updateAccommodation(formData: FormData) {
     .update({
       name,
       address: optionalString(formData, "address"),
+      city: optionalString(formData, "city"),
       check_in: optionalString(formData, "check_in"),
       check_out: optionalString(formData, "check_out"),
       price,
@@ -403,6 +389,7 @@ export async function updateAccommodation(formData: FormData) {
       distance_to_venue: optionalString(formData, "distance_to_venue"),
       travel_time_to_venue: optionalString(formData, "travel_time_to_venue"),
       link: optionalString(formData, "link"),
+      notes: optionalString(formData, "notes"),
     })
     .eq("id", id);
 

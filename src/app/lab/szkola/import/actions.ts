@@ -144,7 +144,14 @@ async function runIntakePipeline(params: {
   const { data: sessionsData } = await supabase.from("school_sessions").select("*");
   const sessions = (sessionsData as SchoolSession[] | null) ?? [];
   const sessionMatch = matchImportToSession(
-    { text: params.text, startAt: extracted.start_at, checkIn: extracted.check_in, checkOut: extracted.check_out },
+    {
+      text: params.text,
+      startAt: extracted.start_at,
+      checkIn: extracted.check_in,
+      checkOut: extracted.check_out,
+      origin: extracted.origin,
+      destination: extracted.destination,
+    },
     sessions,
   );
 

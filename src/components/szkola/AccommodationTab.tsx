@@ -5,18 +5,10 @@ import { useFormStatus } from "react-dom";
 import { Bed, ExternalLink } from "lucide-react";
 import { addAccommodation, deleteAccommodation, updateAccommodation } from "@/app/lab/szkola/zjazdy/[id]/actions";
 import EmptyState from "@/components/lab/EmptyState";
+import AccommodationFormFields from "@/components/szkola/AccommodationFormFields";
 import { formatMoney } from "@/lib/szkola/money";
 import { getDaysUntil } from "@/lib/szkola/preparation";
-import {
-  ACCOMMODATION_STATUSES,
-  ACCOMMODATION_STATUS_LABELS,
-  CURRENCIES,
-  type Accommodation,
-} from "@/lib/szkola/types";
-
-const inputClass =
-  "rounded-[10px] border border-[#e8e2ec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
-const labelClass = "text-xs font-medium text-[#201a2b]";
+import { ACCOMMODATION_STATUS_LABELS, type Accommodation } from "@/lib/szkola/types";
 
 function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
   const { pending } = useFormStatus();
@@ -28,133 +20,6 @@ function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: st
     >
       {pending ? pendingLabel : label}
     </button>
-  );
-}
-
-function AccommodationFields({ accommodation }: { accommodation?: Accommodation }) {
-  return (
-    <>
-      <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Nazwa obiektu *</label>
-        <input name="name" required defaultValue={accommodation?.name ?? ""} className={inputClass} />
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Adres</label>
-        <input name="address" defaultValue={accommodation?.address ?? ""} className={inputClass} />
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Check-in</label>
-          <input name="check_in" type="date" defaultValue={accommodation?.check_in ?? ""} className={inputClass} />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Check-out</label>
-          <input name="check_out" type="date" defaultValue={accommodation?.check_out ?? ""} className={inputClass} />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_90px_1fr]">
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Cena</label>
-          <input
-            name="price"
-            type="number"
-            min={0}
-            step="0.01"
-            defaultValue={accommodation?.price ?? ""}
-            className={inputClass}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Waluta</label>
-          <select name="currency" defaultValue={accommodation?.currency ?? "PLN"} className={inputClass}>
-            {CURRENCIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Status płatności</label>
-          <select
-            name="payment_status"
-            defaultValue={accommodation?.payment_status ?? "do_znalezienia"}
-            className={inputClass}
-          >
-            {ACCOMMODATION_STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {ACCOMMODATION_STATUS_LABELS[s]}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Nr rezerwacji</label>
-          <input
-            name="reservation_number"
-            defaultValue={accommodation?.reservation_number ?? ""}
-            className={inputClass}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Bezpłatne anulowanie do</label>
-          <input
-            name="free_cancellation_until"
-            type="date"
-            defaultValue={accommodation?.free_cancellation_until ?? ""}
-            className={inputClass}
-          />
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Warunki anulowania</label>
-        <input
-          name="cancellation_policy"
-          defaultValue={accommodation?.cancellation_policy ?? ""}
-          className={inputClass}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Odległość od szkoły</label>
-          <input
-            name="distance_to_venue"
-            defaultValue={accommodation?.distance_to_venue ?? ""}
-            className={inputClass}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Czas dojazdu</label>
-          <input
-            name="travel_time_to_venue"
-            defaultValue={accommodation?.travel_time_to_venue ?? ""}
-            className={inputClass}
-          />
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Link do rezerwacji</label>
-        <input name="link" type="url" defaultValue={accommodation?.link ?? ""} className={inputClass} />
-      </div>
-
-      <label className="flex items-center gap-2 text-sm text-[#201a2b]">
-        <input
-          type="checkbox"
-          name="breakfast_included"
-          defaultChecked={accommodation?.breakfast_included ?? false}
-          className="h-4 w-4 accent-[#5b2a86]"
-        />
-        Śniadanie wliczone
-      </label>
-    </>
   );
 }
 
@@ -188,7 +53,7 @@ function AccommodationCard({ sessionId, accommodation }: { sessionId: string; ac
         >
           <input type="hidden" name="session_id" value={sessionId} />
           <input type="hidden" name="id" value={accommodation.id} />
-          <AccommodationFields accommodation={accommodation} />
+          <AccommodationFormFields accommodation={accommodation} />
           {error && <p className="text-sm text-red-600">{error}</p>}
           <div className="flex gap-3">
             <SubmitButton label="Zapisz" pendingLabel="Zapisywanie…" />
@@ -307,7 +172,7 @@ export default function AccommodationTab({
             className="mt-4 flex flex-col gap-3 rounded-[10px] border border-[#e8e2ec] bg-[#f7f4ef] p-4"
           >
             <input type="hidden" name="session_id" value={sessionId} />
-            <AccommodationFields />
+            <AccommodationFormFields />
             {error && <p className="text-sm text-red-600">{error}</p>}
             <SubmitButton label="Dodaj nocleg" pendingLabel="Dodawanie…" />
           </form>
