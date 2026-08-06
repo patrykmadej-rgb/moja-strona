@@ -5,14 +5,16 @@ import { useRouter } from "next/navigation";
 import { CalendarRange, MapPin, User } from "lucide-react";
 import SessionStatusBadge from "@/components/szkola/SessionStatusBadge";
 import EmptyState from "@/components/lab/EmptyState";
-import { getDaysUntil, getMissingTaskTitles, getPreparationPercent } from "@/lib/szkola/preparation";
+import { getAutomaticPreparationItems, getAutomaticPreparationMissingLabels, getAutomaticPreparationPercent, getDaysUntil } from "@/lib/szkola/preparation";
 import { formatSessionDateRange } from "@/lib/szkola/format";
-import type { SchoolSession, SessionTask } from "@/lib/szkola/types";
+import type { Accommodation, SchoolSemester, SchoolSession, TravelSegment } from "@/lib/szkola/types";
 
 export default function NextSessionCard({
   session,
 }: {
-  session: (SchoolSession & { tasks: SessionTask[] }) | null;
+  session:
+    | (SchoolSession & { segments: TravelSegment[]; accommodations: Accommodation[]; semester: SchoolSemester | null })
+    | null;
 }) {
   const router = useRouter();
 
@@ -33,8 +35,14 @@ export default function NextSessionCard({
     );
   }
 
-  const percent = getPreparationPercent(session.tasks);
-  const missing = getMissingTaskTitles(session.tasks, 4);
+  const prepItems = getAutomaticPreparationItems({
+    segments: session.segments,
+    accommodations: session.accommodations,
+    lodgingNotNeeded: session.lodging_not_needed,
+    semester: session.semester,
+  });
+  const percent = getAutomaticPreparationPercent(prepItems);
+  const missing = getAutomaticPreparationMissingLabels(prepItems);
   const daysUntil = getDaysUntil(session.start_date);
   const title = session.session_number ? `Zjazd ${session.session_number}` : session.title;
 

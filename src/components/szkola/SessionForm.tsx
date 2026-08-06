@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useFormStatus } from "react-dom";
-import { CURRENCIES, SESSION_STATUSES, SESSION_STATUS_LABELS, type SchoolSession } from "@/lib/szkola/types";
+import { CURRENCIES, SESSION_STATUSES, SESSION_STATUS_LABELS, type SchoolSemester, type SchoolSession } from "@/lib/szkola/types";
 
 const inputClass =
   "rounded-[10px] border border-[#e8e2ec] bg-white px-3 py-2 text-sm text-[#201a2b] outline-none focus:border-[#5b2a86]";
@@ -22,12 +23,14 @@ function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: st
 
 export default function SessionForm({
   session,
+  semesters,
   action,
   submitLabel,
   pendingLabel,
   onCancel,
 }: {
   session?: SchoolSession;
+  semesters: SchoolSemester[];
   action: (formData: FormData) => void;
   submitLabel: string;
   pendingLabel: string;
@@ -146,6 +149,32 @@ export default function SessionForm({
             className={inputClass}
           />
         </div>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="semester_id" className={labelClass}>
+          Semestr
+        </label>
+        <select
+          id="semester_id"
+          name="semester_id"
+          defaultValue={session?.semester_id ?? ""}
+          className={inputClass}
+        >
+          <option value="">Brak przypisanego semestru</option>
+          {semesters.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-[#9a919f]">
+          Steruje automatycznym statusem płatności w Statusie przygotowań. Semestrami zarządzasz w{" "}
+          <Link href="/lab/szkola/semestry" className="text-[#5b2a86] hover:underline">
+            zakładce Semestry
+          </Link>
+          .
+        </p>
       </div>
 
       {session && (

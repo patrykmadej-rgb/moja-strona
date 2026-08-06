@@ -40,6 +40,10 @@ export type SchoolSession = {
   updated_at: string;
   /** Czy ten zjazd powstał automatycznie z grupowania weekendów kalendarza (patrz calendarWeekendAutomation.ts). */
   created_from_calendar: boolean;
+  /** Semestr, do którego przypisany jest zjazd — steruje automatycznym statusem "Semestr opłacony" (migracja 019). */
+  semester_id: string | null;
+  /** Jedyna ręczna decyzja w automatycznym "Statusie przygotowań" dot. noclegu (sekcja 4 briefu) — migracja 019. */
+  lodging_not_needed: boolean;
 };
 
 export const CURRENCIES = ["PLN", "DKK", "EUR"] as const;
@@ -205,6 +209,30 @@ export type SchoolPayment = {
   document_number: string | null;
   notes: string | null;
   created_at: string;
+};
+
+/**
+ * Szkoła jest opłacana semestralnie z góry (migracja 019) — jeden semestr
+ * obejmuje wiele zjazdów (school_sessions.semester_id), a automatyczny
+ * status "Semestr opłacony" w Statusie przygotowań patrzy na
+ * payment_status/paid_at TEGO semestru, nie na płatność pojedynczego
+ * zjazdu. payment_status celowo reużywa PaymentStatus/PAYMENT_STATUSES
+ * (ten sam słownik co school_payments.status) zamiast definiować nowy typ.
+ */
+export type SchoolSemester = {
+  id: string;
+  name: string;
+  start_date: string;
+  end_date: string | null;
+  payment_due_date: string | null;
+  amount: number | null;
+  currency: Currency | null;
+  payment_status: PaymentStatus;
+  paid_at: string | null;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
 export const EXPENSE_CATEGORIES = [
@@ -496,7 +524,37 @@ export type TrainingHourRequirement = {
   updated_at: string;
 };
 
-export const DEFAULT_SESSION_CHECKLIST: string[] = [
+/**
+ * "Status przygotowań" (sekcja "Moje zadania") przestał być ręczną checklistą
+ * odhaczanych oczywistości — jest teraz automatycznym podsumowaniem realnych
+ * danych (transport z travel_segments, nocleg z accommodations, płatność z
+ * semestru, patrz lib/szkola/preparation.ts). Z tego powodu z domyślnej listy
+ * usunięto WSZYSTKIE pozycje, które taki automatyczny status teraz pokrywa:
+ * "Rejestracja na zjazd" (uczestnik jest zapisany na każdy zjazd automatycznie),
+ * "Ubezpieczenie" (nie jest elementem przygotowań), "Materiały i przygotowanie"
+ * (zakładka Materiały ma własny status, to nie checklist item), bilety/transport
+ * z lotniska/odprawa/dokumenty podróżne (pokrywa automatyczny status Transport),
+ * "Zakwaterowanie" (pokrywa automatyczny status Nocleg) i "Opłata za zjazd"
+ * (pokrywa automatyczny status "Semestr opłacony"). Zostaje jedyna pozycja,
+ * której NIE da się wywnioskować z żadnej tabeli — "Urlop w pracy" — jako
+ * sensowny przykład prawdziwie ręcznego zadania (sekcja 6 briefu: dodawanie
+ * kolejnych pozycji nadal działa, to tylko domyślny seed dla nowego zjazdu).
+ */
+export const DEFAULT_SESSION_CHECKLIST: string[] = ["Urlop w pracy"];
+
+/**
+ * Sekcja 8 briefu: "Nie usuwaj istniejących rekordów checklisty z bazy...
+ * przestań je wyświetlać, pozostaw dane historyczne bez migracji
+ * destrukcyjnej." Stare session_tasks o tych tytułach (z poprzedniej wersji
+ * DEFAULT_SESSION_CHECKLIST, sprzed automatycznego Statusu przygotowań)
+ * zostają w bazie nietknięte, ale PreparationChecklistCard filtruje je z
+ * widoku "Moje zadania" po tytule — każdy z nich jest już pokryty przez
+ * automatyczny status (Transport/Nocleg/Płatność) albo (rejestracja,
+ * ubezpieczenie, materiały) w ogóle przestał być elementem przygotowań.
+ * "Urlop w pracy" NIE jest tu wymieniony — to jedyna pozycja, która zostaje
+ * (patrz DEFAULT_SESSION_CHECKLIST powyżej).
+ */
+export const LEGACY_CHECKLIST_TITLES = new Set<string>([
   "Rejestracja na zjazd",
   "Bilet w jedną stronę",
   "Bilet powrotny",
@@ -504,12 +562,11 @@ export const DEFAULT_SESSION_CHECKLIST: string[] = [
   "Opłata za zjazd",
   "Transport z lotniska lub dworca",
   "Transport powrotny",
-  "Urlop w pracy",
   "Ubezpieczenie podróży",
   "Materiały i przygotowanie",
   "Odprawa lotnicza",
   "Dokumenty podróżne",
-];
+]);
 
 // ---------------------------------------------------------------------------
 // ETAP 4 — integracja z Google Calendar.

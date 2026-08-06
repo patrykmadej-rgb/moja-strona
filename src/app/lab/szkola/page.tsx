@@ -12,7 +12,7 @@ import ImportSummaryCard from "@/components/szkola/ImportSummaryCard";
 import AlertsSummaryCard from "@/components/szkola/AlertsSummaryCard";
 import { todayDateString } from "@/lib/lab/format";
 import { sumByCurrency } from "@/lib/szkola/money";
-import type { Accommodation, Currency, SchoolAlert, SchoolSession, SessionTask, TravelSegment } from "@/lib/szkola/types";
+import type { Accommodation, Currency, SchoolAlert, SchoolSemester, SchoolSession, TravelSegment } from "@/lib/szkola/types";
 
 export const metadata: Metadata = {
   title: "Szkoła psychoterapii",
@@ -89,17 +89,19 @@ export default async function SzkolaPulpitPage() {
   const sessions = (upcomingSessions as SchoolSession[] | null) ?? [];
   const nextSession = sessions[0] ?? null;
 
-  let tasks: SessionTask[] = [];
   let nextSessionSegments: TravelSegment[] = [];
   let nextSessionAccommodations: Accommodation[] = [];
+  let nextSessionSemester: SchoolSemester | null = null;
   if (nextSession) {
-    const [{ data: tasksData }, { data: itinerary }, { data: accommodationsData }] = await Promise.all([
-      supabase.from("session_tasks").select("*").eq("session_id", nextSession.id).order("sort_order", { ascending: true }),
+    const [{ data: itinerary }, { data: accommodationsData }, { data: semesterData }] = await Promise.all([
       supabase.from("travel_itineraries").select("id").eq("session_id", nextSession.id).maybeSingle(),
       supabase.from("accommodations").select("*").eq("session_id", nextSession.id),
+      nextSession.semester_id
+        ? supabase.from("school_semesters").select("*").eq("id", nextSession.semester_id).maybeSingle()
+        : Promise.resolve({ data: null }),
     ]);
-    tasks = (tasksData as SessionTask[] | null) ?? [];
     nextSessionAccommodations = (accommodationsData as Accommodation[] | null) ?? [];
+    nextSessionSemester = (semesterData as SchoolSemester | null) ?? null;
     if (itinerary) {
       const { data: segmentsData } = await supabase.from("travel_segments").select("*").eq("itinerary_id", itinerary.id);
       nextSessionSegments = (segmentsData as TravelSegment[] | null) ?? [];
@@ -181,7 +183,18 @@ export default async function SzkolaPulpitPage() {
         </div>
 
         <div className="mt-6 flex flex-col gap-5">
-          <NextSessionCard session={nextSession ? { ...nextSession, tasks } : null} />
+          <NextSessionCard
+            session={
+              nextSession
+                ? {
+                    ...nextSession,
+                    segments: nextSessionSegments,
+                    accommodations: nextSessionAccommodations,
+                    semester: nextSessionSemester,
+                  }
+                : null
+            }
+          />
 
           {nextSession && (
             <NextSessionLogisticsCard

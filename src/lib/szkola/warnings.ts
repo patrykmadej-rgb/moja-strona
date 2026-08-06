@@ -1,5 +1,5 @@
 import { getDaysUntil } from "@/lib/szkola/preparation";
-import type { Accommodation, SchoolPayment, SchoolSession, TravelSegment } from "@/lib/szkola/types";
+import type { Accommodation, SchoolSemester, SchoolSession, TravelSegment } from "@/lib/szkola/types";
 
 export type WarningSeverity = "info" | "uwaga" | "pilne";
 
@@ -21,13 +21,14 @@ export function getSessionWarnings({
   session,
   segments,
   accommodations,
-  payments,
+  semester,
   scheduleItems,
 }: {
   session: SchoolSession;
   segments: TravelSegment[];
   accommodations: Accommodation[];
-  payments: SchoolPayment[];
+  /** Szkoła jest opłacana semestralnie z góry — status płatności patrzy na semestr, nie na płatność per-zjazd (patrz preparation.ts). */
+  semester: SchoolSemester | null;
   scheduleItems: ScheduleWindow[];
 }): SessionWarning[] {
   const warnings: SessionWarning[] = [];
@@ -45,15 +46,21 @@ export function getSessionWarnings({
       warnings.push({ id: "no-return", severity: "uwaga", message: "Brak biletu powrotnego." });
     }
 
-    const hasAccommodation = accommodations.some((a) => a.payment_status !== "anulowane");
-    if (!hasAccommodation) {
-      warnings.push({ id: "no-accommodation", severity: "uwaga", message: "Brak zarezerwowanego noclegu." });
+    if (!session.lodging_not_needed) {
+      const hasAccommodation = accommodations.some((a) => a.payment_status !== "anulowane");
+      if (!hasAccommodation) {
+        warnings.push({ id: "no-accommodation", severity: "uwaga", message: "Brak zarezerwowanego noclegu." });
+      }
     }
 
-    const sessionFeePayments = payments.filter((p) => p.category === "oplata_za_zjazd");
-    const isSessionPaid = sessionFeePayments.some((p) => p.status === "oplacone");
-    if (!isSessionPaid) {
-      warnings.push({ id: "unpaid-session", severity: "pilne", message: "Zjazd nie został jeszcze opłacony." });
+    if (!semester) {
+      warnings.push({ id: "no-semester", severity: "uwaga", message: "Zjazd nie ma przypisanego semestru." });
+    } else if (semester.payment_status !== "oplacone" && semester.payment_status !== "anulowane") {
+      warnings.push({
+        id: "unpaid-semester",
+        severity: "pilne",
+        message: `Semestr „${semester.name}” nie został jeszcze opłacony.`,
+      });
     }
   }
 

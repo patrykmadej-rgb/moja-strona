@@ -45,6 +45,8 @@ function makeSession(overrides: Partial<SchoolSession> & { start_date: string })
     created_at: "",
     updated_at: "",
     created_from_calendar: false,
+    semester_id: null,
+    lodging_not_needed: false,
     ...overrides,
   };
 }

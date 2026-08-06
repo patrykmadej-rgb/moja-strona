@@ -8,6 +8,7 @@ import {
   CalendarDays,
   Plane,
   WalletCards,
+  GraduationCap,
   FolderOpen,
   Files,
   Clock4,
@@ -21,6 +22,7 @@ type NavItem = { href: string; label: string; icon: LucideIcon; enabled: boolean
 const ITEMS: NavItem[] = [
   { href: "/lab/szkola", label: "Pulpit", icon: LayoutDashboard, enabled: true },
   { href: "/lab/szkola/zjazdy", label: "Zjazdy", icon: CalendarRange, enabled: true },
+  { href: "/lab/szkola/semestry", label: "Semestry", icon: GraduationCap, enabled: true },
   { href: "/lab/szkola/kalendarz", label: "Kalendarz", icon: CalendarDays, enabled: true },
   { href: "/lab/szkola/podroze", label: "Podróże", icon: Plane, enabled: true },
   { href: "/lab/szkola/koszty", label: "Koszty", icon: WalletCards, enabled: true },

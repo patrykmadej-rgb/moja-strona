@@ -15,6 +15,7 @@ import type {
   Accommodation,
   Expense,
   SchoolPayment,
+  SchoolSemester,
   SchoolSession,
   SessionDocument,
   SessionMaterial,
@@ -36,6 +37,7 @@ export default function SessionOverview({
   materials,
   documents,
   hoursEntries,
+  semesters,
   onNavigateTab,
 }: {
   session: SchoolSession;
@@ -48,19 +50,30 @@ export default function SessionOverview({
   materials: SessionMaterial[];
   documents: SessionDocument[];
   hoursEntries: TrainingHoursEntry[];
+  semesters: SchoolSemester[];
   onNavigateTab: (tab: SessionTabKey) => void;
 }) {
+  const semester = semesters.find((s) => s.id === session.semester_id) ?? null;
+
   const warnings = getSessionWarnings({
     session,
     segments,
     accommodations,
-    payments,
+    semester,
     scheduleItems,
   });
 
   const mainColumn = (
     <>
-      <PreparationChecklistCard sessionId={session.id} tasks={tasks} />
+      <PreparationChecklistCard
+        sessionId={session.id}
+        lodgingNotNeeded={session.lodging_not_needed}
+        segments={segments}
+        accommodations={accommodations}
+        semester={semester}
+        tasks={tasks}
+        onNavigateTab={onNavigateTab}
+      />
       <TravelSummaryCard segments={segments} onNavigateTab={() => onNavigateTab("podroz")} />
       <ScheduleSummaryCard items={scheduleItems} onNavigateTab={() => onNavigateTab("plan")} />
       <MaterialsSummaryCard materials={materials} onNavigateTab={() => onNavigateTab("materialy")} />

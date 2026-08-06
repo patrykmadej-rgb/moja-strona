@@ -22,6 +22,8 @@ function makeSession(overrides: Partial<SchoolSession>): SchoolSession {
     created_at: "2026-01-01T00:00:00.000Z",
     updated_at: "2026-01-01T00:00:00.000Z",
     created_from_calendar: false,
+    semester_id: null,
+    lodging_not_needed: false,
     ...overrides,
   };
 }

@@ -3,9 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import SzkolaNav from "@/components/szkola/SzkolaNav";
 import SessionsPageHeader from "@/components/szkola/SessionsPageHeader";
 import SessionsExplorer from "@/components/szkola/SessionsExplorer";
-import { getMissingTaskTitles, getPreparationPercent } from "@/lib/szkola/preparation";
+import { getAutomaticPreparationItems, getAutomaticPreparationMissingLabels, getAutomaticPreparationPercent } from "@/lib/szkola/preparation";
 import { sumByCurrency } from "@/lib/szkola/money";
-import type { Currency, SchoolSession, SessionTask } from "@/lib/szkola/types";
+import type { Accommodation, Currency, SchoolSemester, SchoolSession, TravelSegment } from "@/lib/szkola/types";
 import type { SessionListItem } from "@/components/szkola/SessionsExplorer";
 
 export const metadata: Metadata = {
@@ -15,17 +15,31 @@ export const metadata: Metadata = {
 export default async function ZjazdySzkolaPage() {
   const supabase = await createClient();
 
-  const [{ data: sessionsData }, { data: tasksData }, { data: scheduleData }, { data: paymentsData }, { data: expensesData }] =
-    await Promise.all([
-      supabase.from("school_sessions").select("*").order("start_date", { ascending: true }),
-      supabase.from("session_tasks").select("*"),
-      supabase.from("session_schedule_items").select("id, session_id"),
-      supabase.from("school_payments").select("session_id, amount, currency"),
-      supabase.from("expenses").select("session_id, amount, currency"),
-    ]);
+  const [
+    { data: sessionsData },
+    { data: itinerariesData },
+    { data: segmentsData },
+    { data: accommodationsData },
+    { data: semestersData },
+    { data: scheduleData },
+    { data: paymentsData },
+    { data: expensesData },
+  ] = await Promise.all([
+    supabase.from("school_sessions").select("*").order("start_date", { ascending: true }),
+    supabase.from("travel_itineraries").select("id, session_id"),
+    supabase.from("travel_segments").select("*"),
+    supabase.from("accommodations").select("*"),
+    supabase.from("school_semesters").select("*"),
+    supabase.from("session_schedule_items").select("id, session_id"),
+    supabase.from("school_payments").select("session_id, amount, currency"),
+    supabase.from("expenses").select("session_id, amount, currency"),
+  ]);
 
   const sessions = (sessionsData as SchoolSession[] | null) ?? [];
-  const allTasks = (tasksData as SessionTask[] | null) ?? [];
+  const itineraries = (itinerariesData as { id: string; session_id: string }[] | null) ?? [];
+  const allSegments = (segmentsData as TravelSegment[] | null) ?? [];
+  const accommodations = (accommodationsData as Accommodation[] | null) ?? [];
+  const semesters = (semestersData as SchoolSemester[] | null) ?? [];
   const scheduleItems = (scheduleData as { id: string; session_id: string }[] | null) ?? [];
   const payments =
     (paymentsData as { session_id: string | null; amount: number; currency: Currency | null }[] | null) ?? [];
@@ -33,7 +47,17 @@ export default async function ZjazdySzkolaPage() {
     (expensesData as { session_id: string | null; amount: number; currency: Currency | null }[] | null) ?? [];
 
   const items: SessionListItem[] = sessions.map((session) => {
-    const tasks = allTasks.filter((t) => t.session_id === session.id);
+    const itineraryId = itineraries.find((it) => it.session_id === session.id)?.id;
+    const segments = itineraryId ? allSegments.filter((s) => s.itinerary_id === itineraryId) : [];
+    const sessionAccommodations = accommodations.filter((a) => a.session_id === session.id);
+    const semester = semesters.find((s) => s.id === session.semester_id) ?? null;
+    const prepItems = getAutomaticPreparationItems({
+      segments,
+      accommodations: sessionAccommodations,
+      lodgingNotNeeded: session.lodging_not_needed,
+      semester,
+    });
+
     const scheduleCount = scheduleItems.filter((s) => s.session_id === session.id).length;
     const costSums = sumByCurrency([
       ...payments.filter((p) => p.session_id === session.id),
@@ -42,10 +66,10 @@ export default async function ZjazdySzkolaPage() {
 
     return {
       ...session,
-      preparationPercent: getPreparationPercent(tasks),
-      taskDoneCount: tasks.filter((t) => t.is_done).length,
-      taskTotalCount: tasks.length,
-      missingTaskTitles: getMissingTaskTitles(tasks),
+      preparationPercent: getAutomaticPreparationPercent(prepItems),
+      taskDoneCount: prepItems.filter((i) => i.kind === "done" || i.kind === "not_needed").length,
+      taskTotalCount: prepItems.length,
+      missingTaskTitles: getAutomaticPreparationMissingLabels(prepItems),
       scheduleItemCount: scheduleCount,
       costSums,
     };

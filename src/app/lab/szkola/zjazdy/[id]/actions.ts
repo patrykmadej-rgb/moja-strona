@@ -120,6 +120,7 @@ export async function updateSession(formData: FormData) {
 
   const sessionNumberRaw = String(formData.get("session_number") ?? "").trim();
   const plannedBudgetRaw = String(formData.get("planned_budget") ?? "").trim();
+  const semesterIdRaw = String(formData.get("semester_id") ?? "").trim();
 
   const { error } = await supabase
     .from("school_sessions")
@@ -137,6 +138,7 @@ export async function updateSession(formData: FormData) {
       notes: String(formData.get("notes") ?? "").trim() || null,
       planned_budget: plannedBudgetRaw ? Number(plannedBudgetRaw) : null,
       planned_budget_currency: String(formData.get("planned_budget_currency") ?? "PLN"),
+      semester_id: semesterIdRaw || null,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);
@@ -186,6 +188,25 @@ export async function addTask(formData: FormData) {
 export async function toggleTask(sessionId: string, taskId: string, isDone: boolean) {
   const supabase = await createClient();
   const { error } = await supabase.from("session_tasks").update({ is_done: isDone }).eq("id", taskId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);
+  revalidatePath("/lab/szkola/zjazdy");
+  revalidatePath("/lab/szkola");
+}
+
+/**
+ * Jedyna ręczna decyzja w automatycznym "Statusie przygotowań" dot. noclegu
+ * (sekcja 4 briefu) — nie tworzy/usuwa żadnej rezerwacji, tylko przełącza
+ * school_sessions.lodging_not_needed, żeby status noclegu pokazywał
+ * "Nocleg niewymagany" zamiast "Nocleg nie został jeszcze dodany".
+ */
+export async function toggleLodgingNotNeeded(sessionId: string, notNeeded: boolean) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("school_sessions")
+    .update({ lodging_not_needed: notNeeded, updated_at: new Date().toISOString() })
+    .eq("id", sessionId);
   if (error) throw new Error(error.message);
 
   revalidatePath(`/lab/szkola/zjazdy/${sessionId}`);

@@ -7,6 +7,7 @@ import type {
   Expense,
   SchoolCalendarEvent,
   SchoolPayment,
+  SchoolSemester,
   SchoolSession,
   SessionDocument,
   SessionMaterial,
@@ -47,6 +48,7 @@ export default async function SessionDetailPage({
     { data: documentsData },
     { data: hoursEntriesData },
     { data: googleEventsData },
+    { data: semestersData },
   ] = await Promise.all([
     supabase.from("session_tasks").select("*").eq("session_id", id).order("sort_order", { ascending: true }),
     supabase.from("travel_itineraries").select("id").eq("session_id", id).maybeSingle(),
@@ -72,6 +74,7 @@ export default async function SessionDetailPage({
       .eq("session_id", id)
       .is("deleted_at", null)
       .order("start_at", { ascending: true }),
+    supabase.from("school_semesters").select("*").order("start_date", { ascending: false }),
   ]);
 
   let segments: TravelSegment[] = [];
@@ -104,6 +107,7 @@ export default async function SessionDetailPage({
       documents={(documentsData as SessionDocument[] | null) ?? []}
       hoursEntries={(hoursEntriesData as TrainingHoursEntry[] | null) ?? []}
       importableGoogleEvents={importableGoogleEvents}
+      semesters={(semestersData as SchoolSemester[] | null) ?? []}
     />
   );
 }

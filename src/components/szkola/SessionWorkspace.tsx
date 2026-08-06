@@ -21,6 +21,7 @@ import type {
   Expense,
   SchoolCalendarEvent,
   SchoolPayment,
+  SchoolSemester,
   SchoolSession,
   SessionDocument,
   SessionMaterial,
@@ -42,6 +43,7 @@ export default function SessionWorkspace({
   documents,
   hoursEntries,
   importableGoogleEvents,
+  semesters,
 }: {
   session: SchoolSession;
   tasks: SessionTask[];
@@ -54,6 +56,7 @@ export default function SessionWorkspace({
   documents: SessionDocument[];
   hoursEntries: TrainingHoursEntry[];
   importableGoogleEvents: SchoolCalendarEvent[];
+  semesters: SchoolSemester[];
 }) {
   const [tab, setTab] = useState<SessionTabKey>("przeglad");
   const [editing, setEditing] = useState(false);
@@ -69,6 +72,7 @@ export default function SessionWorkspace({
             <div className="mt-4 rounded-[16px] border border-[#e8e2ec] bg-white p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
               <SessionForm
                 session={session}
+                semesters={semesters}
                 action={async (formData) => {
                   await updateSession(formData);
                   setEditing(false);
@@ -100,6 +104,7 @@ export default function SessionWorkspace({
                   materials={materials}
                   documents={documents}
                   hoursEntries={hoursEntries}
+                  semesters={semesters}
                   onNavigateTab={setTab}
                 />
               )}

@@ -1,6 +1,6 @@
 import { getDaysUntil } from "@/lib/szkola/preparation";
 import { todayDateString } from "@/lib/lab/format";
-import type { Accommodation, SchoolPayment, SessionTask } from "@/lib/szkola/types";
+import { LEGACY_CHECKLIST_TITLES, type Accommodation, type SchoolPayment, type SessionTask } from "@/lib/szkola/types";
 
 type Deadline = {
   id: string;
@@ -22,7 +22,7 @@ export default function UpcomingDeadlinesCard({
 
   const deadlines: Deadline[] = [
     ...tasks
-      .filter((t) => !t.is_done && t.due_date)
+      .filter((t) => !t.is_done && t.due_date && !LEGACY_CHECKLIST_TITLES.has(t.title))
       .map((t) => ({ id: `task-${t.id}`, label: t.title, date: t.due_date as string, kind: "checklista" as const })),
     ...payments
       .filter((p) => p.status !== "oplacone" && p.status !== "anulowane" && p.due_date)

@@ -20,6 +20,7 @@ export async function createSession(formData: FormData) {
 
   const sessionNumberRaw = String(formData.get("session_number") ?? "").trim();
   const plannedBudgetRaw = String(formData.get("planned_budget") ?? "").trim();
+  const semesterIdRaw = String(formData.get("semester_id") ?? "").trim();
 
   const { data: session, error } = await supabase
     .from("school_sessions")
@@ -36,6 +37,7 @@ export async function createSession(formData: FormData) {
       notes: String(formData.get("notes") ?? "").trim() || null,
       planned_budget: plannedBudgetRaw ? Number(plannedBudgetRaw) : null,
       planned_budget_currency: String(formData.get("planned_budget_currency") ?? "PLN"),
+      semester_id: semesterIdRaw || null,
       created_by: user.id,
     })
     .select()

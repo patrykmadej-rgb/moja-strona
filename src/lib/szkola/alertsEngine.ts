@@ -83,6 +83,10 @@ async function checkMissingAccommodation(
   const drafts: AlertDraft[] = [];
   for (const session of sessions) {
     if (!isSessionActive(session)) continue;
+    // Ta sama zasada co automatyczny status noclegu w Statusie przygotowań
+    // (preparation.ts) — ręcznie oznaczone "nocleg niepotrzebny" nie powinno
+    // dalej generować alertu o braku noclegu.
+    if (session.lodging_not_needed) continue;
     const daysAway = daysUntil(session.start_date, now);
     if (daysAway < 0 || daysAway > 21) continue;
 
@@ -142,34 +146,47 @@ async function checkCancellationDeadlines(
   return drafts;
 }
 
+/**
+ * Szkoła jest opłacana semestralnie z góry (migracja 019) — status płatności
+ * patrzy na school_semesters.payment_status semestru przypisanego do zjazdu
+ * (session.semester_id), NIE na płatność school_payments per-zjazd (ta sama
+ * zasada co automatyczny status "Semestr opłacony" w preparation.ts).
+ */
 async function checkUnpaidSessions(
   supabase: SupabaseServerClient,
   sessions: SchoolSession[],
   now: Date,
 ): Promise<AlertDraft[]> {
   const drafts: AlertDraft[] = [];
+  const semesterIds = Array.from(new Set(sessions.map((s) => s.semester_id).filter((id): id is string => Boolean(id))));
+  const semesterPaymentStatusById = new Map<string, string>();
+  if (semesterIds.length > 0) {
+    const { data: semesters } = await supabase.from("school_semesters").select("id, payment_status").in("id", semesterIds);
+    for (const semester of semesters ?? []) {
+      semesterPaymentStatusById.set(semester.id, semester.payment_status);
+    }
+  }
+
   for (const session of sessions) {
     if (!isSessionActive(session)) continue;
     const daysAway = daysUntil(session.start_date, now);
     if (daysAway < 0 || daysAway > 14) continue;
 
-    const { data: payments } = await supabase
-      .from("school_payments")
-      .select("status")
-      .eq("session_id", session.id)
-      .eq("category", "oplata_za_zjazd");
-    const isPaid = (payments ?? []).some((p) => p.status === "oplacone");
+    const paymentStatus = session.semester_id ? semesterPaymentStatusById.get(session.semester_id) : undefined;
+    const isPaid = paymentStatus === "oplacone" || paymentStatus === "anulowane";
     if (!isPaid) {
       drafts.push({
         category: "platnosc",
         priority: "pilne",
-        title: `Nieopłacony zjazd — ${session.title}`,
-        description: "Zjazd zbliża się, a opłata za zjazd nie jest jeszcze oznaczona jako opłacona.",
+        title: `Nieopłacony semestr — ${session.title}`,
+        description: session.semester_id
+          ? "Zjazd zbliża się, a semestr, do którego należy, nie jest jeszcze oznaczony jako opłacony."
+          : "Zjazd zbliża się, a nie ma przypisanego semestru — nie da się potwierdzić opłaty.",
         sessionId: session.id,
         source: "unpaid_session",
         sourceId: session.id,
-        actionLabel: "Zobacz płatności",
-        actionHref: `/lab/szkola/zjazdy/${session.id}?tab=platnosci`,
+        actionLabel: "Zobacz semestry",
+        actionHref: "/lab/szkola/semestry",
         dedupeKey: `unpaid_session:${session.id}`,
       });
     }
