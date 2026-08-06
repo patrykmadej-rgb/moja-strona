@@ -192,5 +192,147 @@
       "Jak trauma kształtuje decyzje, relacje i zachowania społeczne?",
       "Jak wspierać zdrowienie i odporność w społecznościach po konflikcie?"
     ]
+  },
+  "OMniePage": {
+    "metaTitle": "O mnie",
+    "metaDescription": "Badacz, autor publikacji naukowych i psychoterapeuta w trakcie certyfikacji. Łączę psychologię, kryminologię i bezpieczeństwo z doświadczeniem w międzynarodowym zarządzaniu i biznesie.",
+    "photoAlt": "Patryk Madej",
+    "hero": {
+      "eyebrow": "O mnie",
+      "heading": "Łączę naukę, psychoterapię i praktykę.",
+      "paragraph1": "Jestem doktorantem w Instytucie Nauk o Polityce i Bezpieczeństwie Uniwersytetu Szczecińskiego, studentem psychologii oraz uczestnikiem czteroletniego szkolenia psychoterapeutycznego. Łączę zainteresowanie człowiekiem i procesami społecznymi z doświadczeniem zdobytym w międzynarodowym zarządzaniu, zakupach i energetyce odnawialnej.",
+      "paragraph2": "W pracy naukowej koncentruję się na separatyzmie, bezpieczeństwie międzynarodowym i Bałkanach Zachodnich, a dodatkowo na kryminologii, wiktymologii i psychologii bezpieczeństwa. W szkoleniu psychoterapeutycznym pracuję w nurcie integracyjno-psychodynamicznym, pogłębiając warsztat pracy z traumą metodą EMDR.",
+      "ctaBadania": "Zobacz moje badania",
+      "ctaPublikacje": "Zobacz publikacje",
+      "ctaKontakt": "Skontaktuj się",
+      "photoCaption": "Badacz · Psycholog w kształceniu · Psychoterapeuta w trakcie certyfikacji"
+    },
+    "facts": {
+      "prawo": { "label": "Prawo", "value": "Magister prawa" },
+      "psychologia": { "label": "Psychologia", "value": "Studia psychologiczne w toku" },
+      "psychoterapia": { "label": "Psychoterapia", "value": "W trakcie szkolenia i certyfikacji" },
+      "doswiadczenie": { "label": "Doświadczenie", "value": "Międzynarodowe zarządzanie i biznes" }
+    },
+    "journey": {
+      "eyebrow": "Droga zawodowa",
+      "heading": "Moja droga zawodowa",
+      "intro": "Kilka etapów, które złożyły się na obecne połączenie nauki, psychoterapii i praktyki.",
+      "stages": [
+        {
+          "period": "Wykształcenie prawnicze",
+          "org": "Studia prawnicze",
+          "role": "Absolwent prawa",
+          "description": "Fundament dalszej pracy naukowej — wykształcenie prawnicze i rozumienie systemu instytucjonalnego."
+        },
+        {
+          "period": "Doświadczenie międzynarodowe",
+          "org": "Vestas",
+          "role": "Zarządzanie zakupami i kontraktami",
+          "description": "Praca w międzynarodowym środowisku energetyki wiatrowej — negocjacje, kontrakty i zarządzanie dostawcami."
+        },
+        {
+          "period": "Doświadczenie międzynarodowe",
+          "org": "Maersk Logistics & Services",
+          "role": "Logistyka i projekty offshore",
+          "description": "Zarządzanie projektami i współpraca międzynarodowa w logistyce i usługach offshore."
+        },
+        {
+          "period": "Rozwój naukowy",
+          "org": "Uniwersytet Szczeciński — Instytut Nauk o Polityce i Bezpieczeństwie",
+          "role": "Doktorant",
+          "description": "Badania nad separatyzmem, bezpieczeństwem międzynarodowym i Bałkanami Zachodnimi."
+        },
+        {
+          "period": "Rozwój naukowy",
+          "org": "Studia psychologiczne",
+          "role": "Student psychologii",
+          "description": "Pogłębianie rozumienia człowieka od strony psychologicznej — uzupełnienie perspektywy prawnej i politologicznej."
+        },
+        {
+          "period": "Od 2026",
+          "org": "Szkoła psychoterapii (PTP)",
+          "role": "Uczestnik czteroletniego szkolenia",
+          "description": "Nurt integracyjno-psychodynamiczny, metoda EMDR w pracy z traumą, rozwój pod superwizją."
+        }
+      ]
+    },
+    "cards": {
+      "education": {
+        "heading": "Wykształcenie i rozwój",
+        "items": [
+          "Studia prawnicze — wykształcenie prawnicze, podstawa dalszej ścieżki naukowej",
+          "Doktorat — Nauki o Polityce i Bezpieczeństwie, Uniwersytet Szczeciński (w trakcie)",
+          "Studia psychologiczne — studia jednolite (w trakcie)",
+          "Szkoła psychoterapii — czteroletni kurs akredytowany przez Sekcję Naukową Psychoterapii i Terapii Rodzin PTP, nurt integracyjno-psychodynamiczny, EMDR (od 2026)"
+        ],
+        "moreLabel": "Zobacz więcej"
+      },
+      "specializations": {
+        "heading": "Obszary specjalizacji",
+        "items": [
+          "Psychoterapia integracyjno-psychodynamiczna (w trakcie szkolenia)",
+          "Trauma i regulacja emocji — EMDR",
+          "Kryminologia i wiktymologia",
+          "Psychologia bezpieczeństwa",
+          "Separatyzm i bezpieczeństwo międzynarodowe",
+          "Odporność instytucjonalna"
+        ]
+      },
+      "experience": {
+        "heading": "Doświadczenie zawodowe",
+        "items": [
+          "Zarządzanie i zakupy w środowisku międzynarodowym",
+          "Negocjacje i kontrakty",
+          "Energetyka odnawialna — Vestas",
+          "Logistyka i projekty offshore — Maersk Logistics & Services",
+          "Zarządzanie projektami i zespołami",
+          "Analizy strategiczne i biznesowe"
+        ],
+        "linkedinLabel": "Zobacz profil LinkedIn"
+      }
+    },
+    "research": {
+      "eyebrow": "Badania",
+      "heading": "Badania i zainteresowania naukowe",
+      "intro": "Pięć obszarów, które łączę w pracy badawczej — od bezpieczeństwa międzynarodowego po psychologię kliniczną.",
+      "ctaLabel": "Poznaj moje badania"
+    },
+    "publications": {
+      "eyebrow": "Publikacje",
+      "heading": "Wybrane publikacje",
+      "ctaLabel": "Zobacz wszystkie publikacje"
+    },
+    "psychoterapiaSection": {
+      "eyebrow": "Psychoterapia",
+      "heading": "Człowiek w centrum",
+      "paragraph1": "Jestem uczestnikiem czteroletniego szkolenia psychoterapeutycznego w nurcie integracyjno-psychodynamicznym, akredytowanego przez Sekcję Naukową Psychoterapii i Terapii Rodzin Polskiego Towarzystwa Psychiatrycznego. Rozwijam warsztat pracy pod superwizją, korzystając z metody EMDR w pracy z traumą.",
+      "paragraph2": "Najważniejszym elementem tej pracy jest dla mnie relacja terapeutyczna — przestrzeń, w której teoria spotyka się z historią, doświadczeniem i możliwością zmiany drugiego człowieka. Nie prowadzę jeszcze gabinetu ani nie przyjmuję klientów.",
+      "ctaLabel": "Więcej o psychoterapii"
+    },
+    "values": {
+      "eyebrow": "Wartości",
+      "heading": "Co jest dla mnie ważne",
+      "items": [
+        { "title": "Autentyczność", "description": "Relacja oparta na szczerości i szacunku." },
+        { "title": "Rzetelność", "description": "Wnioski oparte na wiedzy, źródłach i analizie." },
+        { "title": "Odpowiedzialność", "description": "Świadomość wpływu decyzji na ludzi i otoczenie." },
+        { "title": "Rozwój", "description": "Stałe uczenie się i łączenie różnych perspektyw." }
+      ]
+    },
+    "personal": {
+      "eyebrow": "Poza pracą",
+      "heading": "Poza pracą",
+      "intro": "Prywatnie to, co poszerza perspektywę zawodową i naukową.",
+      "items": ["Podróże", "Poznawanie kultur", "Literatura naukowa i filozoficzna", "Natura", "Fotografia", "Rozwój i nauka"]
+    },
+    "manifest": {
+      "text": "Zrozumienie człowieka jest podstawą budowania bezpieczniejszego i bardziej świadomego świata."
+    },
+    "finalCta": {
+      "heading": "Porozmawiajmy",
+      "description": "Zapraszam do kontaktu w sprawach badań, publikacji, współpracy naukowej, projektów oraz psychoterapii.",
+      "ctaKontakt": "Skontaktuj się",
+      "ctaLinkedin": "LinkedIn"
+    }
   }
 }

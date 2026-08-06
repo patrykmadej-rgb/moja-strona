@@ -192,5 +192,147 @@
       "Jak trauma kształtuje decyzje, relacje i zachowania społeczne?",
       "Jak wspierać zdrowienie i odporność w społecznościach po konflikcie?"
     ]
+  },
+  "OMniePage": {
+    "metaTitle": "About me",
+    "metaDescription": "Researcher, published author and psychotherapist in training. I combine psychology, criminology and security research with a background in international management and business.",
+    "photoAlt": "Patryk Madej",
+    "hero": {
+      "eyebrow": "About me",
+      "heading": "Bringing together research, psychotherapy and practice.",
+      "paragraph1": "I am a doctoral candidate at the Institute of Political and Security Studies at the University of Szczecin, a psychology student, and a participant in a four-year psychotherapy training programme. I combine an interest in people and social processes with experience gained in international management, procurement and renewable energy.",
+      "paragraph2": "My academic work focuses on separatism, international security and the Western Balkans, as well as criminology, victimology and security psychology. In my psychotherapy training I work within the integrative-psychodynamic orientation, developing my practice in trauma work through the EMDR method.",
+      "ctaBadania": "See my research",
+      "ctaPublikacje": "See my publications",
+      "ctaKontakt": "Get in touch",
+      "photoCaption": "Researcher · Psychology student · Psychotherapist in training"
+    },
+    "facts": {
+      "prawo": { "label": "Law", "value": "Master's degree in law" },
+      "psychologia": { "label": "Psychology", "value": "Ongoing psychology studies" },
+      "psychoterapia": { "label": "Psychotherapy", "value": "In training and accreditation" },
+      "doswiadczenie": { "label": "Experience", "value": "International management and business" }
+    },
+    "journey": {
+      "eyebrow": "Career path",
+      "heading": "My professional journey",
+      "intro": "A few stages that shaped the current combination of research, psychotherapy and practice.",
+      "stages": [
+        {
+          "period": "Legal education",
+          "org": "Law studies",
+          "role": "Law graduate",
+          "description": "The foundation for later academic work — a legal education and an understanding of institutional systems."
+        },
+        {
+          "period": "International experience",
+          "org": "Vestas",
+          "role": "Procurement and contract management",
+          "description": "Work in the international wind-energy sector — negotiations, contracts and supplier management."
+        },
+        {
+          "period": "International experience",
+          "org": "Maersk Logistics & Services",
+          "role": "Logistics and offshore projects",
+          "description": "Project management and international collaboration in logistics and offshore services."
+        },
+        {
+          "period": "Academic development",
+          "org": "University of Szczecin — Institute of Political and Security Studies",
+          "role": "Doctoral candidate",
+          "description": "Research on separatism, international security and the Western Balkans."
+        },
+        {
+          "period": "Academic development",
+          "org": "Psychology studies",
+          "role": "Psychology student",
+          "description": "Deepening my understanding of people from a psychological perspective — complementing the legal and political-science viewpoint."
+        },
+        {
+          "period": "Since 2026",
+          "org": "Psychotherapy training (Polish Psychiatric Association)",
+          "role": "Participant in a four-year training programme",
+          "description": "Integrative-psychodynamic orientation, the EMDR method for trauma work, development under supervision."
+        }
+      ]
+    },
+    "cards": {
+      "education": {
+        "heading": "Education and development",
+        "items": [
+          "Law studies — a legal education, the basis for my later academic path",
+          "Doctorate — Political and Security Studies, University of Szczecin (in progress)",
+          "Psychology studies — integrated master's programme (in progress)",
+          "Psychotherapy training — a four-year programme accredited by the Scientific Section of Psychotherapy and Family Therapy of the Polish Psychiatric Association, integrative-psychodynamic orientation, EMDR (since 2026)"
+        ],
+        "moreLabel": "See more"
+      },
+      "specializations": {
+        "heading": "Areas of specialization",
+        "items": [
+          "Integrative-psychodynamic psychotherapy (in training)",
+          "Trauma and emotion regulation — EMDR",
+          "Criminology and victimology",
+          "Security psychology",
+          "Separatism and international security",
+          "Institutional resilience"
+        ]
+      },
+      "experience": {
+        "heading": "Professional experience",
+        "items": [
+          "Management and procurement in an international environment",
+          "Negotiations and contracts",
+          "Renewable energy — Vestas",
+          "Logistics and offshore projects — Maersk Logistics & Services",
+          "Project and team management",
+          "Strategic and business analysis"
+        ],
+        "linkedinLabel": "See LinkedIn profile"
+      }
+    },
+    "research": {
+      "eyebrow": "Research",
+      "heading": "Research and academic interests",
+      "intro": "Five areas I bring together in my research work — from international security to clinical psychology.",
+      "ctaLabel": "Explore my research"
+    },
+    "publications": {
+      "eyebrow": "Publications",
+      "heading": "Selected publications",
+      "ctaLabel": "See all publications"
+    },
+    "psychoterapiaSection": {
+      "eyebrow": "Psychotherapy",
+      "heading": "The person at the centre",
+      "paragraph1": "I am a participant in a four-year psychotherapy training programme within the integrative-psychodynamic orientation, accredited by the Scientific Section of Psychotherapy and Family Therapy of the Polish Psychiatric Association. I am developing my practice under supervision, using the EMDR method in trauma work.",
+      "paragraph2": "For me, the most important part of this work is the therapeutic relationship — a space where theory meets another person's history, experience and capacity for change. I do not yet run a practice or see clients.",
+      "ctaLabel": "More about psychotherapy"
+    },
+    "values": {
+      "eyebrow": "Values",
+      "heading": "What matters to me",
+      "items": [
+        { "title": "Authenticity", "description": "A relationship built on honesty and respect." },
+        { "title": "Rigour", "description": "Conclusions grounded in knowledge, sources and analysis." },
+        { "title": "Responsibility", "description": "Awareness of how decisions affect people and their surroundings." },
+        { "title": "Growth", "description": "Continuous learning and combining different perspectives." }
+      ]
+    },
+    "personal": {
+      "eyebrow": "Outside work",
+      "heading": "Outside work",
+      "intro": "Personally, the things that broaden my professional and academic perspective.",
+      "items": ["Travel", "Exploring cultures", "Academic and philosophical literature", "Nature", "Photography", "Growth and learning"]
+    },
+    "manifest": {
+      "text": "Understanding people is the foundation for building a safer and more conscious world."
+    },
+    "finalCta": {
+      "heading": "Let's talk",
+      "description": "Feel free to get in touch about research, publications, academic collaboration, projects or psychotherapy.",
+      "ctaKontakt": "Get in touch",
+      "ctaLinkedin": "LinkedIn"
+    }
   }
 }

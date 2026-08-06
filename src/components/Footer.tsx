@@ -17,7 +17,7 @@ export default async function Footer() {
           </div>
 
           <nav className="flex flex-wrap items-center justify-center gap-6 text-sm text-[#4A3360] dark:text-neutral-400">
-            <Link href="/#o-mnie" className="hover:text-[#4A1D6E] dark:hover:text-purple-300">{t("oMnie")}</Link>
+            <Link href="/o-mnie" className="hover:text-[#4A1D6E] dark:hover:text-purple-300">{t("oMnie")}</Link>
             <Link href="/badania" className="hover:text-[#4A1D6E] dark:hover:text-purple-300">{t("badania")}</Link>
             <Link href="/publikacje" className="hover:text-[#4A1D6E] dark:hover:text-purple-300">{t("publikacje")}</Link>
             <Link href="/psychoterapia" className="hover:text-[#4A1D6E] dark:hover:text-purple-300">{t("psychoterapia")}</Link>

@@ -192,5 +192,147 @@
       "Jak trauma kształtuje decyzje, relacje i zachowania społeczne?",
       "Jak wspierać zdrowienie i odporność w społecznościach po konflikcie?"
     ]
+  },
+  "OMniePage": {
+    "metaTitle": "Chi sono",
+    "metaDescription": "Ricercatore, autore di pubblicazioni scientifiche e psicoterapeuta in formazione. Unisco psicologia, criminologia e ricerca sulla sicurezza a un'esperienza nella gestione internazionale e nel business.",
+    "photoAlt": "Patryk Madej",
+    "hero": {
+      "eyebrow": "Chi sono",
+      "heading": "Unisco ricerca, psicoterapia e pratica.",
+      "paragraph1": "Sono dottorando presso l'Istituto di Scienze Politiche e della Sicurezza dell'Università di Stettino, studente di psicologia e partecipante a un corso quadriennale di formazione psicoterapeutica. Unisco l'interesse per la persona e per i processi sociali all'esperienza maturata nella gestione internazionale, negli acquisti e nelle energie rinnovabili.",
+      "paragraph2": "Nel mio lavoro scientifico mi concentro sul separatismo, sulla sicurezza internazionale e sui Balcani occidentali, oltre che su criminologia, vittimologia e psicologia della sicurezza. Nella formazione psicoterapeutica lavoro secondo l'orientamento integrativo-psicodinamico, approfondendo il lavoro sul trauma con il metodo EMDR.",
+      "ctaBadania": "Scopri le mie ricerche",
+      "ctaPublikacje": "Vedi le pubblicazioni",
+      "ctaKontakt": "Contattami",
+      "photoCaption": "Ricercatore · Studente di psicologia · Psicoterapeuta in formazione"
+    },
+    "facts": {
+      "prawo": { "label": "Diritto", "value": "Laurea magistrale in giurisprudenza" },
+      "psychologia": { "label": "Psicologia", "value": "Studi di psicologia in corso" },
+      "psychoterapia": { "label": "Psicoterapia", "value": "In formazione e accreditamento" },
+      "doswiadczenie": { "label": "Esperienza", "value": "Gestione internazionale e business" }
+    },
+    "journey": {
+      "eyebrow": "Percorso professionale",
+      "heading": "Il mio percorso professionale",
+      "intro": "Alcune tappe che hanno dato forma all'attuale unione tra ricerca, psicoterapia e pratica.",
+      "stages": [
+        {
+          "period": "Formazione giuridica",
+          "org": "Studi di giurisprudenza",
+          "role": "Laureato in giurisprudenza",
+          "description": "La base per il successivo lavoro scientifico — una formazione giuridica e la comprensione del sistema istituzionale."
+        },
+        {
+          "period": "Esperienza internazionale",
+          "org": "Vestas",
+          "role": "Gestione degli acquisti e dei contratti",
+          "description": "Lavoro nel settore internazionale dell'energia eolica — negoziazioni, contratti e gestione dei fornitori."
+        },
+        {
+          "period": "Esperienza internazionale",
+          "org": "Maersk Logistics & Services",
+          "role": "Logistica e progetti offshore",
+          "description": "Gestione di progetti e collaborazione internazionale nella logistica e nei servizi offshore."
+        },
+        {
+          "period": "Sviluppo scientifico",
+          "org": "Università di Stettino — Istituto di Scienze Politiche e della Sicurezza",
+          "role": "Dottorando",
+          "description": "Ricerca sul separatismo, sulla sicurezza internazionale e sui Balcani occidentali."
+        },
+        {
+          "period": "Sviluppo scientifico",
+          "org": "Studi di psicologia",
+          "role": "Studente di psicologia",
+          "description": "Approfondimento della comprensione della persona dal punto di vista psicologico — a completamento della prospettiva giuridica e politologica."
+        },
+        {
+          "period": "Dal 2026",
+          "org": "Scuola di psicoterapia (Società Polacca di Psichiatria)",
+          "role": "Partecipante a un corso quadriennale",
+          "description": "Orientamento integrativo-psicodinamico, metodo EMDR nel lavoro sul trauma, sviluppo sotto supervisione."
+        }
+      ]
+    },
+    "cards": {
+      "education": {
+        "heading": "Formazione e sviluppo",
+        "items": [
+          "Studi di giurisprudenza — formazione giuridica, base del successivo percorso scientifico",
+          "Dottorato — Scienze Politiche e della Sicurezza, Università di Stettino (in corso)",
+          "Studi di psicologia — corso di laurea a ciclo unico (in corso)",
+          "Scuola di psicoterapia — corso quadriennale accreditato dalla Sezione Scientifica di Psicoterapia e Terapia Familiare della Società Polacca di Psichiatria, orientamento integrativo-psicodinamico, EMDR (dal 2026)"
+        ],
+        "moreLabel": "Scopri di più"
+      },
+      "specializations": {
+        "heading": "Aree di specializzazione",
+        "items": [
+          "Psicoterapia integrativo-psicodinamica (in formazione)",
+          "Trauma e regolazione delle emozioni — EMDR",
+          "Criminologia e vittimologia",
+          "Psicologia della sicurezza",
+          "Separatismo e sicurezza internazionale",
+          "Resilienza istituzionale"
+        ]
+      },
+      "experience": {
+        "heading": "Esperienza professionale",
+        "items": [
+          "Gestione e acquisti in un contesto internazionale",
+          "Negoziazioni e contratti",
+          "Energie rinnovabili — Vestas",
+          "Logistica e progetti offshore — Maersk Logistics & Services",
+          "Gestione di progetti e team",
+          "Analisi strategiche e di business"
+        ],
+        "linkedinLabel": "Vedi il profilo LinkedIn"
+      }
+    },
+    "research": {
+      "eyebrow": "Ricerca",
+      "heading": "Ricerca e interessi scientifici",
+      "intro": "Cinque aree che unisco nel mio lavoro di ricerca — dalla sicurezza internazionale alla psicologia clinica.",
+      "ctaLabel": "Scopri le mie ricerche"
+    },
+    "publications": {
+      "eyebrow": "Pubblicazioni",
+      "heading": "Pubblicazioni selezionate",
+      "ctaLabel": "Vedi tutte le pubblicazioni"
+    },
+    "psychoterapiaSection": {
+      "eyebrow": "Psicoterapia",
+      "heading": "La persona al centro",
+      "paragraph1": "Sono partecipante a un corso quadriennale di formazione psicoterapeutica secondo l'orientamento integrativo-psicodinamico, accreditato dalla Sezione Scientifica di Psicoterapia e Terapia Familiare della Società Polacca di Psichiatria. Sviluppo la mia pratica sotto supervisione, utilizzando il metodo EMDR nel lavoro sul trauma.",
+      "paragraph2": "Per me l'elemento più importante di questo lavoro è la relazione terapeutica — uno spazio in cui la teoria incontra la storia, l'esperienza e la possibilità di cambiamento dell'altra persona. Non gestisco ancora uno studio né seguo pazienti.",
+      "ctaLabel": "Scopri di più sulla psicoterapia"
+    },
+    "values": {
+      "eyebrow": "Valori",
+      "heading": "Cosa è importante per me",
+      "items": [
+        { "title": "Autenticità", "description": "Una relazione fondata sulla sincerità e sul rispetto." },
+        { "title": "Rigore", "description": "Conclusioni fondate sulla conoscenza, sulle fonti e sull'analisi." },
+        { "title": "Responsabilità", "description": "Consapevolezza dell'impatto delle decisioni sulle persone e sul contesto." },
+        { "title": "Crescita", "description": "Apprendimento continuo e unione di prospettive diverse." }
+      ]
+    },
+    "personal": {
+      "eyebrow": "Fuori dal lavoro",
+      "heading": "Fuori dal lavoro",
+      "intro": "Nella vita privata, ciò che amplia la mia prospettiva professionale e scientifica.",
+      "items": ["Viaggi", "Scoperta di nuove culture", "Letteratura scientifica e filosofica", "Natura", "Fotografia", "Crescita e apprendimento"]
+    },
+    "manifest": {
+      "text": "Comprendere la persona è il fondamento per costruire un mondo più sicuro e più consapevole."
+    },
+    "finalCta": {
+      "heading": "Parliamone",
+      "description": "Sono a disposizione per ricerche, pubblicazioni, collaborazioni scientifiche, progetti e psicoterapia.",
+      "ctaKontakt": "Contattami",
+      "ctaLinkedin": "LinkedIn"
+    }
   }
 }

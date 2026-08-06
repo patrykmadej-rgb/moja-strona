@@ -191,7 +191,7 @@ export default async function Home() {
                   {tHero("ctaBadania")}
                 </Link>
                 <Link
-                  href="/#o-mnie"
+                  href="/o-mnie"
                   className="rounded-none border border-[#4A1D6E] px-7 py-3 text-sm font-normal text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E] hover:text-white dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
                 >
                   {tHero("ctaOMnie")}
@@ -222,7 +222,7 @@ export default async function Home() {
               {tHero("ctaBadania")}
             </Link>
             <Link
-              href="/#o-mnie"
+              href="/o-mnie"
               className="rounded-none border border-[#4A1D6E] px-7 py-3 text-sm font-normal text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E] hover:text-white dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
             >
               {tHero("ctaOMnie")}
@@ -468,7 +468,7 @@ export default async function Home() {
                 {tAbout("paragraph1")}
               </p>
               <Link
-                href="/#o-mnie"
+                href="/o-mnie"
                 className="relative z-20 mt-5 inline-flex items-center gap-2 rounded-full bg-[#4A1D6E] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073] dark:hover:bg-[#7B4DB8]"
               >
                 {tAbout("moreLink")}

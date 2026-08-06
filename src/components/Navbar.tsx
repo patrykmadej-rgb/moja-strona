@@ -8,7 +8,7 @@ import { signOut } from "@/app/actions";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const navLinks = [
-  { href: "/#o-mnie", key: "oMnie" },
+  { href: "/o-mnie", key: "oMnie" },
   { href: "/badania", key: "badania" },
   { href: "/publikacje", key: "publikacje" },
   { href: "/projekty", key: "projekty" },
