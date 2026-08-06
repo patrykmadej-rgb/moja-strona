@@ -14,6 +14,7 @@ import {
   Settings,
   LogOut,
   FlaskConical,
+  Home,
   type LucideIcon,
 } from "lucide-react";
 import { signOutLab } from "@/app/lab/actions";
@@ -25,6 +26,16 @@ type NavItem = {
   icon: LucideIcon;
   enabled: boolean;
 };
+
+/**
+ * Powrót na publiczną stronę główną — celowo POZA PRIMARY_ITEMS: to jedyna
+ * pozycja sidebara, która nigdy nie ma stanu active (sidebar istnieje tylko
+ * w /lab, więc "/" nigdy nie jest bieżącą ścieżką), więc renderowana jest
+ * osobno z isActive={false} na sztywno zamiast przez współdzielone
+ * isItemActive(). Link do "/" (nie pełny URL) — działa tak samo lokalnie
+ * i na produkcji.
+ */
+const HOME_ITEM: NavItem = { key: "strona-glowna", href: "/", label: "Strona główna", icon: Home, enabled: true };
 
 const PRIMARY_ITEMS: NavItem[] = [
   { key: "pulpit", href: "/lab", label: "Pulpit", icon: LayoutDashboard, enabled: true },
@@ -181,6 +192,12 @@ export default function Sidebar({ email }: { email?: string | null }) {
         </Link>
 
         <div className="relative z-[4] mt-6 flex flex-col items-center gap-2">
+          <NavButton item={HOME_ITEM} isActive={false} />
+        </div>
+
+        <div className="relative z-[4] my-3 h-px w-8 shrink-0 bg-white/[0.08]" />
+
+        <div className="relative z-[4] flex flex-col items-center gap-2">
           {PRIMARY_ITEMS.map((item) => (
             <NavButton key={item.key} item={item} isActive={isItemActive(item.href)} />
           ))}
