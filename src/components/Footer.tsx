@@ -20,7 +20,6 @@ export default async function Footer() {
             <Link href="/o-mnie" className="hover:text-[#4A1D6E] dark:hover:text-purple-300">{t("oMnie")}</Link>
             <Link href="/badania" className="hover:text-[#4A1D6E] dark:hover:text-purple-300">{t("badania")}</Link>
             <Link href="/publikacje" className="hover:text-[#4A1D6E] dark:hover:text-purple-300">{t("publikacje")}</Link>
-            <Link href="/psychoterapia" className="hover:text-[#4A1D6E] dark:hover:text-purple-300">{t("psychoterapia")}</Link>
             <Link href="/kontakt" className="hover:text-[#4A1D6E] dark:hover:text-purple-300">{t("kontakt")}</Link>
           </nav>
 

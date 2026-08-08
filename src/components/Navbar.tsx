@@ -12,7 +12,6 @@ const navLinks = [
   { href: "/badania", key: "badania" },
   { href: "/publikacje", key: "publikacje" },
   { href: "/projekty", key: "projekty" },
-  { href: "/psychoterapia", key: "psychoterapia" },
   { href: "/wiedza", key: "wiedza" },
 ];
 

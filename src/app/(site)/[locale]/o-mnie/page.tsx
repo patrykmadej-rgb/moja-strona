@@ -268,12 +268,6 @@ export default async function OMniePage() {
                   </li>
                 ))}
               </ul>
-              <Link
-                href="/psychoterapia"
-                className="mt-5 inline-block text-sm font-semibold text-[#4A1D6E] hover:underline dark:text-purple-300"
-              >
-                {t("cards.education.moreLabel")} →
-              </Link>
             </div>
 
             {/* Specjalizacje */}
@@ -417,12 +411,6 @@ export default async function OMniePage() {
             <p>{t("psychoterapiaSection.paragraph1")}</p>
             <p>{t("psychoterapiaSection.paragraph2")}</p>
           </div>
-          <Link
-            href="/psychoterapia"
-            className="mt-6 inline-flex items-center gap-2 rounded-none border border-[#4A1D6E] px-7 py-3 text-sm font-normal text-[#4A1D6E] transition-colors hover:bg-[#4A1D6E] hover:text-white dark:border-purple-400/40 dark:text-purple-300 dark:hover:border-purple-400"
-          >
-            {t("psychoterapiaSection.ctaLabel")}
-          </Link>
         </div>
       </section>
 

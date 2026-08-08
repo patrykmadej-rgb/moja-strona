@@ -97,7 +97,6 @@ const pillars: { key: string; href: string; Icon: LucideIcon }[] = [
   { key: "badania", href: "/badania", Icon: Search },
   { key: "publikacje", href: "/publikacje", Icon: FileText },
   { key: "projekty", href: "/projekty", Icon: Share2 },
-  { key: "psychoterapia", href: "/psychoterapia", Icon: Brain },
   { key: "wiedza", href: "/wiedza", Icon: PenTool },
 ];
 
@@ -117,7 +116,6 @@ const areas = [
   "Bezpieczeństwo",
   "Prawo",
   "Neuroróżnorodność",
-  "Psychoterapia",
   "AI i analiza danych",
 ];
 
@@ -243,14 +241,14 @@ export default async function Home() {
       {/* PIĘĆ FILARÓW */}
       <section className="relative">
         <div className="relative left-[calc(-50vw+50%)] w-screen bg-[#EAE5DE] py-6 dark:bg-neutral-900">
-          <div className="grid grid-cols-2 gap-y-6 md:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-y-6 md:grid-cols-4">
             {pillars.map((pillar, i) => (
               <Link
                 key={pillar.href}
                 href={pillar.href}
                 className={`group flex flex-row items-center gap-2 px-6 py-0 transition-opacity hover:opacity-80 md:px-8 ${
                   i < pillars.length - 1
-                    ? "lg:border-r lg:border-black/10 dark:lg:border-white/10"
+                    ? "md:border-r md:border-black/10 dark:md:border-white/10"
                     : ""
                 }`}
               >
