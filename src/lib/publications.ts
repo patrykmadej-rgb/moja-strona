@@ -225,6 +225,16 @@ export function getPublicationBySlug(slug: string): Publication | undefined {
   return publications.find((p) => p.slug === slug);
 }
 
+/** Publikacje oznaczone co najmniej jednym z podanych tagów (dokładne
+ * dopasowanie stringów, tak jak getAllTags/tagToSlug), posortowane malejąco
+ * wg roku (getPublicationSortYear — "w-trakcie" bez roku trafia na początek). */
+export function getPublicationsByTags(tags: string[], pubs: Publication[] = publications): Publication[] {
+  const tagSet = new Set(tags);
+  return pubs
+    .filter((p) => p.tags.some((t) => tagSet.has(t)))
+    .sort((a, b) => getPublicationSortYear(b) - getPublicationSortYear(a));
+}
+
 const POLISH_MONTHS: Record<string, number> = {
   styczen: 1,
   styczeń: 1,

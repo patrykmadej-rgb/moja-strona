@@ -3,8 +3,7 @@ import { Cormorant_Garamond, Manrope } from "next/font/google";
 import { getTranslations } from "next-intl/server";
 import { siteConfig } from "@/lib/site-config";
 import { researchDirections, type ResearchDirectionId } from "@/lib/research-directions";
-import { publications, getFeaturedPublications } from "@/lib/publications";
-import { getAllTags, tagToSlug } from "@/lib/tags";
+import { getFeaturedPublications } from "@/lib/publications";
 import ResearchHero from "@/components/research/ResearchHero";
 import ResearchDirectionNetwork, { type DirectionContent } from "@/components/research/ResearchDirectionNetwork";
 import ResearchProcess from "@/components/research/ResearchProcess";
@@ -38,19 +37,6 @@ export default async function BadaniaPage() {
   const t = await getTranslations("ResearchPage");
   const tStatus = await getTranslations("PublicationStatus");
 
-  // Kierunek dostaje prawdziwy link tylko wtedy, gdy istnieje faktyczna publikacja
-  // oznaczona odpowiadającym tagiem (routing /tagi/[tag] generuje statyczne strony
-  // wyłącznie dla tagów realnie występujących w publikacjach). Obecnie dotyczy to
-  // tylko "separatism" (tag "Separatyzm"). Pozostałe trzy renderują się jako
-  // wizualny (nieklikalny) odpowiednik "Poznaj kierunek →", żeby nie tworzyć
-  // fikcyjnego routingu do nieistniejących podstron kierunków.
-  const allTags = getAllTags(publications);
-  const directionHref = new Map<ResearchDirectionId, string>();
-  for (const dir of researchDirections) {
-    const matchingTag = dir.candidateTags.find((tag) => allTags.includes(tag));
-    if (matchingTag) directionHref.set(dir.id, `/tagi/${tagToSlug(matchingTag)}`);
-  }
-
   const directionCopy = t.raw("directions") as Record<
     ResearchDirectionId,
     { titleLine1: string; titleLine2: string; description: string }
@@ -61,7 +47,7 @@ export default async function BadaniaPage() {
     titleLine1: directionCopy[dir.id].titleLine1,
     titleLine2: directionCopy[dir.id].titleLine2,
     description: directionCopy[dir.id].description,
-    href: directionHref.get(dir.id),
+    href: `/badania/${dir.slug}`,
   }));
 
   const featuredPublications = getFeaturedPublications();

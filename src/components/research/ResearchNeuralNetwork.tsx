@@ -17,145 +17,150 @@ type NetPath = {
   id: string;
   d: string;
   direction: ResearchDirectionId | null;
-  kind: "primary" | "secondary" | "active";
+  kind: "primary" | "secondary" | "tertiary" | "active";
+  /** Bardzo powolny, subtelny "oddech" opacity — tylko na 2-3 głównych
+   * połączeniach (01-02, 02-03, 03-04), nie na wszystkich elementach naraz. */
+  flow?: boolean;
 };
 
 /**
- * Stabilne, ręcznie zdefiniowane współrzędne (wygenerowane raz, offline, przez
- * deterministyczną funkcję sin-hash — NIE Math.random) — sieć wygląda identycznie
- * przy każdym renderze/wejściu na stronę, bez ryzyka hydration mismatch.
- * 5 skupisk (separatism/profiling/threats/prevention×2) wokół stabilnych
- * "hubów": (240,330) (520,220) (700,510) (990,330) (1220,500) — zgodnie ze
- * specyfikacją. 60 węzłów (50 małych + 10 większych, po 2 na skupisko) i 22
- * organiczne krzywe (Q-bezier z przesuniętym punktem kontrolnym — dendryty,
- * nie proste odcinki): 16 gałęzi wewnątrz skupisk + 6 "mostów" między nimi.
+ * PUNKTY STYKU: pięć "hubów" (jeden na kierunek, 04/"prevention" ma
+ * dwa wewnętrzne pod-skupiska) wyznaczonych DOKŁADNIE pod środkami czterech
+ * kół na /badania — współrzędne zmierzone empirycznie (Playwright,
+ * viewport 1440px, przeliczone z px na jednostki viewBox 1440×730 tej
+ * samej skali) i zweryfikowane tak, żeby węzły klastra faktycznie leżały
+ * pod odpowiadającym kołem, nie obok niego:
+ *   01 (separatism): hub (186,514)
+ *   02 (profiling):  hub (688,224)
+ *   03 (threats):    hub (609,520)
+ *   04 (prevention): hub-a (1087,313), hub-b (1317,483)
+ * Każdy klaster to stabilne, ręcznie zdefiniowane współrzędne (NIE
+ * Math.random) — sieć wygląda identycznie przy każdym renderze/wejściu na
+ * stronę, bez ryzyka hydration mismatch. Gałęzie łączące kluby (p16-p21)
+ * zaczynają/kończą się DOKŁADNIE w punktach odpowiadających
+ * .research-hex-connector--a/--b/--c w globals.css (patrz tam) — koło ma
+ * min. dwa widoczne punkty styku (02 — trzy).
  */
 const NODES: NetNode[] = [
-  { id: "n0", x: 240, y: 330, r: 4.6, kind: "large", direction: "separatism" },
-  { id: "n1", x: 269.1, y: 375.4, r: 3.8, kind: "large", direction: "separatism" },
-  { id: "n2", x: 231.3, y: 376.3, r: 1.4, kind: "small", direction: "separatism" },
-  { id: "n3", x: 96.5, y: 381.4, r: 1.5, kind: "small", direction: "separatism" },
-  { id: "n4", x: 205.2, y: 405.2, r: 1.4, kind: "small", direction: "separatism" },
-  { id: "n5", x: 277.1, y: 313.2, r: 2.4, kind: "small", direction: "separatism" },
-  { id: "n6", x: 198.6, y: 305.4, r: 1.6, kind: "small", direction: "separatism" },
-  { id: "n7", x: 306.6, y: 301.1, r: 1.5, kind: "small", direction: "separatism" },
-  { id: "n8", x: 169.4, y: 218.1, r: 2.2, kind: "small", direction: "separatism" },
-  { id: "n9", x: 315.5, y: 376.7, r: 2.5, kind: "small", direction: "separatism" },
-  { id: "n10", x: 262.7, y: 308.2, r: 2.2, kind: "small", direction: "separatism" },
-  { id: "n11", x: 347.2, y: 357, r: 2.6, kind: "small", direction: "separatism" },
-  { id: "n12", x: 520, y: 220, r: 4.6, kind: "large", direction: "profiling" },
-  { id: "n13", x: 515.5, y: 169, r: 3.8, kind: "large", direction: "profiling" },
-  { id: "n14", x: 491.4, y: 300.2, r: 2.4, kind: "small", direction: "profiling" },
-  { id: "n15", x: 511.6, y: 122.3, r: 2, kind: "small", direction: "profiling" },
-  { id: "n16", x: 429.1, y: 155.4, r: 2.5, kind: "small", direction: "profiling" },
-  { id: "n17", x: 548.8, y: 240.7, r: 2, kind: "small", direction: "profiling" },
-  { id: "n18", x: 615.1, y: 245.9, r: 1.7, kind: "small", direction: "profiling" },
-  { id: "n19", x: 544.3, y: 278.1, r: 2.2, kind: "small", direction: "profiling" },
-  { id: "n20", x: 443.7, y: 223, r: 2, kind: "small", direction: "profiling" },
-  { id: "n21", x: 417.6, y: 246, r: 1.9, kind: "small", direction: "profiling" },
-  { id: "n22", x: 568.8, y: 269, r: 1.4, kind: "small", direction: "profiling" },
-  { id: "n23", x: 692.1, y: 238.7, r: 2.5, kind: "small", direction: "profiling" },
-  { id: "n24", x: 700, y: 510, r: 4.6, kind: "large", direction: "threats" },
-  { id: "n25", x: 622.3, y: 486.7, r: 3.8, kind: "large", direction: "threats" },
-  { id: "n26", x: 806.4, y: 589.7, r: 2.5, kind: "small", direction: "threats" },
-  { id: "n27", x: 624.7, y: 463.1, r: 2.1, kind: "small", direction: "threats" },
-  { id: "n28", x: 744.7, y: 394.4, r: 2.3, kind: "small", direction: "threats" },
-  { id: "n29", x: 736.5, y: 573.5, r: 2.1, kind: "small", direction: "threats" },
-  { id: "n30", x: 771.9, y: 601.8, r: 2.3, kind: "small", direction: "threats" },
-  { id: "n31", x: 787.4, y: 550, r: 2.4, kind: "small", direction: "threats" },
-  { id: "n32", x: 885.7, y: 504.4, r: 1.7, kind: "small", direction: "threats" },
-  { id: "n33", x: 790.9, y: 538.8, r: 1.5, kind: "small", direction: "threats" },
-  { id: "n34", x: 739.4, y: 434.7, r: 2.5, kind: "small", direction: "threats" },
-  { id: "n35", x: 606.3, y: 562.5, r: 2.6, kind: "small", direction: "threats" },
-  { id: "n36", x: 990, y: 330, r: 4.6, kind: "large", direction: "prevention" },
-  { id: "n37", x: 909.9, y: 346.4, r: 3.8, kind: "large", direction: "prevention" },
-  { id: "n38", x: 991.3, y: 280.6, r: 2.1, kind: "small", direction: "prevention" },
-  { id: "n39", x: 1042.8, y: 274.5, r: 2.5, kind: "small", direction: "prevention" },
-  { id: "n40", x: 803.5, y: 331.7, r: 2.1, kind: "small", direction: "prevention" },
-  { id: "n41", x: 1012.7, y: 351.4, r: 2.2, kind: "small", direction: "prevention" },
-  { id: "n42", x: 863.4, y: 399.7, r: 2.1, kind: "small", direction: "prevention" },
-  { id: "n43", x: 942, y: 246.8, r: 1.6, kind: "small", direction: "prevention" },
-  { id: "n44", x: 1126.8, y: 289.3, r: 2.3, kind: "small", direction: "prevention" },
-  { id: "n45", x: 1041.4, y: 369.3, r: 2.4, kind: "small", direction: "prevention" },
-  { id: "n46", x: 931.2, y: 257.8, r: 2.5, kind: "small", direction: "prevention" },
-  { id: "n47", x: 943.2, y: 366.7, r: 1.6, kind: "small", direction: "prevention" },
-  { id: "n48", x: 1220, y: 500, r: 4.6, kind: "large", direction: "prevention" },
-  { id: "n49", x: 1204.9, y: 574.6, r: 3.8, kind: "large", direction: "prevention" },
-  { id: "n50", x: 1110.4, y: 577.2, r: 1.4, kind: "small", direction: "prevention" },
-  { id: "n51", x: 1167.4, y: 439.4, r: 2.4, kind: "small", direction: "prevention" },
-  { id: "n52", x: 1331, y: 540.3, r: 1.9, kind: "small", direction: "prevention" },
-  { id: "n53", x: 1300.7, y: 518.7, r: 1.4, kind: "small", direction: "prevention" },
-  { id: "n54", x: 1225.1, y: 540.9, r: 1.6, kind: "small", direction: "prevention" },
-  { id: "n55", x: 1073.9, y: 558.9, r: 2.5, kind: "small", direction: "prevention" },
-  { id: "n56", x: 1174.9, y: 587.7, r: 2.3, kind: "small", direction: "prevention" },
-  { id: "n57", x: 1121.8, y: 569.1, r: 1.4, kind: "small", direction: "prevention" },
-  { id: "n58", x: 1154.3, y: 531.6, r: 1.9, kind: "small", direction: "prevention" },
-  { id: "n59", x: 1163.8, y: 469.7, r: 2.4, kind: "small", direction: "prevention" },
-  // --- Dogęszczenie sieci (druga iteracja): węzły "ambientowe" (direction:
-  // null) wzmacniające widoczność w pięciu wskazanych strefach — za
-  // nagłówkiem, między 01-02, między 02-04, pod 03, przy prawej krawędzi.
-  { id: "n60", x: 120, y: 100, r: 2.0, kind: "small", direction: null },
-  { id: "n61", x: 280, y: 90, r: 1.8, kind: "small", direction: null },
-  { id: "n62", x: 330, y: 180, r: 3.4, kind: "large", direction: null },
-  { id: "n63", x: 430, y: 290, r: 1.8, kind: "small", direction: null },
-  { id: "n64", x: 780, y: 260, r: 3.4, kind: "large", direction: null },
-  { id: "n65", x: 850, y: 310, r: 1.8, kind: "small", direction: null },
-  { id: "n66", x: 655, y: 610, r: 2.2, kind: "small", direction: null },
-  { id: "n67", x: 740, y: 660, r: 1.7, kind: "small", direction: null },
-  { id: "n68", x: 1370, y: 410, r: 2.0, kind: "small", direction: null },
-  { id: "n69", x: 1400, y: 540, r: 1.7, kind: "small", direction: null },
+  { id: "n0", x: 186.0, y: 514.0, r: 4.6, kind: "large", direction: "separatism" },
+  { id: "n1", x: 215.1, y: 559.4, r: 3.8, kind: "large", direction: "separatism" },
+  { id: "n2", x: 177.3, y: 560.3, r: 1.4, kind: "small", direction: "separatism" },
+  { id: "n3", x: 42.5, y: 565.4, r: 1.5, kind: "small", direction: "separatism" },
+  { id: "n4", x: 151.2, y: 589.2, r: 1.4, kind: "small", direction: "separatism" },
+  { id: "n5", x: 223.1, y: 497.2, r: 2.4, kind: "small", direction: "separatism" },
+  { id: "n6", x: 144.6, y: 489.4, r: 1.6, kind: "small", direction: "separatism" },
+  { id: "n7", x: 252.6, y: 485.1, r: 1.5, kind: "small", direction: "separatism" },
+  { id: "n8", x: 115.4, y: 402.1, r: 2.2, kind: "small", direction: "separatism" },
+  { id: "n9", x: 261.5, y: 560.7, r: 2.5, kind: "small", direction: "separatism" },
+  { id: "n10", x: 208.7, y: 492.2, r: 2.2, kind: "small", direction: "separatism" },
+  { id: "n11", x: 293.2, y: 541.0, r: 2.6, kind: "small", direction: "separatism" },
+  { id: "n12", x: 688.0, y: 224.0, r: 4.6, kind: "large", direction: "profiling" },
+  { id: "n13", x: 683.5, y: 173.0, r: 3.8, kind: "large", direction: "profiling" },
+  { id: "n14", x: 659.4, y: 304.2, r: 2.4, kind: "small", direction: "profiling" },
+  { id: "n15", x: 679.6, y: 126.3, r: 2, kind: "small", direction: "profiling" },
+  { id: "n16", x: 597.1, y: 159.4, r: 2.5, kind: "small", direction: "profiling" },
+  { id: "n17", x: 716.8, y: 244.7, r: 2, kind: "small", direction: "profiling" },
+  { id: "n18", x: 783.1, y: 249.9, r: 1.7, kind: "small", direction: "profiling" },
+  { id: "n19", x: 712.3, y: 282.1, r: 2.2, kind: "small", direction: "profiling" },
+  { id: "n20", x: 611.7, y: 227.0, r: 2, kind: "small", direction: "profiling" },
+  { id: "n21", x: 585.6, y: 250.0, r: 1.9, kind: "small", direction: "profiling" },
+  { id: "n22", x: 736.8, y: 273.0, r: 1.4, kind: "small", direction: "profiling" },
+  { id: "n23", x: 860.1, y: 242.7, r: 2.5, kind: "small", direction: "profiling" },
+  { id: "n24", x: 609.0, y: 520.0, r: 4.6, kind: "large", direction: "threats" },
+  { id: "n25", x: 531.3, y: 496.7, r: 3.8, kind: "large", direction: "threats" },
+  { id: "n26", x: 715.4, y: 599.7, r: 2.5, kind: "small", direction: "threats" },
+  { id: "n27", x: 533.7, y: 473.1, r: 2.1, kind: "small", direction: "threats" },
+  { id: "n28", x: 653.7, y: 404.4, r: 2.3, kind: "small", direction: "threats" },
+  { id: "n29", x: 645.5, y: 583.5, r: 2.1, kind: "small", direction: "threats" },
+  { id: "n30", x: 680.9, y: 611.8, r: 2.3, kind: "small", direction: "threats" },
+  { id: "n31", x: 696.4, y: 560.0, r: 2.4, kind: "small", direction: "threats" },
+  { id: "n32", x: 794.7, y: 514.4, r: 1.7, kind: "small", direction: "threats" },
+  { id: "n33", x: 699.9, y: 548.8, r: 1.5, kind: "small", direction: "threats" },
+  { id: "n34", x: 648.4, y: 444.7, r: 2.5, kind: "small", direction: "threats" },
+  { id: "n35", x: 515.3, y: 572.5, r: 2.6, kind: "small", direction: "threats" },
+  { id: "n36", x: 1087.0, y: 313.0, r: 4.6, kind: "large", direction: "prevention" },
+  { id: "n37", x: 1006.9, y: 329.4, r: 3.8, kind: "large", direction: "prevention" },
+  { id: "n38", x: 1088.3, y: 263.6, r: 2.1, kind: "small", direction: "prevention" },
+  { id: "n39", x: 1139.8, y: 257.5, r: 2.5, kind: "small", direction: "prevention" },
+  { id: "n40", x: 900.5, y: 314.7, r: 2.1, kind: "small", direction: "prevention" },
+  { id: "n41", x: 1109.7, y: 334.4, r: 2.2, kind: "small", direction: "prevention" },
+  { id: "n42", x: 960.4, y: 382.7, r: 2.1, kind: "small", direction: "prevention" },
+  { id: "n43", x: 1039.0, y: 229.8, r: 1.6, kind: "small", direction: "prevention" },
+  { id: "n44", x: 1223.8, y: 272.3, r: 2.3, kind: "small", direction: "prevention" },
+  { id: "n45", x: 1138.4, y: 352.3, r: 2.4, kind: "small", direction: "prevention" },
+  { id: "n46", x: 1028.2, y: 240.8, r: 2.5, kind: "small", direction: "prevention" },
+  { id: "n47", x: 1040.2, y: 349.7, r: 1.6, kind: "small", direction: "prevention" },
+  { id: "n48", x: 1317.0, y: 483.0, r: 4.6, kind: "large", direction: "prevention" },
+  { id: "n49", x: 1301.9, y: 557.6, r: 3.8, kind: "large", direction: "prevention" },
+  { id: "n50", x: 1207.4, y: 560.2, r: 1.4, kind: "small", direction: "prevention" },
+  { id: "n51", x: 1264.4, y: 422.4, r: 2.4, kind: "small", direction: "prevention" },
+  { id: "n52", x: 1428.0, y: 523.3, r: 1.9, kind: "small", direction: "prevention" },
+  { id: "n53", x: 1397.7, y: 501.7, r: 1.4, kind: "small", direction: "prevention" },
+  { id: "n54", x: 1322.1, y: 523.9, r: 1.6, kind: "small", direction: "prevention" },
+  { id: "n55", x: 1170.9, y: 541.9, r: 2.5, kind: "small", direction: "prevention" },
+  { id: "n56", x: 1271.9, y: 570.7, r: 2.3, kind: "small", direction: "prevention" },
+  { id: "n57", x: 1218.8, y: 552.1, r: 1.4, kind: "small", direction: "prevention" },
+  { id: "n58", x: 1251.3, y: 514.6, r: 1.9, kind: "small", direction: "prevention" },
+  { id: "n59", x: 1260.8, y: 452.7, r: 2.4, kind: "small", direction: "prevention" },
+  // --- Gałąź za prawą krawędzią koła 04 (żądanie: "za prawą stroną koła 04") ---
+  { id: "n68", x: 1410, y: 385, r: 2.0, kind: "small", direction: null },
+  { id: "n69", x: 1400, y: 480, r: 1.7, kind: "small", direction: null },
+  // --- Bardzo delikatne wypełnienie pustych przestrzeni (między kołami i po
+  // prawej stronie sekcji) — pojedyncze, subtelne punkty, nie kolejne skupiska. ---
+  { id: "n70", x: 420, y: 460, r: 1.8, kind: "small", direction: null },
+  { id: "n71", x: 900, y: 180, r: 1.6, kind: "small", direction: null },
+  { id: "n72", x: 950, y: 550, r: 1.8, kind: "small", direction: null },
+  { id: "n73", x: 1250, y: 250, r: 1.5, kind: "small", direction: null },
+  { id: "n74", x: 340, y: 330, r: 1.4, kind: "small", direction: null },
+  { id: "n75", x: 1150, y: 550, r: 1.8, kind: "small", direction: null },
 ];
 
 const PATHS: NetPath[] = [
-  { id: "p0", d: "M240,330 Q255,356.8 231.3,376.3", direction: "separatism", kind: "active" },
-  { id: "p1", d: "M240,330 Q259.4,323.6 277.1,313.2", direction: "separatism", kind: "primary" },
-  { id: "p2", d: "M240,330 Q215.5,267.2 169.4,218.1", direction: "separatism", kind: "primary" },
-  { id: "p3", d: "M520,220 Q523,266.3 491.4,300.2", direction: "profiling", kind: "active" },
-  { id: "p4", d: "M520,220 Q533.5,231.6 548.8,240.7", direction: "profiling", kind: "primary" },
-  { id: "p5", d: "M520,220 Q481.5,211.4 443.7,223", direction: "profiling", kind: "primary" },
-  { id: "p6", d: "M700,510 Q762,538.1 806.4,589.7", direction: "threats", kind: "active" },
-  { id: "p7", d: "M700,510 Q706.3,446 744.7,394.4", direction: "threats", kind: "primary" },
-  { id: "p8", d: "M700,510 Q738.1,542.2 787.4,550", direction: "threats", kind: "primary" },
-  { id: "p9", d: "M700,510 Q711.3,467.9 739.4,434.7", direction: "threats", kind: "primary" },
-  { id: "p10", d: "M990,330 Q966,304.7 991.3,280.6", direction: "prevention", kind: "active" },
-  { id: "p11", d: "M990,330 Q1004.1,337.7 1012.7,351.4", direction: "prevention", kind: "primary" },
-  { id: "p12", d: "M990,330 Q1055.1,298.6 1126.8,289.3", direction: "prevention", kind: "primary" },
-  { id: "p13", d: "M1220,500 Q1168.9,543.9 1110.4,577.2", direction: "prevention", kind: "active" },
-  { id: "p14", d: "M1220,500 Q1265.1,488.9 1300.7,518.7", direction: "prevention", kind: "primary" },
-  { id: "p15", d: "M1220,500 Q1219.3,555.1 1174.9,587.7", direction: "prevention", kind: "primary" },
-  { id: "p16", d: "M240,330 Q381.9,279.8 520,220", direction: null, kind: "primary" },
-  { id: "p17", d: "M520,220 Q606.1,367.4 700,510", direction: null, kind: "primary" },
-  { id: "p18", d: "M700,510 Q881.8,479.2 990,330", direction: null, kind: "primary" },
-  { id: "p19", d: "M990,330 Q1120.2,394.5 1220,500", direction: null, kind: "primary" },
-  { id: "p20", d: "M240,330 Q488.2,373.5 700,510", direction: null, kind: "secondary" },
-  { id: "p21", d: "M520,220 Q754.2,278.3 990,330", direction: null, kind: "secondary" },
-  // --- Dogęszczenie sieci (druga iteracja) ---
-  // Za nagłówkiem (lewy górny róg sekcji)
-  { id: "p22", d: "M240,330 Q170,210 120,100", direction: "separatism", kind: "secondary" },
-  { id: "p23", d: "M120,100 Q200,80 280,90", direction: null, kind: "secondary" },
-  // Drugie, wyraźne połączenie między 01 i 02 (obok istniejącego p16)
-  { id: "p24", d: "M240,330 Q285,240 330,180", direction: "separatism", kind: "primary" },
-  { id: "p25", d: "M330,180 Q380,190 430,290", direction: null, kind: "secondary" },
-  { id: "p26", d: "M430,290 Q475,255 520,220", direction: "profiling", kind: "primary" },
-  // Drugie, wyraźne połączenie między 02 i 04 (prevention) — obok p21
-  { id: "p27", d: "M520,220 Q660,225 780,260", direction: "profiling", kind: "primary" },
-  { id: "p28", d: "M780,260 Q815,285 850,310", direction: null, kind: "secondary" },
-  { id: "p29", d: "M850,310 Q920,320 990,330", direction: "prevention", kind: "primary" },
-  // Pod 03 (threats)
-  { id: "p30", d: "M700,510 Q680,570 655,610", direction: "threats", kind: "primary" },
-  { id: "p31", d: "M655,610 Q700,645 740,660", direction: null, kind: "secondary" },
-  // Wokół prawej krawędzi sekcji
-  { id: "p32", d: "M1220,500 Q1310,450 1370,410", direction: "prevention", kind: "primary" },
-  { id: "p33", d: "M1370,410 Q1390,475 1400,540", direction: null, kind: "secondary" },
+  { id: "p0", d: "M186.0,514.0 Q201.0,540.8 177.3,560.3", direction: "separatism", kind: "active" },
+  { id: "p1", d: "M186.0,514.0 Q205.4,507.6 223.1,497.2", direction: "separatism", kind: "primary" },
+  { id: "p2", d: "M186.0,514.0 Q161.5,451.2 115.4,402.1", direction: "separatism", kind: "primary" },
+  { id: "p3", d: "M688.0,224.0 Q691.0,270.3 659.4,304.2", direction: "profiling", kind: "active" },
+  { id: "p4", d: "M688.0,224.0 Q701.5,235.6 716.8,244.7", direction: "profiling", kind: "primary" },
+  { id: "p5", d: "M688.0,224.0 Q649.5,215.4 611.7,227.0", direction: "profiling", kind: "primary" },
+  { id: "p6", d: "M609.0,520.0 Q671.0,548.1 715.4,599.7", direction: "threats", kind: "active" },
+  { id: "p7", d: "M609.0,520.0 Q615.3,456.0 653.7,404.4", direction: "threats", kind: "primary" },
+  { id: "p8", d: "M609.0,520.0 Q647.1,552.2 696.4,560.0", direction: "threats", kind: "primary" },
+  { id: "p9", d: "M609.0,520.0 Q620.3,477.9 648.4,444.7", direction: "threats", kind: "primary" },
+  { id: "p10", d: "M1087.0,313.0 Q1063.0,287.7 1088.3,263.6", direction: "prevention", kind: "active" },
+  { id: "p11", d: "M1087.0,313.0 Q1101.1,320.7 1109.7,334.4", direction: "prevention", kind: "primary" },
+  { id: "p12", d: "M1087.0,313.0 Q1152.1,281.6 1223.8,272.3", direction: "prevention", kind: "primary" },
+  { id: "p13", d: "M1317.0,483.0 Q1265.9,526.9 1207.4,560.2", direction: "prevention", kind: "active" },
+  { id: "p14", d: "M1317.0,483.0 Q1362.1,471.9 1397.7,501.7", direction: "prevention", kind: "primary" },
+  { id: "p15", d: "M1317.0,483.0 Q1316.3,538.1 1271.9,570.7", direction: "prevention", kind: "primary" },
+  // --- Główny łańcuch między kołami (01→02→03→04), zaczepiony DOKŁADNIE w
+  // punktach .research-hex-connector--a/--b/--c z globals.css. Organiczne
+  // krzywe (Q-bezier z przesuniętym punktem kontrolnym), nie proste
+  // odcinki jak na schemacie blokowym. ---
+  { id: "p16", d: "M266.4,418.3 Q460,330 564.4,294.8", direction: null, kind: "primary", flow: true },
+  { id: "p17", d: "M687.8,366.5 Q650,384 609,401.5", direction: null, kind: "primary", flow: true },
+  { id: "p18", d: "M724.1,496.1 Q900,460 1079.3,398.5", direction: null, kind: "primary", flow: true },
+  { id: "p19", d: "M1087.0,313.0 Q1217.2,377.5 1317.0,483.0", direction: "prevention", kind: "secondary" },
+  // Bezpośrednie, drugorzędne "skróty" — 01-03 i 02-04.
+  { id: "p20", d: "M311.9,514 Q460,500 550,480", direction: null, kind: "secondary" },
+  { id: "p21", d: "M822.7,269.4 Q950,330 1079.3,398.5", direction: null, kind: "secondary" },
+  // Gałąź za prawą krawędzią koła 04.
+  { id: "p32", d: "M1317.4,440.4 Q1370,410 1410,385", direction: null, kind: "secondary" },
+  { id: "p33", d: "M1410,385 Q1440,430 1400,480", direction: null, kind: "tertiary" },
+  // --- Bardzo delikatne wypełnienie pustych przestrzeni (kind:"tertiary" —
+  // najcieńsze, najbledsze włókna, patrz .research-neural-path--tertiary). ---
+  { id: "p34", d: "M420,460 Q460,420 500,480", direction: null, kind: "tertiary" },
+  { id: "p35", d: "M900,180 Q930,210 950,250", direction: null, kind: "tertiary" },
+  { id: "p36", d: "M900,500 Q950,530 1000,545", direction: null, kind: "tertiary" },
+  { id: "p37", d: "M1250,250 Q1290,270 1320,300", direction: null, kind: "tertiary" },
 ];
 
-/** 5 punktów pulsujących pierścieni = 5 hubów skupisk. */
+/** 5 punktów pulsujących pierścieni = 5 hubów skupisk (pod środkami kół). */
 const RINGS: { x: number; y: number; direction: ResearchDirectionId }[] = [
-  { x: 240, y: 330, direction: "separatism" },
-  { x: 520, y: 220, direction: "profiling" },
-  { x: 700, y: 510, direction: "threats" },
-  { x: 990, y: 330, direction: "prevention" },
-  { x: 1220, y: 500, direction: "prevention" },
+  { x: 186, y: 514, direction: "separatism" },
+  { x: 688, y: 224, direction: "profiling" },
+  { x: 609, y: 520, direction: "threats" },
+  { x: 1087, y: 313, direction: "prevention" },
+  { x: 1317, y: 483, direction: "prevention" },
 ];
 
 /** 5 impulsów poruszających się po wybranych ścieżkach (SMIL animateMotion). */
@@ -234,6 +239,7 @@ export default function ResearchNeuralNetwork({ activeDirection }: Props) {
               className={`research-neural-path research-neural-path--${p.kind}`}
               data-active={isActiveGroup ? "true" : undefined}
               data-dimmed={isDimmed ? "true" : undefined}
+              data-flow={p.flow && !reducedMotion ? "true" : undefined}
             />
           );
         })}

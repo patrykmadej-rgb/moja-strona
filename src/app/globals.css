@@ -937,10 +937,38 @@ html {
    .research-closing-cta (patrz .research-closing-network) zachowuje
    oryginalne, jasne na ciemnym kolory. */
 .research-page .research-directions-section .research-neural-path {
-  stroke: rgba(82, 35, 111, 0.28);
+  stroke: rgba(82, 35, 111, 0.3);
+  stroke-width: 1.2px;
 }
 .research-page .research-directions-section .research-neural-path--secondary {
-  stroke: rgba(119, 82, 140, 0.14);
+  stroke: rgba(110, 68, 132, 0.17);
+  stroke-width: 0.8px;
+}
+/* Najdelikatniejsze włókna — wypełniają wolne przestrzenie (patrz p34-p37 w
+   ResearchNeuralNetwork.tsx), prawie niewidoczne same w sobie. */
+.research-page .research-directions-section .research-neural-path--tertiary {
+  stroke: rgba(110, 68, 132, 0.08);
+  stroke-width: 0.6px;
+}
+/* Bardzo powolny, subtelny "oddech" opacity na 2-3 głównych połączeniach
+   (01-02, 02-03, 03-04) — nie ruch, tylko delikatne narastanie/zanikanie
+   jasności linii. Zatrzymany (nie: usunięty), gdy ścieżka jest przygaszona
+   (data-dimmed, aktywny hover na innym kierunku), żeby nie walczyć o tę samą
+   właściwość opacity z regułą przygaszenia. */
+.research-page .research-directions-section .research-neural-path[data-flow="true"] {
+  animation: research-path-flow 7s ease-in-out infinite;
+}
+.research-page .research-directions-section .research-neural-path[data-flow="true"][data-dimmed="true"] {
+  animation-play-state: paused;
+}
+@keyframes research-path-flow {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 .research-page .research-directions-section .research-neural-node {
   fill: rgba(82, 35, 111, 0.35);
@@ -949,6 +977,10 @@ html {
 .research-page .research-directions-section .research-neural-node--large {
   fill: #572573;
   opacity: 1;
+  /* "Węzły pośrednie: 4-5px" ze specyfikacji — mniejsze niż bazowy promień
+     (3.8-4.6, myślany pod ciemne tło); własność CSS `r` nadpisuje atrybut
+     SVG bez edycji ~14 współrzędnych w tablicy NODES. */
+  r: 2.3px;
 }
 .research-page .research-directions-section .research-neural-node[data-active="true"] {
   fill: #c9a33f;
@@ -988,12 +1020,17 @@ html {
     radial-gradient(circle at 65% 45%, rgba(111, 62, 139, 0.055), transparent 42%),
     var(--research-cream);
   isolation: isolate;
-  /* 670px — po podniesieniu kół 01/03 (patrz .research-hex--01/--03) dno
-     najniższego koła (01) kończy się w 618px; 670px zostawia ~52px odstępu
-     do końca sekcji (docelowy zakres 48-64px), bez dużego pustego pasa nad
-     kolejną sekcją. */
-  height: 670px;
-  min-height: 670px;
+  /* clamp(636px, 42vw, 730px) — 636px, nie sugerowane w specyfikacji 650px:
+     "od najniższego koła do końca sekcji: 32-48px" liczy się do zewnętrznej
+     krawędzi sekcji, czyli w sumie z padding-bottom (32px) — przy 650px
+     wewnętrzny odstęp ponad padding-bottom wychodził dodatkowe ~24px (razem
+     ~56-66px, za dużo). 636px domyka to na ~42px sumarycznie (10px
+     wewnętrznego odstępu + 32px padding-bottom), przy zachowaniu min. 36px
+     między kołem 02 a 03 i bezpiecznego odstępu od nagłówka (zmierzone). */
+  height: clamp(636px, 42vw, 730px);
+  min-height: 0;
+  padding-top: 36px;
+  padding-bottom: 32px;
 }
 .research-page .research-directions-section > * {
   grid-area: 1 / 1;
@@ -1029,17 +1066,7 @@ html {
   );
 }
 
-@media (max-width: 1279px) and (min-width: 900px) {
-  /* Dno najniższego koła (01) kończy się w 316+235=551px; 610px zostawia
-     ~59px odstępu do końca sekcji. min-height musi być nadpisany razem z
-     height — inaczej bazowe min-height:670px z reguły desktopowej wygrywa
-     (używana wysokość to max(height, min-height) w CSS). */
-  .research-page .research-directions-section {
-    height: 610px;
-    min-height: 610px;
-  }
-}
-@media (max-width: 899px) {
+@media (max-width: 1023px) {
   .research-page .research-directions-section {
     height: auto;
     min-height: 0;
@@ -1076,7 +1103,7 @@ html {
   margin-inline: auto;
   z-index: 2;
 }
-@media (max-width: 899px) {
+@media (max-width: 1023px) {
   .research-page .research-directions-inner {
     width: min(100% - 48px, 1380px);
     height: auto;
@@ -1131,7 +1158,7 @@ html {
   line-height: 1.6;
   color: rgba(60, 38, 70, 0.68);
 }
-@media (max-width: 899px) {
+@media (max-width: 1023px) {
   .research-page .research-directions-heading {
     position: static;
     width: 100%;
@@ -1156,76 +1183,54 @@ html {
   transform: translateY(-4px);
 }
 
-/* Koła jako lekkie punkty wejścia, nie planety — znacznie mniejsze niż w
-   poprzedniej iteracji (żaden nie przekracza 300px). 01: lewy dół, poniżej
-   nagłówka · 02: największe, górny środek · 03: dolny środek · 04: prawa,
-   środkowa wysokość. */
+/* Koła jako lekkie punkty wejścia, nie planety — żaden nie przekracza 300px.
+   01: lewy dół, poniżej nagłówka · 02: największe, górny środek · 03: dolny
+   środek · 04: prawa, środkowa wysokość. Jedna wspólna pozycja/rozmiar dla
+   całego zakresu >=1024px (patrz @media (max-width:1023px) niżej dla
+   siatki 2x2) — średnice kół stałe, nie skalowane w dół dla "średnich"
+   szerokości jak w poprzedniej iteracji. */
 .research-page .research-hex--01 {
   left: 1%;
-  /* 380px -> 368px. Tytuł nagłówka rośnie do 46px przy najszerszych
-     desktopach (clamp(36px,2.8vw,46px)), więc koło 01 może bezpiecznie
-     wjechać w górę tylko o ~12px — dalej naruszałoby wymóg min. 48px
-     odstępu od tekstu wprowadzającego (zweryfikowane pomiarem). Główny
-     ciężar redukcji pustej przestrzeni przenosi się na koło 03, które nie
-     sąsiaduje z nagłówkiem. */
-  top: 368px;
+  /* 368px -> 308px (-60px, środek żądanego zakresu 50-70px). Dalej ogranicza
+     to odstęp od nagłówka (tytuł rośnie do 46px na najszerszych desktopach)
+     — przy -60px zostaje ~33px, mniej niż poprzednio przyjęte bezpieczne
+     48px, ale wciąż bez realnego nachodzenia (zmierzone). */
+  top: 308px;
   width: 250px;
   height: 250px;
 }
 .research-page .research-hex--02 {
   left: 37%;
-  top: 20px;
+  /* 20px -> 0px (-20px, górna granica dopuszczalnego zakresu "0-20px, jeśli
+     potrzebne") — potrzebne: koło 03 dzieli tę samą kolumnę poziomą co 02
+     (nachodzą na siebie w osi X), więc odstęp między nimi liczy się jak
+     "odstęp między rzędami" (wymóg min. 36px, patrz koło 03 niżej). */
+  top: 0;
   width: 285px;
   height: 285px;
 }
 .research-page .research-hex--03 {
   left: 33%;
-  /* 400px -> 355px (-45px, górna granica żądanego zakresu 35-50px). */
-  top: 355px;
+  /* 355px -> 321px (-34px). Mniej niż żądane 45-60px: koło 03 dzieli kolumnę
+     poziomą z kołem 02 (patrz wyżej), więc odstęp między ich obrysami musi
+     zostać >=36px — nawet przy maksymalnym dopuszczalnym przesunięciu koła
+     02 (-20px) większe przesunięcie koła 03 łamało ten twardy wymóg
+     (zmierzone). 321px daje odstęp 02->03 dokładnie 36px. */
+  top: 321px;
   width: 235px;
   height: 235px;
 }
 .research-page .research-hex--04 {
   right: 5%;
-  top: 220px;
+  /* 220px -> 195px (-25px, środek żądanego zakresu 20-30px). */
+  top: 195px;
   width: 245px;
   height: 245px;
 }
 
-@media (max-width: 1279px) and (min-width: 900px) {
-  /* Nagłówek renderuje się mniejszy w tym zakresie szerokości (tytuł
-     dochodzi tylko do ~36-40px), więc jest tu więcej marginesu i pełny
-     żądany zakres przesunięcia (30-45px / 35-50px) mieści się bez
-     naruszania odstępu min. 48px od tekstu. */
-  .research-page .research-hex--01 {
-    left: 1%;
-    top: 316px;
-    width: 235px;
-    height: 235px;
-  }
-  .research-page .research-hex--02 {
-    left: 38%;
-    top: 18px;
-    width: 265px;
-    height: 265px;
-  }
-  .research-page .research-hex--03 {
-    left: 34%;
-    top: 325px;
-    width: 220px;
-    height: 220px;
-  }
-  .research-page .research-hex--04 {
-    right: 3%;
-    top: 210px;
-    width: 230px;
-    height: 230px;
-  }
-}
-
-/* Poniżej 900px: kontrolowana siatka 2×2 (nie absolutna "mapa"), sieć
+/* Poniżej 1024px: kontrolowana siatka 2×2 (nie absolutna "mapa"), sieć
    pozostaje subtelnym tłem. Poniżej 640px: jedna kolumna. */
-@media (max-width: 899px) {
+@media (max-width: 1023px) {
   .research-page .research-hex-field {
     position: static;
     height: auto;
@@ -1234,9 +1239,15 @@ html {
     justify-items: center;
     align-items: start;
     column-gap: 18px;
-    row-gap: 36px;
+    row-gap: 28px;
   }
   .research-page .research-hex {
+    /* position:static (nie relative) — .research-hex-connector jest teraz
+       dzieckiem .research-hex-surface (position:relative, ten sam rozmiar),
+       więc nie potrzebuje positioned .research-hex jako kotwicy. Ważne:
+       position:relative NA elemencie siatki z aspect-ratio łamie tu
+       wyrównanie wierszy align-items:start (zmierzony realny bug w tej
+       przeglądarce — koła 03/04 przestawały być w tym samym rzędzie). */
     position: static;
     width: min(40vw, 230px) !important;
     height: auto !important;
@@ -1419,8 +1430,11 @@ html {
   transform: translateX(4px);
 }
 
-/* Punkt połączenia — jeden na koło, po stronie zwróconej w stronę środka
-   sieci, fioletowy, delikatnie się rozjaśniający na hover. */
+/* Punkty połączenia — minimum dwa na koło (wejście + wyjście), koło 02 (jako
+   największe) ma trzy. Fioletowe, delikatnie rozjaśniające się na hover.
+   Pozycje w % (nie px) — konsekwentne z docelowymi kątami gałęzi w
+   ResearchNeuralNetwork.tsx (patrz komentarz "PUNKTY STYKU" tam), skalują się
+   poprawnie razem z kołem na każdej szerokości ekranu. */
 .research-page .research-hex-connector {
   position: absolute;
   z-index: 3;
@@ -1429,6 +1443,12 @@ html {
   border-radius: 9999px !important;
   background: #572573;
   box-shadow: 0 0 4px 1px rgba(87, 37, 115, 0.25);
+  /* margin, nie transform:translate(-50%,-50%) — research-node-pulse (dzielona
+     z .research-neural-node--large) animuje `transform` (scale); animowany
+     transform NADPISUJE cały statyczny transform (własności transform się nie
+     sumują), więc podczas pulsu kropka traciłaby centrujące przesunięcie i
+     "skakała" o połowę swojej szerokości (zmierzone: ~2.6px driftu). */
+  margin: -2.5px 0 0 -2.5px;
   transform-box: fill-box;
   transform-origin: center;
   animation: research-node-pulse 4s ease-in-out infinite;
@@ -1439,30 +1459,44 @@ html {
 .research-page .research-hex:focus-within .research-hex-connector {
   box-shadow: 0 0 8px 2px rgba(87, 37, 115, 0.4);
 }
-/* 01: lewy dół → punkt po prawej (w stronę środka). 02: górny środek → punkt
-   u dołu. 03: dolny środek → punkt u góry. 04: prawa strona → punkt po lewej.
-   margin zamiast transform:translate(-50%) do centrowania — animacja pulsu
-   już animuje `transform` (scale), więc statyczny transform na tej samej
-   właściwości zostałby nadpisany klatkami animacji. */
-.research-page .research-hex--01 .research-hex-connector {
-  right: -3px;
+/* --a: punkt "główny" (dawny jedyny punkt, pozycja bez zmian). --b (i --c
+   dla koła 02): dodatkowe punkty stykające się z nowymi gałęziami sieci
+   łączącymi 01-02, 01-03, 02-03, 02-04, 03-04. */
+.research-page .research-hex--01 .research-hex-connector--a {
+  left: 100%;
   top: 50%;
-  margin-top: -2.5px;
 }
-.research-page .research-hex--02 .research-hex-connector {
-  bottom: -3px;
+.research-page .research-hex--01 .research-hex-connector--b {
+  left: 82.2%;
+  top: 11.7%;
+}
+.research-page .research-hex--02 .research-hex-connector--a {
   left: 50%;
-  margin-left: -2.5px;
+  top: 100%;
 }
-.research-page .research-hex--03 .research-hex-connector {
-  top: -3px;
+.research-page .research-hex--02 .research-hex-connector--b {
+  left: 6.7%;
+  top: 75%;
+}
+.research-page .research-hex--02 .research-hex-connector--c {
+  left: 97.3%;
+  top: 66.1%;
+}
+.research-page .research-hex--03 .research-hex-connector--a {
   left: 50%;
-  margin-left: -2.5px;
+  top: 0%;
 }
-.research-page .research-hex--04 .research-hex-connector {
-  left: -3px;
+.research-page .research-hex--03 .research-hex-connector--b {
+  left: 99%;
+  top: 40%;
+}
+.research-page .research-hex--04 .research-hex-connector--a {
+  left: 0%;
   top: 50%;
-  margin-top: -2.5px;
+}
+.research-page .research-hex--04 .research-hex-connector--b {
+  left: 97%;
+  top: 67.1%;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1484,6 +1518,227 @@ html {
   .research-page .research-hex:hover,
   .research-page .research-hex:focus-within {
     transform: none !important;
+  }
+}
+
+/* ============================================================
+   /badania/[slug] — jedna reużywalna podstrona szczegółowa kierunku
+   badawczego (ResearchDirectionDetail.tsx). Ta sama identyfikacja wizualna
+   co /badania (krem z .research-page, Cormorant Garamond na nagłówkach,
+   fiolet + złoto), delikatna sieć neuronalna w tle jako bardzo cichy akcent
+   (nie główny element kompozycji, jak na /badania).
+   ------------------------------------------------------------ */
+.research-page .research-direction-detail {
+  position: relative;
+  overflow: hidden;
+  padding-block: 64px 96px;
+}
+.research-page .research-direction-network {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  pointer-events: none;
+}
+.research-page .research-direction-network .research-neural-network {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+}
+.research-page .research-direction-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+}
+
+.research-page .research-direction-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-research-manrope), ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--research-muted);
+}
+.research-page .research-direction-breadcrumb a {
+  color: var(--research-muted);
+  transition: color 200ms var(--research-ease);
+}
+.research-page .research-direction-breadcrumb a:hover {
+  color: var(--research-purple);
+}
+.research-page .research-direction-breadcrumb [aria-current="page"] {
+  color: var(--research-text);
+}
+
+.research-page .research-direction-index {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+}
+.research-page .research-direction-number {
+  font-family: var(--font-research-manrope), ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings:
+    "tnum" 1,
+    "zero" 1;
+  letter-spacing: 0.14em;
+  color: #b58d2f;
+}
+.research-page .research-direction-icon {
+  width: 26px;
+  height: 26px;
+  color: #b58d2f;
+}
+
+.research-page .research-direction-title {
+  margin: 14px 0 0;
+  font-size: clamp(36px, 4.4vw, 56px);
+  font-weight: 500;
+  line-height: 1.04;
+  color: var(--research-text);
+}
+.research-page .research-direction-lead {
+  margin: 20px 0 0;
+  max-width: 46ch;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--research-purple);
+}
+.research-page .research-direction-intro {
+  margin: 14px 0 0;
+  max-width: 62ch;
+  font-size: 15px;
+  line-height: 1.7;
+  color: rgba(37, 21, 45, 0.78);
+}
+
+.research-page .research-direction-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  margin-top: 56px;
+}
+@media (max-width: 700px) {
+  .research-page .research-direction-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+}
+.research-page .research-direction-section-heading {
+  margin: 0 0 16px;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--research-text);
+}
+.research-page .research-direction-scope-list,
+.research-page .research-direction-questions-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.research-page .research-direction-scope-list li,
+.research-page .research-direction-questions-list li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: rgba(37, 21, 45, 0.82);
+  border-top: 1px solid var(--research-border);
+  padding-top: 12px;
+}
+.research-page .research-direction-scope-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20px;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px !important;
+  background: var(--research-gold);
+}
+.research-page .research-direction-questions-list {
+  counter-reset: research-direction-question;
+}
+.research-page .research-direction-questions-list li::before {
+  counter-increment: research-direction-question;
+  content: counter(research-direction-question, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 12px;
+  font-family: var(--font-research-cormorant), Georgia, serif;
+  font-size: 11px;
+  color: var(--research-gold);
+}
+
+.research-page .research-direction-pubs {
+  margin-top: 56px;
+  padding-top: 40px;
+  border-top: 1px solid var(--research-border);
+}
+.research-page .research-direction-pubs-empty {
+  margin: 0;
+  font-size: 14.5px;
+  font-style: italic;
+  color: var(--research-muted);
+}
+.research-page .research-direction-pubs-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.research-page .research-direction-pub-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 4px;
+  border-top: 1px solid var(--research-border);
+  transition: background-color 200ms var(--research-ease);
+}
+.research-page .research-direction-pubs-list li:last-child .research-direction-pub-link {
+  border-bottom: 1px solid var(--research-border);
+}
+.research-page .research-direction-pub-link:hover,
+.research-page .research-direction-pub-link:focus-visible {
+  background-color: rgba(84, 32, 120, 0.05);
+}
+.research-page .research-direction-pub-type {
+  font-family: var(--font-research-manrope), ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--research-gold);
+}
+.research-page .research-direction-pub-title {
+  font-size: 15.5px;
+  line-height: 1.4;
+  color: var(--research-text);
+}
+.research-page .research-direction-pub-meta {
+  font-family: var(--font-research-manrope), ui-sans-serif, system-ui, sans-serif;
+  font-size: 12.5px;
+  color: var(--research-muted);
+}
+
+.research-page .research-direction-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 56px;
+}
+
+@media (max-width: 640px) {
+  .research-page .research-direction-detail {
+    padding-block: 40px 64px;
   }
 }
 

@@ -1,18 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import type { LucideIcon } from "lucide-react";
-import { GitBranch, Fingerprint, Brain, Shield } from "lucide-react";
-import type { ResearchDirectionId } from "@/lib/research-directions";
+import { RESEARCH_DIRECTION_ICONS, type ResearchDirectionId } from "@/lib/research-directions";
 import ResearchNeuralNetwork from "./ResearchNeuralNetwork";
 import ResearchHexNode from "./ResearchHexNode";
-
-const ICONS: Record<ResearchDirectionId, LucideIcon> = {
-  separatism: GitBranch,
-  profiling: Fingerprint,
-  threats: Brain,
-  prevention: Shield,
-};
 
 const HEX_CLASS: Record<ResearchDirectionId, string> = {
   separatism: "research-hex--01",
@@ -27,7 +18,7 @@ export type DirectionContent = {
   titleLine1: string;
   titleLine2: string;
   description: string;
-  href?: string;
+  href: string;
 };
 
 type Props = {
@@ -75,7 +66,7 @@ export default function ResearchDirectionNetwork({ eyebrow, headingLines, subtit
               id={d.id}
               hexClass={HEX_CLASS[d.id]}
               number={d.number}
-              Icon={ICONS[d.id]}
+              Icon={RESEARCH_DIRECTION_ICONS[d.id]}
               titleLine1={d.titleLine1}
               titleLine2={d.titleLine2}
               description={d.description}

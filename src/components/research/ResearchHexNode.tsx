@@ -11,7 +11,7 @@ type Props = {
   titleLine2: string;
   description: string;
   linkLabel: string;
-  href?: string;
+  href: string;
   onActivate: () => void;
   onDeactivate: () => void;
 };
@@ -23,11 +23,14 @@ type Props = {
  * kreski pomiarowe na obwodzie (12 i 6 — celowo tylko dwie, żeby koło nie
  * przypominało zegara ani diagramu astrologicznego), i zwięzła treść
  * wyśrodkowana w obu osiach (`.research-hex-content`). Całe koło jest jednym
- * linkiem (gdy `href` istnieje) prowadzącym do istniejącej podstrony
- * kierunku — `.research-hex-connector` to pojedynczy, drobny punkt na styku
- * z siecią neuronalną.
+ * semantycznym linkiem prowadzącym do podstrony kierunku (/badania/[slug])
+ * — `.research-hex-connector` to drobne punkty styku z siecią neuronalną
+ * (min. dwa na koło — punkt wejścia i wyjścia; koło 02, jako największe,
+ * ma trzy), pozycjonowane tak, żeby dokładnie odpowiadać zakończeniom
+ * konkretnych gałęzi w ResearchNeuralNetwork.tsx (patrz komentarz tam).
  */
 export default function ResearchHexNode({
+  id,
   hexClass,
   number,
   Icon,
@@ -43,6 +46,16 @@ export default function ResearchHexNode({
 
   const surfaceInner = (
     <>
+      {/* Dzieci .research-hex-surface (position:relative), NIE .research-hex —
+          .research-hex jest elementem siatki 2x2 poniżej 1024px, a
+          position:relative na elemencie grid z aspect-ratio łamie tam
+          wyrównanie wierszy (align-items:start) w tej przeglądarce
+          (zmierzone: koła 03/04 "rozjeżdżały się" o >100px). Surface ma
+          identyczny rozmiar co .research-hex (100%/100%), więc pozycja
+          wizualna kropek jest taka sama, bez tego efektu ubocznego. */}
+      <span className="research-hex-connector research-hex-connector--a" aria-hidden="true" />
+      <span className="research-hex-connector research-hex-connector--b" aria-hidden="true" />
+      {id === "profiling" && <span className="research-hex-connector research-hex-connector--c" aria-hidden="true" />}
       <span className="research-hex-tick research-hex-tick--12" aria-hidden="true" />
       <span className="research-hex-tick research-hex-tick--6" aria-hidden="true" />
       <div className="research-hex-content">
@@ -71,29 +84,15 @@ export default function ResearchHexNode({
 
   return (
     <div className={`research-hex ${hexClass}`} onMouseEnter={onActivate} onMouseLeave={onDeactivate}>
-      <span className="research-hex-connector" aria-hidden="true" />
-      {href ? (
-        <Link
-          href={href}
-          className="research-hex-surface"
-          aria-label={ariaLabel}
-          onFocus={onActivate}
-          onBlur={onDeactivate}
-        >
-          {surfaceInner}
-        </Link>
-      ) : (
-        <div
-          className="research-hex-surface"
-          tabIndex={0}
-          role="group"
-          aria-label={ariaLabel}
-          onFocus={onActivate}
-          onBlur={onDeactivate}
-        >
-          {surfaceInner}
-        </div>
-      )}
+      <Link
+        href={href}
+        className="research-hex-surface"
+        aria-label={ariaLabel}
+        onFocus={onActivate}
+        onBlur={onDeactivate}
+      >
+        {surfaceInner}
+      </Link>
     </div>
   );
 }

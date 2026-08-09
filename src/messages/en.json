@@ -180,22 +180,70 @@
       "separatism": {
         "titleLine1": "Separatyzmy",
         "titleLine2": "i bezpieczeństwo",
-        "description": "Mechanizmy separatyzmu i ich wpływ na bezpieczeństwo."
+        "description": "Mechanizmy separatyzmu i ich wpływ na bezpieczeństwo.",
+        "introduction": "Ruchy separatystyczne rzadko pozostają wyłącznie problemem wewnętrznym państwa, którego dotyczą. Analizuję, jak dążenia do autonomii lub secesji wpływają na bezpieczeństwo międzynarodowe, relacje między państwami i stabilność regionów — oraz jak odróżnić realne zagrożenie od uzasadnionej próby ochrony tożsamości i praw mniejszości.",
+        "scope": [
+          "Mechanizmy powstawania i eskalacji ruchów separatystycznych",
+          "Wpływ separatyzmu na bezpieczeństwo międzynarodowe i regionalne",
+          "Rola państw trzecich i aktorów zewnętrznych w konfliktach separatystycznych",
+          "Analiza przypadków: Bałkany Zachodnie, Kaukaz, Bliski Wschód"
+        ],
+        "questions": [
+          "Dlaczego idee separatystyczne stają się realnym zagrożeniem?",
+          "Kiedy dążenie do autonomii przechodzi w konflikt zbrojny?",
+          "Jak państwa trzecie wpływają na eskalację lub wygaszanie separatyzmu?"
+        ]
       },
       "profiling": {
         "titleLine1": "Profilowanie kryminalne",
         "titleLine2": "i wiktymologiczne",
-        "description": "Nowoczesne metody rozpoznawania sprawców i ofiar."
+        "description": "Nowoczesne metody rozpoznawania sprawców i ofiar.",
+        "introduction": "Łączę psychologię, kryminologię i wiktymologię, aby lepiej rozumieć zarówno sprawców, jak i ofiary przestępstw. Interesuje mnie, jak nowoczesne metody profilowania pozwalają rozpoznawać wzorce zachowań, mechanizmy wiktymizacji i procesy decyzyjne stojące za przestępczością.",
+        "scope": [
+          "Profilowanie psychologiczne i behawioralne sprawców przestępstw",
+          "Mechanizmy wiktymizacji i czynniki ryzyka po stronie ofiar",
+          "Wykorzystanie profilowania w praktyce śledczej i prewencyjnej",
+          "Granice etyczne i metodologiczne profilowania kryminalnego"
+        ],
+        "questions": [
+          "Czy profil psychologiczny może pomóc przewidzieć mechanizm przemocy?",
+          "Jakie wzorce łączą sprawców pozornie odrębnych przestępstw?",
+          "Jak odróżnić czynniki ryzyka od stygmatyzacji ofiar?"
+        ]
       },
       "threats": {
         "titleLine1": "Psychologia",
         "titleLine2": "zagrożeń",
-        "description": "Psychologiczne źródła zachowań i procesów ryzyka."
+        "description": "Psychologiczne źródła zachowań i procesów ryzyka.",
+        "introduction": "Badam psychologiczne źródła zachowań, które prowadzą do przemocy i zagrożeń bezpieczeństwa. Interesują mnie procesy decyzyjne, emocjonalne i sytuacyjne czynniki ryzyka — oraz to, jak rozpoznawać sygnały ostrzegawcze, zanim dojdzie do eskalacji.",
+        "scope": [
+          "Psychologiczne mechanizmy powstawania zagrożeń i przemocy",
+          "Procesy decyzyjne i sytuacyjne czynniki ryzyka",
+          "Rozpoznawanie sygnałów ostrzegawczych przed eskalacją",
+          "Powiązania między profilem psychologicznym a zachowaniem ryzykownym"
+        ],
+        "questions": [
+          "Jak psychologiczne procesy decyzyjne prowadzą do przemocy?",
+          "Które sygnały ostrzegawcze poprzedzają eskalację zagrożenia?",
+          "Jak odróżnić realne ryzyko od pozornych sygnałów alarmowych?"
+        ]
       },
       "prevention": {
         "titleLine1": "Psychologia",
         "titleLine2": "prewencji",
-        "description": "Psychologiczne mechanizmy skutecznego zapobiegania."
+        "description": "Psychologiczne mechanizmy skutecznego zapobiegania.",
+        "introduction": "Zrozumienie mechanizmu zagrożenia to dopiero połowa pracy — druga połowa to zaprojektowanie skutecznej prewencji. Zajmuję się tym, jak przekładać wiedzę psychologiczną i kryminologiczną na konkretne narzędzia, rekomendacje i rozwiązania, które realnie zapobiegają przemocy.",
+        "scope": [
+          "Projektowanie narzędzi i programów prewencyjnych opartych na dowodach",
+          "Przekładanie wiedzy o mechanizmach zagrożeń na praktykę instytucjonalną",
+          "Ocena skuteczności działań prewencyjnych",
+          "Rekomendacje dla instytucji odpowiedzialnych za bezpieczeństwo"
+        ],
+        "questions": [
+          "Jak projektować prewencję, która działa zanim pojawi się kryzys?",
+          "Co odróżnia skuteczną prewencję od działań pozornych?",
+          "Jak mierzyć realny wpływ programów prewencyjnych?"
+        ]
       }
     },
     "processHeadingLine1": "Od zrozumienia",
@@ -260,6 +308,15 @@
       "Jak trauma kształtuje decyzje, relacje i zachowania społeczne?",
       "Jak wspierać zdrowienie i odporność w społecznościach po konflikcie?"
     ]
+  },
+  "ResearchDirectionPage": {
+    "breadcrumbHome": "Badania",
+    "scopeHeading": "Zakres badań",
+    "questionsHeading": "Kluczowe pytania",
+    "publicationsHeading": "Powiązane publikacje",
+    "noPublications": "Publikacje związane z tym kierunkiem będą sukcesywnie uzupełniane.",
+    "ctaPublications": "Zobacz wszystkie publikacje",
+    "ctaContact": "Skontaktuj się"
   },
   "OMniePage": {
     "metaTitle": "About me",
