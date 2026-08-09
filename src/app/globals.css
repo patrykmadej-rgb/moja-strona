@@ -1004,7 +1004,7 @@ html {
   position: absolute;
   left: 0;
   top: 48px;
-  width: 330px;
+  width: 300px;
   z-index: 4;
 }
 .research-page .research-directions-eyebrow {
@@ -1016,11 +1016,20 @@ html {
 }
 .research-page .research-directions-title {
   font-family: var(--font-research-cormorant), Georgia, serif;
-  font-size: clamp(40px, 3.2vw, 52px);
+  font-size: clamp(36px, 2.8vw, 46px);
   line-height: 0.98;
   font-weight: 500;
   color: var(--research-cream);
-  margin: 18px 0 0;
+  margin: 16px 0 0;
+}
+/* Krótkie, podrzędne wprowadzenie do "mapy" — nie ma konkurować z kartami. */
+.research-page .research-directions-subtitle {
+  margin: 14px 0 0;
+  max-width: 360px;
+  font-family: var(--font-research-manrope), ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(247, 242, 234, 0.62);
 }
 @media (max-width: 767px) {
   .research-page .research-directions-heading {
@@ -1039,11 +1048,11 @@ html {
 .research-page .research-hex {
   position: absolute;
   display: block;
-  transition: transform 250ms var(--research-ease);
+  transition: transform 320ms ease;
 }
 .research-page .research-hex:hover,
 .research-page .research-hex:focus-within {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
 }
 
 /* 01: lewy dół · 02: największy, górny środek · 03: dolny środek · 04: prawa
@@ -1157,104 +1166,130 @@ html {
   }
 }
 
+/* Bardzo cienka, jednolita, półprzezroczysta obwódka (nie pełna złota ramka) —
+   wciąż przez warstwę clip-path + 1px padding, bo zwykły `border` z clip-path
+   renderuje się nierówno. */
 .research-page .research-hex-border {
   width: 100%;
   height: 100%;
   clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-  background: linear-gradient(135deg, rgba(185, 154, 203, 0.86), rgba(199, 163, 70, 0.74));
+  background: rgba(215, 190, 225, 0.38);
   padding: 1px;
-  transition: filter 250ms var(--research-ease);
+  transition: background 320ms ease;
 }
 .research-page .research-hex:hover .research-hex-border,
 .research-page .research-hex:focus-within .research-hex-border {
-  background: linear-gradient(135deg, rgba(185, 154, 203, 0.95), rgba(199, 163, 70, 0.95));
-  filter: drop-shadow(0 0 18px rgba(199, 163, 70, 0.35));
+  background: rgba(215, 190, 225, 0.55);
 }
 
+/* Powierzchnia "szklana", nie lite wypełnienie — sieć neuronalna w tle ma
+   częściowo przeświecać przez heksagon. Układ redakcyjny: treść pakowana od
+   góry do lewej (align-items:flex-start), link dociśnięty do dołu przez
+   margin-top:auto na .research-hex-link. Padding procentowy (rozwiązuje się
+   względem SZEROKOŚCI elementu, także dla top/bottom — tak działa CSS) celowo
+   trzyma tekst z dala od skośnych narożników heksagonu. */
 .research-page .research-hex-surface {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
   width: 100%;
   height: 100%;
   clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-  background: linear-gradient(145deg, rgba(73, 35, 86, 0.84), rgba(42, 18, 53, 0.92));
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.115), rgba(151, 105, 172, 0.075));
   backdrop-filter: blur(8px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 18px 45px rgba(8, 2, 14, 0.18);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--research-cream);
-  padding: 28px 34px;
+  /* Docelowo 20% 20% 17% ze specyfikacji — zmniejszone (głównie góra/dół, bok
+     zostaje generous, żeby tekst nadal nie dotykał skośnych krawędzi), bo przy
+     pełnych opisach (bez line-clamp) i podanych rozmiarach czcionek 20/20/17
+     realnie nie mieściło się w istniejących wysokościach heksagonów — link
+     "Poznaj kierunek" wychodził 23-53px poza heksagon (zweryfikowane realnym
+     renderem, scrollHeight > clientHeight). Priorytet: "wszystkie opisy
+     widoczne w całości" z checklisty zadania. */
+  padding: 10% 20% 20%;
   outline: none;
-  transition: background 250ms var(--research-ease);
+  transition: background 320ms ease;
 }
-/* Heksagon zwęża się w kierunku góry/dołu (clip-path) — wyśrodkowanie w
-   poziomie (wyżej) sprawia, że treść przy górnej/dolnej krawędzi jest
-   przycinana symetrycznie z obu stron zamiast asymetrycznie tylko z lewej
-   (co przy tekście wyrównanym do lewej ucinało początek linku "Poznaj
-   kierunek"). flex-shrink:0 zapobiega degenerowaniu ikony (SVG) do
-   wysokości 0px, gdy sumaryczna zawartość nie mieści się w pionie —
-   zaobserwowane i zweryfikowane realnym renderem w przeglądarce. */
-.research-page .research-hex-icon {
-  flex-shrink: 0;
-}
-.research-page .research-hex-number,
-.research-page .research-hex-title,
-.research-page .research-hex-link {
-  flex-shrink: 0;
-}
+/* Bardzo delikatne, subtelnie różne odcienie na czterech heksagonach — ten sam
+   system, nie cztery różne kolory. 02 (największy) dostaje odrobinę większy
+   padding, zgodnie ze specyfikacją. */
 .research-page .research-hex--02 .research-hex-surface {
-  padding: 32px 40px;
+  padding: 15% 20% 12%;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.13), rgba(185, 154, 203, 0.09));
+}
+.research-page .research-hex--03 .research-hex-surface {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.11), rgba(132, 118, 190, 0.08));
+}
+.research-page .research-hex--04 .research-hex-surface {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.11), rgba(160, 120, 152, 0.07));
 }
 .research-page .research-hex:hover .research-hex-surface,
 .research-page .research-hex:focus-within .research-hex-surface {
-  background: linear-gradient(145deg, rgba(86, 42, 100, 0.88), rgba(52, 22, 66, 0.96));
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(151, 105, 172, 0.12));
 }
 .research-page .research-hex-surface:focus-visible {
   outline: 3px solid var(--research-gold);
   outline-offset: 3px;
 }
 
+/* Numer + ikona w jednym poziomym wierszu ("naukowy indeks"), nie duża ikona
+   nad tytułem. flex-shrink:0 na tekstowych/ikonowych dzieciach zapobiega
+   degenerowaniu SVG-ikony do wysokości 0px, gdy sumaryczna zawartość ledwo
+   mieści się w pionie — zaobserwowane i zweryfikowane realnym renderem w
+   przeglądarce w poprzedniej turze poprawek. */
+.research-page .research-hex-index {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-bottom: 8px;
+}
+.research-page .research-hex-index-line {
+  width: 16px;
+  height: 1px;
+  flex-shrink: 0;
+  background: rgba(210, 171, 69, 0.55);
+}
 .research-page .research-hex-number {
+  flex-shrink: 0;
   font-family: var(--font-research-cormorant), Georgia, serif;
-  font-size: 27px;
+  font-size: 19px;
   line-height: 1;
   color: var(--research-gold);
-  margin-bottom: 10px;
 }
 .research-page .research-hex-icon {
-  width: 27px;
-  height: 27px;
-  color: var(--research-gold);
-  margin-bottom: 12px;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: rgba(210, 171, 69, 0.85);
 }
 .research-page .research-hex-title {
+  flex-shrink: 0;
   margin: 0;
-  font-size: 24px;
-  font-weight: 500;
+  font-size: clamp(25px, 2vw, 34px);
+  font-weight: 400;
   line-height: 1.02;
-  color: var(--research-cream);
-}
-.research-page .research-hex--02 .research-hex-title {
-  font-size: 26px;
+  color: #f5efe7;
 }
 .research-page .research-hex-desc {
   flex-shrink: 0;
-  font-size: 12px;
-  line-height: 1.45;
-  color: rgba(247, 242, 234, 0.75);
-  margin-top: 11px;
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(245, 239, 231, 0.7);
 }
 .research-page .research-hex-link {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
+  margin-top: auto;
+  padding-top: 4px;
+  font-family: var(--font-research-manrope), ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--research-gold);
-  margin-top: 9px;
+  color: #d2ab45;
 }
 .research-page .research-hex-arrow {
   display: inline-block;
@@ -1263,6 +1298,53 @@ html {
 .research-page .research-hex:hover .research-hex-arrow,
 .research-page .research-hex:focus-within .research-hex-arrow {
   transform: translateX(4px);
+}
+
+/* Punkt połączenia — jeden na heksagon, po stronie zwróconej w stronę środka
+   sieci, tak żeby każda karta wyglądała jak węzeł, a nie osobna tablica.
+   Reużywa istniejącej animacji pulsowania węzłów sieci (research-node-pulse). */
+.research-page .research-hex-connector {
+  position: absolute;
+  z-index: 3;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px !important;
+  background: var(--research-gold);
+  box-shadow: 0 0 8px 2px rgba(199, 163, 70, 0.35);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: research-node-pulse 4s ease-in-out infinite;
+  transition: box-shadow 320ms ease;
+  pointer-events: none;
+}
+.research-page .research-hex:hover .research-hex-connector,
+.research-page .research-hex:focus-within .research-hex-connector {
+  box-shadow: 0 0 14px 4px rgba(199, 163, 70, 0.55);
+}
+/* 01: lewy dół → punkt po prawej (w stronę środka). 02: górny środek → punkt
+   u dołu. 03: dolny środek → punkt u góry. 04: prawa strona → punkt po lewej.
+   margin zamiast transform:translate(-50%) do centrowania — animacja pulsu
+   już animuje `transform` (scale), więc statyczny transform na tej samej
+   właściwości zostałby nadpisany klatkami animacji. */
+.research-page .research-hex--01 .research-hex-connector {
+  right: -4px;
+  top: 50%;
+  margin-top: -3px;
+}
+.research-page .research-hex--02 .research-hex-connector {
+  bottom: -4px;
+  left: 50%;
+  margin-left: -3px;
+}
+.research-page .research-hex--03 .research-hex-connector {
+  top: -4px;
+  left: 50%;
+  margin-left: -3px;
+}
+.research-page .research-hex--04 .research-hex-connector {
+  left: -4px;
+  top: 50%;
+  margin-top: -3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1274,6 +1356,15 @@ html {
   }
   .research-page [data-reveal] {
     opacity: 1 !important;
+    transform: none !important;
+  }
+  /* Wyłącz pulsowanie punktu połączenia i pionowe przesunięcie heksagonu na
+     hover/focus — nie tylko przyspiesz animację, ale usuń sam ruch. */
+  .research-page .research-hex-connector {
+    animation: none !important;
+  }
+  .research-page .research-hex:hover,
+  .research-page .research-hex:focus-within {
     transform: none !important;
   }
 }

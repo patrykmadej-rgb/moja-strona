@@ -97,6 +97,7 @@ export default async function BadaniaPage() {
       <ResearchDirectionNetwork
         eyebrow={t("directionsEyebrow")}
         headingLines={[t("directionsHeadingLine1"), t("directionsHeadingLine2"), t("directionsHeadingLine3")]}
+        subtitle={t("directionsSubtitle")}
         linkLabel={t("directionsLinkLabel")}
         directions={directions}
       />

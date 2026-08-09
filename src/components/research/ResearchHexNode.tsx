@@ -18,10 +18,13 @@ type Props = {
 
 /**
  * Heksagon zbudowany z dwóch warstw clip-path (a nie zwykłego `border`, który
- * z clip-path wygląda źle): zewnętrzny `.research-hex-border` to gradientowa
- * lawendowo-złota "obwódka" (1px padding), wewnętrzny `.research-hex-surface`
- * to właściwa, mniejsza powierzchnia z treścią. Tekst renderowany jako
- * zwykły HTML nad SVG sieci — nigdy w samym SVG.
+ * z clip-path wygląda źle): zewnętrzny `.research-hex-border` to cienka,
+ * półprzezroczysta "obwódka" (1px padding), wewnętrzny `.research-hex-surface`
+ * to właściwa, mniejsza powierzchnia z treścią (szkło, nie pełne wypełnienie —
+ * sieć neuronalna w tle ma częściowo przeświecać). Tekst renderowany jako
+ * zwykły HTML nad SVG sieci — nigdy w samym SVG. `.research-hex-connector` to
+ * czysto dekoracyjny, pulsujący punkt na jednej krawędzi, sugerujący że
+ * heksagon jest węzłem sieci, a nie osobną kartą.
  */
 export default function ResearchHexNode({
   hexClass,
@@ -37,10 +40,13 @@ export default function ResearchHexNode({
 }: Props) {
   const content = (
     <>
-      <span className="research-hex-number" aria-hidden="true">
-        {number}
-      </span>
-      <Icon className="research-hex-icon" aria-hidden="true" />
+      <div className="research-hex-index">
+        <span className="research-hex-number" aria-hidden="true">
+          {number}
+        </span>
+        <span className="research-hex-index-line" aria-hidden="true" />
+        <Icon className="research-hex-icon" aria-hidden="true" />
+      </div>
       <h3 className="research-hex-title research-font-display">
         {titleLine1}
         <br />
@@ -58,6 +64,7 @@ export default function ResearchHexNode({
 
   return (
     <div className={`research-hex ${hexClass}`} onMouseEnter={onActivate} onMouseLeave={onDeactivate}>
+      <span className="research-hex-connector" aria-hidden="true" />
       <div className="research-hex-border">
         {href ? (
           <Link href={href} className="research-hex-surface" onFocus={onActivate} onBlur={onDeactivate}>

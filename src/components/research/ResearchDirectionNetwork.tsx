@@ -33,6 +33,7 @@ export type DirectionContent = {
 type Props = {
   eyebrow: string;
   headingLines: [string, string, string];
+  subtitle: string;
   linkLabel: string;
   directions: DirectionContent[];
 };
@@ -43,7 +44,7 @@ type Props = {
  * (rodzic), współdzielony przez SVG sieci (podświetla powiązane ścieżki/synapsy)
  * i same heksagony (hover/focus).
  */
-export default function ResearchDirectionNetwork({ eyebrow, headingLines, linkLabel, directions }: Props) {
+export default function ResearchDirectionNetwork({ eyebrow, headingLines, subtitle, linkLabel, directions }: Props) {
   const [activeDirection, setActiveDirection] = useState<ResearchDirectionId | null>(null);
 
   return (
@@ -64,6 +65,7 @@ export default function ResearchDirectionNetwork({ eyebrow, headingLines, linkLa
             <br />
             {headingLines[2]}
           </h2>
+          <p className="research-directions-subtitle">{subtitle}</p>
         </div>
 
         <div className="research-hex-field">
