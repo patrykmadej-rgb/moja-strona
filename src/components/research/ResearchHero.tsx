@@ -26,7 +26,7 @@ export default function ResearchHero({
   indexItems,
 }: Props) {
   return (
-    <section className="research-hero">
+    <section className="research-hero research-container">
       <div>
         <p className="research-hero-eyebrow">{eyebrow}</p>
         <h1 className="research-hero-title">

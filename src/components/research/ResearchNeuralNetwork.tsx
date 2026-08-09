@@ -3,7 +3,16 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { ResearchDirectionId } from "@/lib/research-directions";
 
-type NetNode = { id: string; x: number; y: number; r: number; kind: "small" | "large"; direction: ResearchDirectionId };
+type NetNode = {
+  id: string;
+  x: number;
+  y: number;
+  r: number;
+  kind: "small" | "large";
+  /** null = węzeł "ambientowy" na moście między skupiskami (nie należy do
+   * żadnego pojedynczego kierunku, więc nigdy nie dostaje data-active). */
+  direction: ResearchDirectionId | null;
+};
 type NetPath = {
   id: string;
   d: string;
@@ -82,6 +91,19 @@ const NODES: NetNode[] = [
   { id: "n57", x: 1121.8, y: 569.1, r: 1.4, kind: "small", direction: "prevention" },
   { id: "n58", x: 1154.3, y: 531.6, r: 1.9, kind: "small", direction: "prevention" },
   { id: "n59", x: 1163.8, y: 469.7, r: 2.4, kind: "small", direction: "prevention" },
+  // --- Dogęszczenie sieci (druga iteracja): węzły "ambientowe" (direction:
+  // null) wzmacniające widoczność w pięciu wskazanych strefach — za
+  // nagłówkiem, między 01-02, między 02-04, pod 03, przy prawej krawędzi.
+  { id: "n60", x: 120, y: 100, r: 2.0, kind: "small", direction: null },
+  { id: "n61", x: 280, y: 90, r: 1.8, kind: "small", direction: null },
+  { id: "n62", x: 330, y: 180, r: 3.4, kind: "large", direction: null },
+  { id: "n63", x: 430, y: 290, r: 1.8, kind: "small", direction: null },
+  { id: "n64", x: 780, y: 260, r: 3.4, kind: "large", direction: null },
+  { id: "n65", x: 850, y: 310, r: 1.8, kind: "small", direction: null },
+  { id: "n66", x: 655, y: 610, r: 2.2, kind: "small", direction: null },
+  { id: "n67", x: 740, y: 660, r: 1.7, kind: "small", direction: null },
+  { id: "n68", x: 1370, y: 410, r: 2.0, kind: "small", direction: null },
+  { id: "n69", x: 1400, y: 540, r: 1.7, kind: "small", direction: null },
 ];
 
 const PATHS: NetPath[] = [
@@ -107,6 +129,24 @@ const PATHS: NetPath[] = [
   { id: "p19", d: "M990,330 Q1120.2,394.5 1220,500", direction: null, kind: "primary" },
   { id: "p20", d: "M240,330 Q488.2,373.5 700,510", direction: null, kind: "secondary" },
   { id: "p21", d: "M520,220 Q754.2,278.3 990,330", direction: null, kind: "secondary" },
+  // --- Dogęszczenie sieci (druga iteracja) ---
+  // Za nagłówkiem (lewy górny róg sekcji)
+  { id: "p22", d: "M240,330 Q170,210 120,100", direction: "separatism", kind: "secondary" },
+  { id: "p23", d: "M120,100 Q200,80 280,90", direction: null, kind: "secondary" },
+  // Drugie, wyraźne połączenie między 01 i 02 (obok istniejącego p16)
+  { id: "p24", d: "M240,330 Q285,240 330,180", direction: "separatism", kind: "primary" },
+  { id: "p25", d: "M330,180 Q380,190 430,290", direction: null, kind: "secondary" },
+  { id: "p26", d: "M430,290 Q475,255 520,220", direction: "profiling", kind: "primary" },
+  // Drugie, wyraźne połączenie między 02 i 04 (prevention) — obok p21
+  { id: "p27", d: "M520,220 Q660,225 780,260", direction: "profiling", kind: "primary" },
+  { id: "p28", d: "M780,260 Q815,285 850,310", direction: null, kind: "secondary" },
+  { id: "p29", d: "M850,310 Q920,320 990,330", direction: "prevention", kind: "primary" },
+  // Pod 03 (threats)
+  { id: "p30", d: "M700,510 Q680,570 655,610", direction: "threats", kind: "primary" },
+  { id: "p31", d: "M655,610 Q700,645 740,660", direction: null, kind: "secondary" },
+  // Wokół prawej krawędzi sekcji
+  { id: "p32", d: "M1220,500 Q1310,450 1370,410", direction: "prevention", kind: "primary" },
+  { id: "p33", d: "M1370,410 Q1390,475 1400,540", direction: null, kind: "secondary" },
 ];
 
 /** 5 punktów pulsujących pierścieni = 5 hubów skupisk. */
