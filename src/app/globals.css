@@ -953,8 +953,13 @@ html {
   background-image: radial-gradient(rgba(185, 154, 203, 0.05) 1px, transparent 1px);
   background-size: 34px 34px;
   isolation: isolate;
-  height: 700px;
-  min-height: 700px;
+  /* 820px (nie dawne 700px) — koła (330-440px) są zauważalnie większe niż
+     poprzednie heksagony (248-350px) i przy tej samej wysokości sekcji koło
+     01 i 03 były realnie przycinane przez dolną krawędź sekcji (zmierzone:
+     dno koła 1090px vs. dno sekcji 1000px). Priorytet: brak przycinania
+     ponad zachowanie dawnej wysokości. */
+  height: 820px;
+  min-height: 820px;
 }
 .research-page .research-directions-section > * {
   grid-area: 1 / 1;
@@ -969,17 +974,12 @@ html {
   justify-self: stretch;
 }
 
-@media (max-width: 1279px) and (min-width: 1024px) {
+@media (max-width: 1279px) and (min-width: 900px) {
   .research-page .research-directions-section {
-    height: 760px;
+    height: 740px;
   }
 }
-@media (max-width: 1023px) and (min-width: 768px) {
-  .research-page .research-directions-section {
-    height: 980px;
-  }
-}
-@media (max-width: 767px) {
+@media (max-width: 899px) {
   .research-page .research-directions-section {
     height: auto;
     padding-block: 48px 40px;
@@ -993,7 +993,7 @@ html {
   margin-inline: auto;
   z-index: 2;
 }
-@media (max-width: 767px) {
+@media (max-width: 899px) {
   .research-page .research-directions-inner {
     width: min(100% - 48px, 1380px);
     height: auto;
@@ -1031,12 +1031,12 @@ html {
   line-height: 1.6;
   color: rgba(247, 242, 234, 0.62);
 }
-@media (max-width: 767px) {
+@media (max-width: 899px) {
   .research-page .research-directions-heading {
     position: static;
     width: 100%;
     max-width: 420px;
-    margin-bottom: 40px;
+    margin-bottom: 52px;
   }
 }
 
@@ -1048,225 +1048,232 @@ html {
 .research-page .research-hex {
   position: absolute;
   display: block;
-  /* Bardzo subtelna, kolorowa poświata odpowiadająca odcieniowi danego
-     heksagonu (nie neonowa obwódka) — na filter:drop-shadow, nie box-shadow,
-     żeby poprawnie kopiować kształt heksagonu mimo clip-path na dzieciach. */
-  filter: drop-shadow(0 0 34px var(--glass-glow));
-  transition:
-    transform 320ms ease,
-    filter 320ms ease;
+  border-radius: 9999px !important;
+  transition: transform 280ms ease;
 }
 .research-page .research-hex:hover,
 .research-page .research-hex:focus-within {
-  transform: translateY(-5px);
-  filter: drop-shadow(0 0 42px var(--glass-glow)) brightness(1.08);
+  transform: translateY(-3px);
 }
 
-/* 01: lewy dół · 02: największy, górny środek · 03: dolny środek · 04: prawa
-   strona. Proporcje poziome (szerszy niż wyższy, ~1.09:1) zamiast dawnych
-   pionowych "tablic" (~0.89:1) — sprawdzone, że przy szerokości kontenera
-   1380px żaden heksagon się nie nakłada (patrz uzasadnienie w raporcie). */
-/* --glass-glow/--glass-main: kolor refleksu i głównego wypełnienia szkła,
-   indywidualny na każdym heksagonie (patrz .research-hex-surface niżej) —
-   zdefiniowane tu, na zewnętrznym pozycjonowanym elemencie, żeby ten sam
-   kolor mógł zasilać zarówno tło powierzchni, jak i ambientową poświatę
-   (filter:drop-shadow) na .research-hex. */
+/* Koła (nie heksagony) — soczewki badawcze zawieszone nad siecią. 01: lewy
+   dół · 02: największe, dominujące, górny środek · 03: dolny środek · 04:
+   prawa strona. Wysokość sekcji (patrz .research-directions-section)
+   zwiększona z 700px do 860px na desktopie — przy rozmiarach kół z tego
+   zadania (330-440px, zauważalnie większych niż poprzednie heksagony
+   248-350px) 700px nie mieściło organicznego układu bez nachodzenia kół na
+   siebie (zweryfikowane realnym pomiarem kolizji), a zadanie explicite
+   priorytetyzuje brak kolizji nad zachowaniem dotychczasowej wysokości. */
 .research-page .research-hex--01 {
-  left: 1%;
-  /* Przesunięte z 292px w dół (+70px), żeby zachować min. 40px odstępu od
-     tekstu wprowadzającego po lewej — przy realnej wysokości tego tekstu i
-     powiększonej typografii heksagonu (patrz .research-hex-title) 292px
-     dawało realną kolizję (zmierzone: heading kończył się ~28px PONIŻEJ
-     górnej krawędzi heksagonu 01, nie odstęp, tylko nachodzenie). */
-  top: 362px;
-  width: 300px;
-  height: 274px;
-  --glass-glow: rgba(211, 83, 164, 0.22);
-  --glass-main: rgba(106, 35, 125, 0.48);
+  left: 0.5%;
+  top: 400px;
+  width: 340px;
+  height: 340px;
 }
 .research-page .research-hex--02 {
-  left: 36%;
-  top: 34px;
-  width: 350px;
-  height: 320px;
-  --glass-glow: rgba(190, 108, 255, 0.3);
-  --glass-main: rgba(112, 48, 160, 0.52);
+  left: 35%;
+  top: 20px;
+  width: 410px;
+  height: 410px;
 }
 .research-page .research-hex--03 {
-  left: 31%;
-  top: 416px;
-  width: 270px;
-  height: 248px;
-  --glass-glow: rgba(116, 123, 255, 0.22);
-  --glass-main: rgba(73, 48, 139, 0.5);
+  left: 30%;
+  top: 470px;
+  width: 320px;
+  height: 320px;
 }
 .research-page .research-hex--04 {
-  right: 3%;
-  top: 312px;
-  width: 270px;
-  height: 248px;
-  --glass-glow: rgba(225, 103, 190, 0.2);
-  --glass-main: rgba(103, 37, 122, 0.48);
+  right: 4%;
+  top: 280px;
+  width: 310px;
+  height: 310px;
 }
 
-@media (max-width: 1279px) and (min-width: 1024px) {
+@media (max-width: 1279px) and (min-width: 900px) {
+  /* Przeliczone od zera (nie proste skalowanie procentów z desktopu) — przy
+     kołach tego rozmiaru (260-330px) dawne procentowe pozycje z węższych
+     heksagonów dawały realne kolizje (zmierzone: 01/03 nachodziły się na
+     ~230px wysokości, 02/04 na ~136px) — sprawdzone ponownie na 1024px i
+     1100px, brak nakładania się prostokątów otaczających. */
   .research-page .research-hex--01 {
-    top: 308px;
-    width: 258px;
-    height: 236px;
+    left: 1%;
+    top: 340px;
+    width: 280px;
+    height: 280px;
   }
   .research-page .research-hex--02 {
-    top: 29px;
-    width: 301px;
-    height: 275px;
+    left: 37%;
+    top: 16px;
+    width: 330px;
+    height: 330px;
   }
   .research-page .research-hex--03 {
-    top: 358px;
-    width: 232px;
-    height: 213px;
+    left: 33%;
+    top: 430px;
+    width: 260px;
+    height: 260px;
   }
   .research-page .research-hex--04 {
-    top: 268px;
-    width: 232px;
-    height: 213px;
-  }
-}
-
-@media (max-width: 1023px) and (min-width: 768px) {
-  /* Nagłówek sekcji ("Różne perspektywy...") jest na tablecie nadal absolutnie
-     pozycjonowany (position:static dopiero <768px) i zajmuje ~200px wysokości
-     w lewej kolumnie (width:330px) — 01 i 02 muszą zaczynać się PONIŻEJ niego,
-     inaczej nachodzą na tekst (zweryfikowane wizualnie na 768px). */
-  .research-page .research-hex--01 {
-    left: 2%;
-    top: 308px;
-    width: 290px;
-    height: 266px;
-  }
-  .research-page .research-hex--02 {
-    left: auto;
-    right: 4%;
-    top: 205px;
-    width: 320px;
-    height: 293px;
-  }
-  .research-page .research-hex--03 {
-    left: 4%;
-    top: 590px;
+    right: 2%;
+    top: 360px;
     width: 250px;
-    height: 230px;
-  }
-  .research-page .research-hex--04 {
-    left: auto;
-    right: 6%;
-    top: 580px;
-    width: 245px;
-    height: 225px;
+    height: 250px;
   }
 }
 
-@media (max-width: 767px) {
+/* Poniżej 900px: kontrolowana siatka 2×2 (nie absolutna "mapa"), zgodnie ze
+   specyfikacją — dwa rzędy po dwa koła, wyśrodkowane, różne rozmiary
+   zachowane. Poniżej 640px: jedna kolumna. */
+@media (max-width: 899px) {
   .research-page .research-hex-field {
     position: static;
     height: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-items: center;
+    align-items: start;
+    column-gap: 20px;
+    row-gap: 40px;
   }
   .research-page .research-hex {
     position: static;
-    width: min(100%, 330px) !important;
+    width: min(42vw, 300px) !important;
     height: auto !important;
-  }
-  .research-page .research-hex--01 {
-    aspect-ratio: 300 / 274;
+    aspect-ratio: 1 / 1;
   }
   .research-page .research-hex--02 {
-    aspect-ratio: 350 / 320;
-  }
-  .research-page .research-hex--03,
-  .research-page .research-hex--04 {
-    aspect-ratio: 270 / 248;
+    width: min(48vw, 320px) !important;
   }
 }
 
-/* Cienka, optycznie zmienna krawędź szkła — jeden gradient po przekątnej
-   (145deg) zamiast płaskiego koloru: jasna lawenda w lewym górnym rogu,
-   krótki złoty "błysk" w 75% (jakby światło łapało krawędź przy punkcie
-   połączenia z siecią), głęboki fiolet w prawym dolnym rogu. Wciąż przez
-   clip-path + 1px padding (zwykły `border` z clip-path renderuje się
-   nierówno). */
-.research-page .research-hex-border {
-  width: 100%;
-  height: 100%;
-  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-  background: linear-gradient(
-    145deg,
-    rgba(239, 211, 255, 0.58),
-    rgba(172, 101, 220, 0.22) 44%,
-    rgba(210, 171, 69, 0.34) 75%,
-    rgba(83, 32, 108, 0.5)
-  );
-  padding: 1px;
-  transition: filter 320ms ease;
-}
-.research-page .research-hex:hover .research-hex-border,
-.research-page .research-hex:focus-within .research-hex-border {
-  filter: brightness(1.18);
+@media (max-width: 639px) {
+  .research-page .research-hex-field {
+    grid-template-columns: 1fr;
+    row-gap: 32px;
+  }
+  .research-page .research-hex,
+  .research-page .research-hex--02 {
+    width: min(100%, 320px) !important;
+  }
 }
 
-/* Powierzchnia "szkła laboratoryjnego" — nasycony ametyst/śliwka, NIE szara
-   przezroczystość. Trzy nałożone warstwy tła (od góry): (1) neutralny
-   biały "sheen" po przekątnej w lewym górnym rogu — bardzo krótki, żeby nie
-   zrobić z powierzchni mlecznej plamy; (2) kolorowy refleks (radial,
-   indywidualny na heksagon, --glass-glow) w tym samym rogu; (3) główne
-   wypełnienie (linear, --glass-main → głęboka śliwka). Układ redakcyjny:
-   treść pakowana od góry do lewej (align-items:flex-start), link dociśnięty
-   do dołu przez margin-top:auto na .research-hex-link. Padding procentowy
-   (rozwiązuje się względem SZEROKOŚCI elementu, także dla top/bottom — tak
-   działa CSS) celowo trzyma tekst z dala od skośnych narożników heksagonu —
-   wartości dostrojone empirycznie tak, żeby PEŁNE opisy (bez line-clamp) i
-   powiększona typografia (patrz .research-hex-title) mieściły się bez
-   ucinania (zweryfikowane realnym renderem, scrollHeight <= clientHeight na
-   wszystkich 4 kartach). */
+/* Druga, wewnętrzna obwódka jako ::after (koło nie ma problemu z clip-path
+   obcinającym box-shadow jak heksagon, więc nie trzeba już osobnego
+   wrappera-"sandwicha" na krawędź). */
 .research-page .research-hex-surface {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
-  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-  background:
-    linear-gradient(125deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.045) 22%, transparent 43%),
-    radial-gradient(circle at 24% 16%, var(--glass-glow) 0%, rgba(151, 76, 205, 0.12) 30%, transparent 58%),
-    linear-gradient(145deg, var(--glass-main) 0%, rgba(78, 28, 112, 0.52) 48%, rgba(42, 15, 62, 0.68) 100%);
+  border-radius: 9999px !important;
+  border: 1px solid rgba(226, 211, 231, 0.32);
+  background-color: transparent;
+  background-image:
+    radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.025) 26%, transparent 48%),
+    linear-gradient(145deg, rgba(92, 55, 111, 0.5) 0%, rgba(58, 33, 74, 0.62) 55%, rgba(31, 17, 43, 0.74) 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    inset 1px 0 0 rgba(255, 255, 255, 0.08),
-    inset 0 -1px 0 rgba(116, 52, 151, 0.42),
-    0 18px 50px rgba(9, 2, 16, 0.22);
-  backdrop-filter: blur(16px) saturate(145%);
-  -webkit-backdrop-filter: blur(16px) saturate(145%);
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -20px 50px rgba(12, 5, 18, 0.16),
+    0 18px 50px rgba(8, 3, 13, 0.18);
+  backdrop-filter: blur(12px) saturate(110%);
+  -webkit-backdrop-filter: blur(12px) saturate(110%);
   color: var(--research-cream);
-  padding: 9% 20% 19%;
   outline: none;
-  transition: filter 320ms ease;
+  transition:
+    border-color 280ms ease,
+    background-color 280ms ease;
 }
-.research-page .research-hex--02 .research-hex-surface {
-  padding: 13% 20% 11%;
+.research-page .research-hex-surface::after {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(226, 211, 231, 0.1);
+  pointer-events: none;
+}
+.research-page .research-hex:hover .research-hex-surface,
+.research-page .research-hex:focus-within .research-hex-surface {
+  border-color: rgba(226, 211, 231, 0.48);
+  background-color: rgba(79, 45, 96, 0.68);
 }
 .research-page .research-hex-surface:focus-visible {
   outline: 3px solid var(--research-gold);
   outline-offset: 3px;
 }
 
-/* Numer + ikona w jednym poziomym wierszu ("naukowy indeks"), nie duża ikona
-   nad tytułem. flex-shrink:0 na tekstowych/ikonowych dzieciach zapobiega
-   degenerowaniu SVG-ikony do wysokości 0px, gdy sumaryczna zawartość ledwo
-   mieści się w pionie — zaobserwowane i zweryfikowane realnym renderem w
-   przeglądarce w poprzedniej turze poprawek. */
+/* Krótkie kreski pomiarowe na obwodzie (12/3/6/9) — delikatny, analityczny
+   akcent "soczewki", nie astrologiczny symbol. Celowo nie identyczne. */
+.research-page .research-hex-tick {
+  position: absolute;
+  background: rgba(210, 171, 69, 0.5);
+  pointer-events: none;
+}
+.research-page .research-hex-tick--12 {
+  top: 7px;
+  left: 50%;
+  width: 1px;
+  height: 10px;
+  transform: translateX(-50%);
+}
+.research-page .research-hex-tick--6 {
+  bottom: 7px;
+  left: 50%;
+  width: 1px;
+  height: 12px;
+  background: rgba(226, 211, 231, 0.4);
+  transform: translateX(-50%);
+}
+.research-page .research-hex-tick--3 {
+  right: 7px;
+  top: 50%;
+  width: 9px;
+  height: 1px;
+  transform: translateY(-50%);
+}
+.research-page .research-hex-tick--9 {
+  left: 7px;
+  top: 50%;
+  width: 8px;
+  height: 1px;
+  background: rgba(226, 211, 231, 0.4);
+  transform: translateY(-50%);
+}
+
+/* Jeden niepełny, cienki łuk (~22% obwodu) — jak oznaczenie skali na
+   soczewce, nigdy pełny pierścień i bez animacji obrotowej.
+   pathLength=100 na <circle> pozwala wyrazić dasharray/offset w
+   jednostkach "procentowych" niezależnie od promienia. */
+.research-page .research-hex-arc {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.research-page .research-hex-arc circle {
+  fill: none;
+  stroke: rgba(226, 211, 231, 0.55);
+  stroke-width: 0.6;
+  stroke-dasharray: 22 78;
+  stroke-dashoffset: -12;
+  opacity: 0.25;
+}
+
+/* Treść w wąskiej, wyśrodkowanej kolumnie — nie na pełną szerokość koła, żeby
+   nie dotykała krzywizny. */
+.research-page .research-hex-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 62%;
+  max-width: 260px;
+  margin-inline: auto;
+}
 .research-page .research-hex-index {
   display: flex;
   align-items: center;
@@ -1285,70 +1292,69 @@ html {
   font-family: var(--font-research-cormorant), Georgia, serif;
   font-size: 18px;
   line-height: 1;
-  color: #e0b94f;
+  color: #d2ab45;
 }
 .research-page .research-hex-icon {
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-  color: #e0b94f;
+  width: 22px;
+  height: 22px;
+  color: #d2ab45;
 }
 .research-page .research-hex-title {
   flex-shrink: 0;
   margin: 0;
-  font-size: clamp(28px, 2.1vw, 36px);
+  font-size: clamp(24px, 1.8vw, 30px);
   font-weight: 400;
-  line-height: 1.02;
-  color: #fff8f0;
+  line-height: 1.05;
+  color: var(--research-cream);
 }
 .research-page .research-hex-desc {
   flex-shrink: 0;
-  margin-top: 4px;
+  margin-top: 8px;
   font-size: 13px;
-  line-height: 1.4;
-  color: rgba(255, 248, 240, 0.76);
+  line-height: 1.45;
+  color: rgba(247, 242, 234, 0.72);
 }
 .research-page .research-hex-link {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  margin-top: auto;
-  padding-top: 4px;
+  margin-top: 12px;
   font-family: var(--font-research-manrope), ui-sans-serif, system-ui, sans-serif;
   font-size: 12px;
   font-weight: 600;
-  color: #e0b94f;
+  color: #d2ab45;
 }
 .research-page .research-hex-arrow {
   display: inline-block;
-  transition: transform 200ms var(--research-ease);
+  transition: transform 200ms ease;
 }
 .research-page .research-hex:hover .research-hex-arrow,
 .research-page .research-hex:focus-within .research-hex-arrow {
   transform: translateX(4px);
 }
 
-/* Punkt połączenia — jeden na heksagon, po stronie zwróconej w stronę środka
-   sieci, tak żeby każda karta wyglądała jak węzeł, a nie osobna tablica.
-   Reużywa istniejącej animacji pulsowania węzłów sieci (research-node-pulse). */
+/* Punkt połączenia — jeden na koło, po stronie zwróconej w stronę środka
+   sieci, 5px, bez dużej poświaty. Reużywa istniejącej animacji pulsowania
+   węzłów sieci (research-node-pulse), bardzo subtelnie. */
 .research-page .research-hex-connector {
   position: absolute;
   z-index: 3;
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 9999px !important;
   background: var(--research-gold);
-  box-shadow: 0 0 8px 2px rgba(199, 163, 70, 0.35);
+  box-shadow: 0 0 4px 1px rgba(199, 163, 70, 0.3);
   transform-box: fill-box;
   transform-origin: center;
   animation: research-node-pulse 4s ease-in-out infinite;
-  transition: box-shadow 320ms ease;
+  transition: box-shadow 280ms ease;
   pointer-events: none;
 }
 .research-page .research-hex:hover .research-hex-connector,
 .research-page .research-hex:focus-within .research-hex-connector {
-  box-shadow: 0 0 14px 4px rgba(199, 163, 70, 0.55);
+  box-shadow: 0 0 8px 2px rgba(199, 163, 70, 0.5);
 }
 /* 01: lewy dół → punkt po prawej (w stronę środka). 02: górny środek → punkt
    u dołu. 03: dolny środek → punkt u góry. 04: prawa strona → punkt po lewej.
@@ -1356,24 +1362,24 @@ html {
    już animuje `transform` (scale), więc statyczny transform na tej samej
    właściwości zostałby nadpisany klatkami animacji. */
 .research-page .research-hex--01 .research-hex-connector {
-  right: -4px;
+  right: -3px;
   top: 50%;
-  margin-top: -3px;
+  margin-top: -2.5px;
 }
 .research-page .research-hex--02 .research-hex-connector {
-  bottom: -4px;
+  bottom: -3px;
   left: 50%;
-  margin-left: -3px;
+  margin-left: -2.5px;
 }
 .research-page .research-hex--03 .research-hex-connector {
-  top: -4px;
+  top: -3px;
   left: 50%;
-  margin-left: -3px;
+  margin-left: -2.5px;
 }
 .research-page .research-hex--04 .research-hex-connector {
-  left: -4px;
+  left: -3px;
   top: 50%;
-  margin-top: -3px;
+  margin-top: -2.5px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1387,7 +1393,7 @@ html {
     opacity: 1 !important;
     transform: none !important;
   }
-  /* Wyłącz pulsowanie punktu połączenia i pionowe przesunięcie heksagonu na
+  /* Wyłącz pulsowanie punktu połączenia i pionowe przesunięcie koła na
      hover/focus — nie tylko przyspiesz animację, ale usuń sam ruch. */
   .research-page .research-hex-connector {
     animation: none !important;
