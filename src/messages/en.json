@@ -162,18 +162,7 @@
     "intro": "Łączę psychologię, kryminologię, wiktymologię i nauki o bezpieczeństwie, badając człowieka w relacji z traumą, przestępczością, instytucjami i konfliktem.",
     "ctaExplore": "Poznaj obszary badawcze",
     "ctaPublications": "Zobacz publikacje",
-    "mapAriaLabel": "Interaktywna mapa obszarów badawczych",
-    "mapNodeOpenDetails": "zobacz szczegóły",
-    "mapCenterLabel": "Człowiek · System · Bezpieczeństwo",
-    "mapLabel": "Mapa badań",
-    "mapMobileHint": "Dotknij węzła, aby rozwinąć szczegóły obszaru.",
     "axesEyebrow": "Obszary badawcze",
-    "featuredBadge": "Obszar wyróżniony",
-    "expand": "Rozwiń",
-    "selected": "Wybrany obszar",
-    "questionsHeading": "Pytania badawcze",
-    "tagsHeading": "Tematy",
-    "seeRelatedProjects": "Zobacz powiązane projekty →",
     "currentWorkEyebrow": "W toku",
     "currentWorkHeading": "Aktualnie pracuję nad",
     "filterAll": "Wszystkie",
@@ -191,7 +180,52 @@
       "Jak identyfikować zagrożenia bez naruszania praw jednostki?",
       "Jak trauma kształtuje decyzje, relacje i zachowania społeczne?",
       "Jak wspierać zdrowienie i odporność w społecznościach po konflikcie?"
-    ]
+    ],
+    "areasIntro": "Moje badania łączą perspektywy człowieka i systemu, aby lepiej rozumieć zjawiska społeczne i projektować mądre rozwiązania.",
+    "areasSeeArea": "Zobacz obszar",
+    "areas": {
+      "balkans": {
+        "title": "Bałkany i separatyzmy",
+        "description": "Badania nad mniejszościami, ruchami separatystycznymi, tożsamością narodową i procesami budowania pokoju w regionach postkonfliktowych."
+      },
+      "security": {
+        "title": "Psychologia bezpieczeństwa",
+        "description": "Wykorzystanie psychologii poznawczej i społecznej w analizie zagrożeń, ryzyka i zachowań w sytuacjach niepewności."
+      },
+      "profiling": {
+        "title": "Profilowanie i kryminologia",
+        "description": "Krytyczna ocena narzędzi profilowania, analiza zachowań przestępczych i procesów decyzyjnych sprawców."
+      },
+      "victimology": {
+        "title": "Wiktymologia, trauma i zdrowienie",
+        "description": "Klasyfikacja ofiar, mechanizmy traumy, procesy zdrowienia i wsparcie psychospołeczne w perspektywie indywidualnej i instytucjonalnej."
+      },
+      "clinical": {
+        "title": "Psychologia kliniczna",
+        "description": "Badania nad ograniczeniami diagnostyki, depresją, ADHD i dobrostanem psychicznym."
+      }
+    },
+    "heroWords": [
+      "Człowiek",
+      "System",
+      "Bezpieczeństwo"
+    ],
+    "questionsSection": {
+      "headingLine1": "Pytania, które",
+      "headingLine2": "prowadzą moje badania",
+      "intro": "Każde badanie zaczyna się od pytania, które ma znaczenie — dla człowieka, dla systemu, dla społeczeństwa.",
+      "items": [
+        "Jak doświadczenia człowieka kształtują bezpieczeństwo systemów?",
+        "Co zwiększa odporność społeczną w warunkach kryzysu i konfliktu?",
+        "Jak wiedza naukowa może przełożyć się na lepsze decyzje i realny wpływ?"
+      ]
+    },
+    "publicationsHeading": "Wybrane publikacje",
+    "publicationsCta": "Zobacz wszystkie publikacje",
+    "noPublications": "Publikacje pojawią się w tym miejscu wkrótce.",
+    "closingHeadingLine1": "Badania zaczynają się",
+    "closingHeadingLine2": "od dobrego pytania.",
+    "closingCta": "Zobacz wszystkie publikacje"
   },
   "OMniePage": {
     "metaTitle": "About me",
@@ -208,10 +242,22 @@
       "photoCaption": "Researcher · Psychology student · Psychotherapist in training"
     },
     "facts": {
-      "prawo": { "label": "Law", "value": "Master's degree in law" },
-      "psychologia": { "label": "Psychology", "value": "Ongoing psychology studies" },
-      "psychoterapia": { "label": "Psychotherapy", "value": "In training and accreditation" },
-      "doswiadczenie": { "label": "Experience", "value": "International management and business" }
+      "prawo": {
+        "label": "Law",
+        "value": "Master's degree in law"
+      },
+      "psychologia": {
+        "label": "Psychology",
+        "value": "Ongoing psychology studies"
+      },
+      "psychoterapia": {
+        "label": "Psychotherapy",
+        "value": "In training and accreditation"
+      },
+      "doswiadczenie": {
+        "label": "Experience",
+        "value": "International management and business"
+      }
     },
     "journey": {
       "eyebrow": "Career path",
@@ -313,17 +359,36 @@
       "eyebrow": "Values",
       "heading": "What matters to me",
       "items": [
-        { "title": "Authenticity", "description": "A relationship built on honesty and respect." },
-        { "title": "Rigour", "description": "Conclusions grounded in knowledge, sources and analysis." },
-        { "title": "Responsibility", "description": "Awareness of how decisions affect people and their surroundings." },
-        { "title": "Growth", "description": "Continuous learning and combining different perspectives." }
+        {
+          "title": "Authenticity",
+          "description": "A relationship built on honesty and respect."
+        },
+        {
+          "title": "Rigour",
+          "description": "Conclusions grounded in knowledge, sources and analysis."
+        },
+        {
+          "title": "Responsibility",
+          "description": "Awareness of how decisions affect people and their surroundings."
+        },
+        {
+          "title": "Growth",
+          "description": "Continuous learning and combining different perspectives."
+        }
       ]
     },
     "personal": {
       "eyebrow": "Outside work",
       "heading": "Outside work",
       "intro": "Personally, the things that broaden my professional and academic perspective.",
-      "items": ["Travel", "Exploring cultures", "Academic and philosophical literature", "Nature", "Photography", "Growth and learning"]
+      "items": [
+        "Travel",
+        "Exploring cultures",
+        "Academic and philosophical literature",
+        "Nature",
+        "Photography",
+        "Growth and learning"
+      ]
     },
     "manifest": {
       "text": "Understanding people is the foundation for building a safer and more conscious world."

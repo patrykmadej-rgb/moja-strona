@@ -1,14 +1,15 @@
-import fs from "node:fs";
-import path from "node:path";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { siteConfig } from "@/lib/site-config";
-import { Link } from "@/i18n/navigation";
-import { researchAxes, currentWork, localizeAxis, localizeCurrentWorkItem } from "@/lib/research";
-import ResearchInteractive from "@/components/research/ResearchInteractive";
-import ResearchClosingSection from "@/components/research/ResearchClosingSection";
-import ExploreAxesButton from "@/components/research/ExploreAxesButton";
+import { researchAxes, type ResearchAxisId } from "@/lib/research";
+import { publications, getFeaturedPublications } from "@/lib/publications";
+import { getAllTags, tagToSlug } from "@/lib/tags";
+import ResearchHero from "@/components/research/ResearchHero";
+import ResearchAreas, { type AreaItem } from "@/components/research/ResearchAreas";
+import ResearchQuestions from "@/components/research/ResearchQuestions";
+import ResearchPublications from "@/components/research/ResearchPublications";
+import ResearchClosingCta from "@/components/research/ResearchClosingCta";
 
 // Typografia zawężona do /badania (nie dotyka globalnych fontów Geist z
 // (site)/layout.tsx) — zmienne CSS podpięte na kontenerze .research-page,
@@ -34,84 +35,77 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function BadaniaPage() {
   const t = await getTranslations("ResearchPage");
-  const locale = await getLocale();
+  const tStatus = await getTranslations("PublicationStatus");
 
-  const localizedAxes = researchAxes.map((axis) => localizeAxis(axis, locale));
-  const localizedWork = currentWork.map((item) => localizeCurrentWorkItem(item, locale));
+  // Moduł obszaru dostaje prawdziwy link tylko wtedy, gdy istnieje faktyczna
+  // publikacja oznaczona odpowiadającym tagiem (routing /tagi/[tag] generuje
+  // statyczne strony wyłącznie dla tagów realnie występujących w publikacjach).
+  // Obecnie dotyczy to tylko "Bałkany Zachodnie" — pozostałe obszary renderują
+  // się jako wizualny (nieklikalny) odpowiednik, żeby nie tworzyć fikcyjnego routingu.
+  const allTags = getAllTags(publications);
+  const axisTagHref = new Map<ResearchAxisId, string>();
+  for (const axis of researchAxes) {
+    const matchingTag = axis.tagsPl.find((tag) => allTags.includes(tag));
+    if (matchingTag) axisTagHref.set(axis.id, `/tagi/${tagToSlug(matchingTag)}`);
+  }
 
-  const hasBackgroundImage = fs.existsSync(
-    path.join(process.cwd(), "public/research/research-map-background.png"),
-  );
+  const areaCopy = t.raw("areas") as Record<ResearchAxisId, { title: string; description: string }>;
+  const areas = researchAxes.map((axis) => ({
+    id: axis.id,
+    number: axis.number,
+    title: areaCopy[axis.id].title,
+    description: areaCopy[axis.id].description,
+    href: axisTagHref.get(axis.id),
+  })) as [AreaItem, AreaItem, AreaItem, AreaItem, AreaItem];
 
-  const labels = {
-    mapLabel: t("mapLabel"),
-    mapAriaLabel: t("mapAriaLabel"),
-    mapNodeOpenDetails: t("mapNodeOpenDetails"),
-    mapCenterLabel: t("mapCenterLabel"),
-    mapMobileHint: t("mapMobileHint"),
-    axesEyebrow: t("axesEyebrow"),
-    featuredBadge: t("featuredBadge"),
-    expand: t("expand"),
-    selected: t("selected"),
-    questionsHeading: t("questionsHeading"),
-    tagsHeading: t("tagsHeading"),
-    seeRelatedProjects: t("seeRelatedProjects"),
-    currentWorkEyebrow: t("currentWorkEyebrow"),
-    currentWorkHeading: t("currentWorkHeading"),
-    filterAll: t("filterAll"),
-    seeAll: t("seeAll"),
-    showLess: t("showLess"),
-    noResults: t("noResults"),
-  };
+  const featuredPublications = getFeaturedPublications();
+  const yearLabels: Record<string, string> = {};
+  for (const pub of featuredPublications) {
+    yearLabels[pub.slug] =
+      pub.year !== undefined ? String(pub.year) : pub.status === "w-trakcie" ? tStatus("inPreparation") : "";
+  }
 
-  const heroLeft = (
-    <div>
-      <p className="text-xs font-semibold tracking-[0.22em] uppercase text-[#4A1D6E] dark:text-purple-400">
-        {t("eyebrow")}
-      </p>
-      <h1 className="research-font-display mt-4 text-[44px] leading-[0.98] font-medium tracking-tight text-[#1C1028] sm:text-[56px] lg:text-[70px] dark:text-white">
-        {t("h1Line1")}
-        <br />
-        {t("h1Line2")}
-      </h1>
-      <p className="mt-5 max-w-[540px] text-lg leading-[1.55] text-[#4A3360] dark:text-neutral-300">
-        {t("intro")}
-      </p>
-      <div className="mt-8 flex flex-wrap items-center gap-3">
-        <ExploreAxesButton label={t("ctaExplore")} />
-        <Link
-          href="/publikacje"
-          className="rounded-research-sm group inline-flex h-12 items-center justify-center gap-2 border border-[#4A1D6E]/35 px-6 text-sm font-semibold text-[#4A1D6E] transition-colors hover:border-[#4A1D6E]/60 hover:bg-[#4A1D6E]/5 dark:border-purple-400/40 dark:text-purple-300"
-        >
-          {t("ctaPublications")}
-          <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5">
-            →
-          </span>
-        </Link>
-      </div>
-    </div>
-  );
-
-  const closing = (
-    <ResearchClosingSection
-      eyebrow={t("approachEyebrow")}
-      heading={t("approachHeading")}
-      body={t("approachBody")}
-      linkLabel={t("approachLink")}
-      questionsEyebrow={t("questionsEyebrow")}
-      questions={t.raw("researchQuestions") as string[]}
-    />
-  );
+  const heroWords = t.raw("heroWords") as [string, string, string];
+  const questions = t.raw("questionsSection.items") as [string, string, string];
 
   return (
     <div className={`research-page ${cormorant.variable} ${manrope.variable}`}>
-      <ResearchInteractive
-        heroLeft={heroLeft}
-        axes={localizedAxes}
-        currentWork={localizedWork}
-        hasBackgroundImage={hasBackgroundImage}
-        labels={labels}
-        closing={closing}
+      <ResearchHero
+        eyebrow={t("eyebrow")}
+        h1Line1={t("h1Line1")}
+        h1Line2={t("h1Line2")}
+        intro={t("intro")}
+        ctaExploreLabel={t("ctaExplore")}
+        ctaPublicationsLabel={t("ctaPublications")}
+        heroWords={heroWords}
+      />
+
+      <ResearchAreas
+        eyebrow={t("axesEyebrow")}
+        intro={t("areasIntro")}
+        seeAreaLabel={t("areasSeeArea")}
+        areas={areas}
+      />
+
+      <ResearchQuestions
+        headingLine1={t("questionsSection.headingLine1")}
+        headingLine2={t("questionsSection.headingLine2")}
+        intro={t("questionsSection.intro")}
+        questions={questions}
+      />
+
+      <ResearchPublications
+        heading={t("publicationsHeading")}
+        ctaLabel={t("publicationsCta")}
+        emptyLabel={t("noPublications")}
+        publications={featuredPublications}
+        yearLabels={yearLabels}
+      />
+
+      <ResearchClosingCta
+        headingLine1={t("closingHeadingLine1")}
+        headingLine2={t("closingHeadingLine2")}
+        ctaLabel={t("closingCta")}
       />
     </div>
   );

@@ -35,7 +35,7 @@ html {
 /* ============================================================
    /badania — paleta i tokeny DODATKOWE, zawężone do .research-page.
    Nie zastępują głównych kolorów marki, to tylko akcent tej podstrony
-   (mapa badań, karty osi), wzorowany na public/_reference/research-page-mockup.png.
+   (premium editorial research portfolio).
    ============================================================ */
 .research-page {
   --research-ivory: #f7f3ed;
@@ -64,9 +64,10 @@ html {
 }
 
 /* Wyjątek od globalnej zasady "kwadratowych" rogów, celowy i ograniczony do tej
-   jednej podstrony: mapa badań i karty osi używają zaokrągleń zgodnie ze
-   wzorcem wizualnym. Restatujemy jawnie te same wartości, które dałyby klasy
-   Tailwind, tylko z wyższą swoistością niż globalne `* { border-radius: 0 }`. */
+   jednej podstrony: obrazy, panele i moduły obszarów badawczych używają
+   dyskretnych zaokrągleń zgodnie z redakcyjnym stylem tej podstrony.
+   Restatujemy jawnie te same wartości, które dałyby klasy Tailwind, tylko
+   z wyższą swoistością niż globalne `* { border-radius: 0 }`. */
 .research-page .rounded-full {
   border-radius: 9999px !important;
 }
@@ -80,35 +81,19 @@ html {
   border-radius: 8px !important;
 }
 
-@keyframes research-breathe {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.018);
-  }
-}
-
-@keyframes research-dot-glow {
-  0%,
-  100% {
-    opacity: 0.45;
-  }
-  50% {
-    opacity: 0.9;
-  }
-}
-
-@keyframes research-fade-up {
+@keyframes research-hero-in {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.research-page .research-hero-in {
+  animation: research-hero-in 900ms var(--research-ease) both;
 }
 
 .research-page [data-reveal] {

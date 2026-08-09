@@ -162,18 +162,7 @@
     "intro": "Łączę psychologię, kryminologię, wiktymologię i nauki o bezpieczeństwie, badając człowieka w relacji z traumą, przestępczością, instytucjami i konfliktem.",
     "ctaExplore": "Poznaj obszary badawcze",
     "ctaPublications": "Zobacz publikacje",
-    "mapAriaLabel": "Interaktywna mapa obszarów badawczych",
-    "mapNodeOpenDetails": "zobacz szczegóły",
-    "mapCenterLabel": "Człowiek · System · Bezpieczeństwo",
-    "mapLabel": "Mapa badań",
-    "mapMobileHint": "Dotknij węzła, aby rozwinąć szczegóły obszaru.",
     "axesEyebrow": "Obszary badawcze",
-    "featuredBadge": "Obszar wyróżniony",
-    "expand": "Rozwiń",
-    "selected": "Wybrany obszar",
-    "questionsHeading": "Pytania badawcze",
-    "tagsHeading": "Tematy",
-    "seeRelatedProjects": "Zobacz powiązane projekty →",
     "currentWorkEyebrow": "W toku",
     "currentWorkHeading": "Aktualnie pracuję nad",
     "filterAll": "Wszystkie",
@@ -191,7 +180,52 @@
       "Jak identyfikować zagrożenia bez naruszania praw jednostki?",
       "Jak trauma kształtuje decyzje, relacje i zachowania społeczne?",
       "Jak wspierać zdrowienie i odporność w społecznościach po konflikcie?"
-    ]
+    ],
+    "areasIntro": "Moje badania łączą perspektywy człowieka i systemu, aby lepiej rozumieć zjawiska społeczne i projektować mądre rozwiązania.",
+    "areasSeeArea": "Zobacz obszar",
+    "areas": {
+      "balkans": {
+        "title": "Bałkany i separatyzmy",
+        "description": "Badania nad mniejszościami, ruchami separatystycznymi, tożsamością narodową i procesami budowania pokoju w regionach postkonfliktowych."
+      },
+      "security": {
+        "title": "Psychologia bezpieczeństwa",
+        "description": "Wykorzystanie psychologii poznawczej i społecznej w analizie zagrożeń, ryzyka i zachowań w sytuacjach niepewności."
+      },
+      "profiling": {
+        "title": "Profilowanie i kryminologia",
+        "description": "Krytyczna ocena narzędzi profilowania, analiza zachowań przestępczych i procesów decyzyjnych sprawców."
+      },
+      "victimology": {
+        "title": "Wiktymologia, trauma i zdrowienie",
+        "description": "Klasyfikacja ofiar, mechanizmy traumy, procesy zdrowienia i wsparcie psychospołeczne w perspektywie indywidualnej i instytucjonalnej."
+      },
+      "clinical": {
+        "title": "Psychologia kliniczna",
+        "description": "Badania nad ograniczeniami diagnostyki, depresją, ADHD i dobrostanem psychicznym."
+      }
+    },
+    "heroWords": [
+      "Człowiek",
+      "System",
+      "Bezpieczeństwo"
+    ],
+    "questionsSection": {
+      "headingLine1": "Pytania, które",
+      "headingLine2": "prowadzą moje badania",
+      "intro": "Każde badanie zaczyna się od pytania, które ma znaczenie — dla człowieka, dla systemu, dla społeczeństwa.",
+      "items": [
+        "Jak doświadczenia człowieka kształtują bezpieczeństwo systemów?",
+        "Co zwiększa odporność społeczną w warunkach kryzysu i konfliktu?",
+        "Jak wiedza naukowa może przełożyć się na lepsze decyzje i realny wpływ?"
+      ]
+    },
+    "publicationsHeading": "Wybrane publikacje",
+    "publicationsCta": "Zobacz wszystkie publikacje",
+    "noPublications": "Publikacje pojawią się w tym miejscu wkrótce.",
+    "closingHeadingLine1": "Badania zaczynają się",
+    "closingHeadingLine2": "od dobrego pytania.",
+    "closingCta": "Zobacz wszystkie publikacje"
   },
   "OMniePage": {
     "metaTitle": "O mnie",
@@ -208,10 +242,22 @@
       "photoCaption": "Badacz · Psycholog w kształceniu · Psychoterapeuta w trakcie certyfikacji"
     },
     "facts": {
-      "prawo": { "label": "Prawo", "value": "Magister prawa" },
-      "psychologia": { "label": "Psychologia", "value": "Studia psychologiczne w toku" },
-      "psychoterapia": { "label": "Psychoterapia", "value": "W trakcie szkolenia i certyfikacji" },
-      "doswiadczenie": { "label": "Doświadczenie", "value": "Międzynarodowe zarządzanie i biznes" }
+      "prawo": {
+        "label": "Prawo",
+        "value": "Magister prawa"
+      },
+      "psychologia": {
+        "label": "Psychologia",
+        "value": "Studia psychologiczne w toku"
+      },
+      "psychoterapia": {
+        "label": "Psychoterapia",
+        "value": "W trakcie szkolenia i certyfikacji"
+      },
+      "doswiadczenie": {
+        "label": "Doświadczenie",
+        "value": "Międzynarodowe zarządzanie i biznes"
+      }
     },
     "journey": {
       "eyebrow": "Droga zawodowa",
@@ -313,17 +359,36 @@
       "eyebrow": "Wartości",
       "heading": "Co jest dla mnie ważne",
       "items": [
-        { "title": "Autentyczność", "description": "Relacja oparta na szczerości i szacunku." },
-        { "title": "Rzetelność", "description": "Wnioski oparte na wiedzy, źródłach i analizie." },
-        { "title": "Odpowiedzialność", "description": "Świadomość wpływu decyzji na ludzi i otoczenie." },
-        { "title": "Rozwój", "description": "Stałe uczenie się i łączenie różnych perspektyw." }
+        {
+          "title": "Autentyczność",
+          "description": "Relacja oparta na szczerości i szacunku."
+        },
+        {
+          "title": "Rzetelność",
+          "description": "Wnioski oparte na wiedzy, źródłach i analizie."
+        },
+        {
+          "title": "Odpowiedzialność",
+          "description": "Świadomość wpływu decyzji na ludzi i otoczenie."
+        },
+        {
+          "title": "Rozwój",
+          "description": "Stałe uczenie się i łączenie różnych perspektyw."
+        }
       ]
     },
     "personal": {
       "eyebrow": "Poza pracą",
       "heading": "Poza pracą",
       "intro": "Prywatnie to, co poszerza perspektywę zawodową i naukową.",
-      "items": ["Podróże", "Poznawanie kultur", "Literatura naukowa i filozoficzna", "Natura", "Fotografia", "Rozwój i nauka"]
+      "items": [
+        "Podróże",
+        "Poznawanie kultur",
+        "Literatura naukowa i filozoficzna",
+        "Natura",
+        "Fotografia",
+        "Rozwój i nauka"
+      ]
     },
     "manifest": {
       "text": "Zrozumienie człowieka jest podstawą budowania bezpieczniejszego i bardziej świadomego świata."

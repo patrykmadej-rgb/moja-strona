@@ -60,35 +60,6 @@ export type CurrentWorkItem = {
   href?: string;
 };
 
-/**
- * Pozycje węzłów na mapie badań (desktop), w procentach kontenera 900×580.
- * Wyprowadzone geometrycznie z viewBox-owych współrzędnych (patrz niżej):
- *   center: (450,276) r=95
- *   balkans: (257,142)   security: (634,142)
- *   profiling: (182,411) clinical: (719,396)
- *   victimology: (450,481)
- *
- * Poprawka "mapa zbyt ściśnięta / węzły zbyt blisko centrum": poprzedni układ
- * miał wiktymologię (dolny węzeł) tylko 155 jednostek od środka — przy Rc=95 i
- * promieniu węzła r=43 zostawiało to raptem 17 jednostek luzu (gap) między
- * obwodami, więc łącząca ją krzywa była w praktyce maleńkim, urwanym
- * odcinkiem (~17px). Pozostałe cztery węzły miały gap 67-150, więc wiktymologia
- * była wyraźnym, brzydkim wyjątkiem. Teraz gap wynosi min. 67 (wiktymologia) do
- * 162 (profiling/clinical) — wszystkie połączenia mają realną, "oddychającą"
- * długość. Kąty (kierunki) węzłów względem centrum BEZ ZMIAN, tylko promień
- * (odległość od centrum) zwiększony. Rozmiar centralnego koła (r=95) i węzłów
- * (r=43) BEZ ZMIAN. CONNECTIONS w ResearchMap.tsx MUSZĄ pozostać spójne z tymi
- * samymi współrzędnymi viewBox (podobnie CONNECTION_DOTS/TOP_ORBIT/BOTTOM_ORBIT)
- * — przy kolejnej zmianie pozycji węzłów te krzywe trzeba przeliczyć na nowo.
- */
-export const RESEARCH_MAP_NODE_POSITIONS: Record<ResearchAxisId, { x: number; y: number }> = {
-  balkans: { x: 28.56, y: 24.45 },
-  security: { x: 70.46, y: 24.42 },
-  profiling: { x: 20.21, y: 70.78 },
-  victimology: { x: 50, y: 82.93 },
-  clinical: { x: 79.94, y: 68.29 },
-};
-
 export const researchAxes: ResearchAxis[] = [
   {
     id: "balkans",
