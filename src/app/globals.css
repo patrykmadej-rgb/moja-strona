@@ -292,7 +292,7 @@ html {
    cztery kroki na jednej poziomej złotej linii po prawej.
    ------------------------------------------------------------ */
 .research-page .research-process {
-  padding-block: 54px 48px;
+  padding-block: 54px 40px;
   background: var(--research-cream);
 }
 .research-page .research-process-grid {
@@ -369,7 +369,7 @@ html {
    Pytania badawcze — trzy duże wiersze, bez kart.
    ------------------------------------------------------------ */
 .research-page .research-questions {
-  padding-block: 44px 54px;
+  padding-block: 40px 54px;
 }
 .research-page .research-questions-grid {
   display: grid;
@@ -440,83 +440,147 @@ html {
 }
 
 /* ------------------------------------------------------------
-   Wybrane publikacje — elegancki indeks / akordeon, bez kart.
+   Wybrane publikacje — pełnowymiarowa sekcja redakcyjna (nie boczna
+   etykieta + technicystyczny akordeon jak poprzednio).
    ------------------------------------------------------------ */
 .research-page .research-publications {
-  padding-block: 48px 60px;
+  position: relative;
+  overflow: hidden;
+  padding-block: 80px 72px;
+  background: #fbf8f2;
 }
-.research-page .research-publications-grid {
-  display: grid;
-  grid-template-columns: 230px 1fr;
-  gap: 56px;
+.research-page .research-publications::before {
+  content: "";
+  position: absolute;
+  top: -10%;
+  right: -8%;
+  width: 46%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(199, 163, 70, 0.1), transparent 70%);
+  pointer-events: none;
 }
-@media (max-width: 767px) {
-  .research-page .research-publications-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
+
+.research-page .research-pubs-header {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 48px;
 }
-.research-page .research-publications-label {
+.research-page .research-pubs-header-text {
+  max-width: 640px;
+}
+.research-page .research-pubs-eyebrow {
   margin: 0;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.2em;
   color: var(--research-gold);
   text-transform: uppercase;
-  line-height: 1.7;
 }
-.research-page .research-publications-cta {
+.research-page .research-pubs-heading {
+  margin: 14px 0 0;
+  font-size: clamp(42px, 4vw, 64px);
+  line-height: 0.98;
+  font-weight: 500;
+  color: var(--research-text);
+}
+.research-page .research-pubs-intro {
+  margin: 14px 0 0;
+  max-width: 560px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--research-muted);
+}
+.research-page .research-pubs-cta {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 18px;
-  font-size: 13px;
+  padding-bottom: 6px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--research-purple);
-  transition: transform 200ms var(--research-ease);
 }
-.research-page .research-publications-cta:hover .research-pub-arrow {
+.research-page .research-pubs-cta:hover .research-pub-arrow {
   transform: translateX(4px);
+}
+.research-page .research-pubs-empty {
+  padding-block: 64px;
+  text-align: center;
+  color: var(--research-muted);
 }
 
 .research-page .research-pub-row {
-  border-bottom: 1px solid var(--research-border);
+  position: relative;
+  border-bottom: 1px solid rgba(82, 30, 112, 0.16);
+  transition: background-color 250ms ease;
 }
 .research-page .research-pub-row:first-child {
-  border-top: 1px solid var(--research-border);
+  border-top: 1px solid rgba(82, 30, 112, 0.16);
 }
+.research-page .research-pub-row[data-open="true"] {
+  background: linear-gradient(90deg, rgba(237, 227, 243, 0.55), rgba(251, 248, 242, 0.2) 60%);
+}
+.research-page .research-pub-row[data-open="true"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--research-gold);
+}
+
 .research-page .research-pub-trigger {
+  width: 100%;
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr) max-content 44px;
-  align-items: start;
-  gap: 18px;
-  padding-block: 22px;
+  grid-template-columns: 64px minmax(0, 1fr) max-content 48px;
+  column-gap: 28px;
+  align-items: center;
+  min-height: 116px;
+  padding-block: 26px;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 250ms ease;
+}
+.research-page .research-pub-trigger:hover {
+  background: rgba(185, 154, 203, 0.08);
+}
+.research-page .research-pub-trigger:focus-visible {
+  outline: 3px solid var(--research-gold);
+  outline-offset: -3px;
 }
 @media (max-width: 639px) {
   .research-page .research-pub-trigger {
     grid-template-columns: 32px minmax(0, 1fr) 44px;
-    gap: 10px;
-  }
-  .research-page .research-pub-year {
-    display: none;
+    column-gap: 12px;
+    min-height: 0;
+    padding-block: 22px;
   }
 }
+
 .research-page .research-pub-number {
-  padding-top: 3px;
   font-family: var(--font-research-cormorant), Georgia, serif;
-  font-size: 20px;
+  font-size: 18px;
   color: var(--research-gold);
 }
 .research-page .research-pub-main {
   display: block;
   min-width: 0;
-  color: inherit;
+}
+.research-page .research-pub-year-mobile {
+  display: none;
 }
 .research-page .research-pub-category {
   display: block;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--research-muted);
 }
@@ -524,41 +588,56 @@ html {
   display: block;
   margin: 4px 0 0;
   font-family: var(--font-research-cormorant), Georgia, serif;
-  font-size: 20px;
+  font-size: clamp(23px, 2vw, 30px);
   font-weight: 500;
-  line-height: 1.25;
+  line-height: 1.16;
   color: var(--research-text);
-  transition: color 200ms var(--research-ease);
+  transition: transform 250ms ease, color 250ms ease;
 }
-.research-page .research-pub-main:hover .research-pub-title,
-.research-page .research-pub-main:focus-visible .research-pub-title {
+.research-page .research-pub-trigger:hover .research-pub-title {
+  transform: translateX(4px);
   color: var(--research-purple);
 }
 .research-page .research-pub-year {
-  padding-top: 4px;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--research-muted);
   white-space: nowrap;
+}
+@media (max-width: 639px) {
+  .research-page .research-pub-year {
+    display: none;
+  }
+  .research-page .research-pub-year-mobile {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 12px;
+    color: var(--research-muted);
+  }
 }
 .research-page .research-pub-toggle {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
-  border: 1px solid var(--research-border);
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(82, 30, 112, 0.18);
   color: var(--research-purple);
-  background: transparent;
   transition:
-    border-color 200ms var(--research-ease),
-    background-color 200ms var(--research-ease);
+    border-color 250ms ease,
+    background-color 250ms ease;
 }
-.research-page .research-pub-toggle:hover,
-.research-page .research-pub-toggle:focus-visible {
-  border-color: var(--research-gold);
-  background: rgba(199, 163, 70, 0.08);
+.research-page .research-pub-trigger:hover .research-pub-toggle {
+  background: rgba(185, 154, 203, 0.16);
+  border-color: rgba(84, 32, 120, 0.32);
 }
+@media (max-width: 639px) {
+  .research-page .research-pub-toggle {
+    width: 38px;
+    height: 38px;
+  }
+}
+
 .research-page .research-pub-panel {
   display: grid;
   grid-template-rows: 0fr;
@@ -570,84 +649,158 @@ html {
 .research-page .research-pub-panel-inner {
   overflow: hidden;
 }
+.research-page .research-pub-expanded {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 48px;
+  padding: 0 28px 32px 92px;
+}
+@media (max-width: 1023px) {
+  .research-page .research-pub-expanded {
+    grid-template-columns: minmax(0, 1fr) 160px;
+    gap: 28px;
+  }
+}
+@media (max-width: 767px) {
+  .research-page .research-pub-expanded {
+    grid-template-columns: 1fr;
+    padding: 0 20px 28px 60px;
+  }
+}
+.research-page .research-pub-expanded-text {
+  min-width: 0;
+}
 .research-page .research-pub-abstract {
-  position: relative;
-  max-width: 900px;
-  padding: 0 40px 26px 70px;
-  font-size: 15px;
+  max-width: 800px;
+  margin: 0;
+  font-family: var(--font-research-manrope), ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
   line-height: 1.65;
-  color: var(--research-muted);
-  /* Wizualne ograniczenie do ok. 4 linii (mieści się w podanym zakresie
-     3-5) — bez zmiany danych/źródła, czysta obcinka CSS z wielokropkiem,
-     zgodnie z konwencją line-clamp już używaną gdzie indziej w projekcie
-     (np. tytuły publikacji na stronie głównej). */
+  color: var(--research-text);
+  /* Kontrolowane, wizualne ograniczenie do ok. 5 linii (bez zmiany danych) —
+     zapobiega przypadkowemu urwaniu w połowie zdania: obcina zawsze na
+     granicy linii i dodaje wielokropek. */
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-@media (max-width: 639px) {
-  .research-page .research-pub-abstract {
-    padding-left: 42px;
+.research-page .research-pub-readmore {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--research-purple);
+}
+.research-page .research-pub-readmore:hover {
+  color: var(--research-gold);
+}
+.research-page .research-pub-ornament {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  opacity: 0.35;
+  align-self: center;
+  justify-self: end;
+}
+@media (max-width: 1023px) {
+  .research-page .research-pub-ornament {
+    max-width: 160px;
   }
 }
-.research-page .research-pub-motif {
-  position: absolute;
-  right: 0;
-  top: 4px;
-  pointer-events: none;
+@media (max-width: 767px) {
+  .research-page .research-pub-ornament {
+    display: none;
+  }
 }
 
 /* ------------------------------------------------------------
-   Końcowe CTA — dwie połówki: ciemna (z fragmentem sieci neuronalnej
-   w tle) i jasna.
+   Końcowe CTA — jedna spójna kompozycja (nie podział 50/50): pełnoszerokościowe
+   ciemne tło z bardzo subtelną siecią neuronalną, nagłówek po lewej, lekko
+   uniesiona jasna "karta kontaktowa" po prawej.
    ------------------------------------------------------------ */
+/* Warstwa sieci jako position:absolute+inset:0 — NIE grid-area:1/1 "stack".
+   Wypróbowany wcześniej wariant grid-stack tutaj nie działał: przy
+   .research-closing-cta bez jawnego 'height' (tylko padding-block), auto-
+   sizowany wiersz grida mierzy PREFEROWANY rozmiar SVG na podstawie jego
+   proporcji intrinsycznej (viewBox 1440x730 → ~1.97:1) i wymuszał ~730px
+   wysokości niezależnie od realnej treści — potwierdzone realnym pomiarem
+   (grid-template-rows: 730px). position:absolute+inset:0 tego nie robi:
+   .research-closing-inner (normalny przepływ) ustala realną wysokość
+   sekcji, a warstwa sieci jest z tego pomiaru całkowicie wyłączona. */
 .research-page .research-closing-cta {
-  display: grid;
-  grid-template-columns: 1fr;
-  min-height: 270px;
-}
-@media (min-width: 768px) {
-  .research-page .research-closing-cta {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-.research-page .research-closing-dark {
   position: relative;
   overflow: hidden;
   background: var(--research-plum);
-  color: var(--research-cream);
-  padding: 54px 72px;
-  display: flex;
-  align-items: center;
+  padding-block: 92px;
 }
 .research-page .research-closing-network {
   position: absolute;
   inset: 0;
-  opacity: 0.45;
+  opacity: 0.18;
   pointer-events: none;
 }
-.research-page .research-closing-heading {
+.research-page .research-closing-network .research-neural-network {
+  position: absolute;
+  inset: 0;
+}
+.research-page .research-closing-inner {
   position: relative;
   z-index: 1;
-  font-size: clamp(26px, 3vw, 38px);
-  line-height: 1.14;
-  font-weight: 500;
-  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  align-items: center;
 }
-.research-page .research-closing-light {
-  background: var(--research-surface);
-  padding: 54px 72px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+@media (min-width: 768px) {
+  .research-page .research-closing-inner {
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 80px;
+  }
+}
+.research-page .research-closing-eyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--research-gold);
+}
+.research-page .research-closing-heading {
+  margin: 16px 0 0;
+  max-width: 560px;
+  font-size: clamp(42px, 4vw, 62px);
+  line-height: 1.03;
+  font-weight: 500;
+  color: var(--research-cream);
+}
+.research-page .research-closing-card {
+  border-radius: 3px !important;
+  background: var(--research-cream);
+  border: 1px solid rgba(199, 163, 70, 0.35);
+  padding: 46px;
+}
+@media (min-width: 1024px) {
+  .research-page .research-closing-card {
+    transform: translateY(-16px);
+  }
+}
+.research-page .research-closing-card-label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--research-purple);
 }
 .research-page .research-closing-text {
+  margin: 14px 0 0;
   font-size: 16px;
-  line-height: 1.7;
+  line-height: 1.65;
   color: var(--research-muted);
   max-width: 460px;
-  margin: 0;
 }
 .research-page .research-closing-actions {
   display: flex;
@@ -656,9 +809,12 @@ html {
   margin-top: 26px;
 }
 @media (max-width: 767px) {
-  .research-page .research-closing-dark,
-  .research-page .research-closing-light {
-    padding: 40px 28px;
+  .research-page .research-closing-cta {
+    padding-block: 64px;
+  }
+  .research-page .research-closing-card {
+    padding: 32px;
+    transform: none;
   }
 }
 
@@ -805,6 +961,8 @@ html {
 }
 .research-page .research-neural-network {
   position: static;
+  min-width: 0;
+  min-height: 0;
   width: 100%;
   height: 100%;
   align-self: stretch;
@@ -1028,7 +1186,7 @@ html {
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 18px 45px rgba(8, 2, 14, 0.18);
   color: var(--research-cream);
-  padding: 34px 42px;
+  padding: 28px 34px;
   outline: none;
   transition: background 250ms var(--research-ease);
 }
@@ -1048,7 +1206,7 @@ html {
   flex-shrink: 0;
 }
 .research-page .research-hex--02 .research-hex-surface {
-  padding: 42px 52px;
+  padding: 32px 40px;
 }
 .research-page .research-hex:hover .research-hex-surface,
 .research-page .research-hex:focus-within .research-hex-surface {
@@ -1085,13 +1243,9 @@ html {
 .research-page .research-hex-desc {
   flex-shrink: 0;
   font-size: 12px;
-  line-height: 1.5;
-  color: rgba(247, 242, 234, 0.72);
-  margin-top: 13px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  line-height: 1.45;
+  color: rgba(247, 242, 234, 0.75);
+  margin-top: 11px;
 }
 .research-page .research-hex-link {
   display: inline-flex;
@@ -1100,7 +1254,7 @@ html {
   font-size: 11px;
   font-weight: 600;
   color: var(--research-gold);
-  margin-top: 15px;
+  margin-top: 9px;
 }
 .research-page .research-hex-arrow {
   display: inline-block;

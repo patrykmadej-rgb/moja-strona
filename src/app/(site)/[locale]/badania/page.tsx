@@ -113,18 +113,20 @@ export default async function BadaniaPage() {
       />
 
       <ResearchPublications
-        labelLine1={t("publicationsLabelLine1")}
-        labelLine2={t("publicationsLabelLine2")}
+        eyebrow={t("publicationsEyebrow")}
+        heading={t("publicationsHeading")}
+        intro={t("publicationsIntro")}
         ctaLabel={t("publicationsCta")}
+        readMoreLabel={t("publicationsReadMore")}
         emptyLabel={t("noPublications")}
         publications={featuredPublications}
         yearLabels={yearLabels}
       />
 
       <ResearchClosingCta
-        headingLine1={t("closingHeadingLine1")}
-        headingLine2={t("closingHeadingLine2")}
-        headingLine3={t("closingHeadingLine3")}
+        eyebrow={t("closingEyebrow")}
+        heading={t("closingHeading")}
+        cardLabel={t("closingCardLabel")}
         bodyText={t("closingBody")}
         ctaPublicationsLabel={t("closingCtaPublications")}
         ctaContactLabel={t("closingCtaContact")}
