@@ -988,10 +988,12 @@ html {
     radial-gradient(circle at 65% 45%, rgba(111, 62, 139, 0.055), transparent 42%),
     var(--research-cream);
   isolation: isolate;
-  /* 700px mieści się w zaleconym zakresie 680-760px — koła są teraz znacznie
-     mniejsze (235-285px, max 300px) niż w poprzedniej iteracji. */
-  height: 700px;
-  min-height: 700px;
+  /* 670px — po podniesieniu kół 01/03 (patrz .research-hex--01/--03) dno
+     najniższego koła (01) kończy się w 618px; 670px zostawia ~52px odstępu
+     do końca sekcji (docelowy zakres 48-64px), bez dużego pustego pasa nad
+     kolejną sekcją. */
+  height: 670px;
+  min-height: 670px;
 }
 .research-page .research-directions-section > * {
   grid-area: 1 / 1;
@@ -1005,22 +1007,65 @@ html {
   align-self: stretch;
   justify-self: stretch;
 }
-/* Sieć najbardziej widoczna w środku kompozycji, subtelnie zanikająca przy
-   krawędziach sekcji. */
+/* Sieć wyciszona bezpośrednio pod nagłówkiem/opisem po lewej (linie i punkty
+   osłabiały czytelność tekstu), narasta między blokiem tekstu a kołem 02 i
+   jest najbogatsza w środkowej/prawej części, gdzie łączy koła 02/03/04. */
 .research-page .research-directions-section .research-neural-network {
-  -webkit-mask-image: radial-gradient(circle at 55% 46%, black 0%, black 52%, transparent 90%);
-  mask-image: radial-gradient(circle at 55% 46%, black 0%, black 52%, transparent 90%);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.04) 0%,
+    rgba(0, 0, 0, 0.1) 22%,
+    rgba(0, 0, 0, 0.55) 38%,
+    rgba(0, 0, 0, 1) 58%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.04) 0%,
+    rgba(0, 0, 0, 0.1) 22%,
+    rgba(0, 0, 0, 0.55) 38%,
+    rgba(0, 0, 0, 1) 58%,
+    rgba(0, 0, 0, 1) 100%
+  );
 }
 
 @media (max-width: 1279px) and (min-width: 900px) {
+  /* Dno najniższego koła (01) kończy się w 316+235=551px; 610px zostawia
+     ~59px odstępu do końca sekcji. min-height musi być nadpisany razem z
+     height — inaczej bazowe min-height:670px z reguły desktopowej wygrywa
+     (używana wysokość to max(height, min-height) w CSS). */
   .research-page .research-directions-section {
-    height: 640px;
+    height: 610px;
+    min-height: 610px;
   }
 }
 @media (max-width: 899px) {
   .research-page .research-directions-section {
     height: auto;
-    padding-block: 48px 40px;
+    min-height: 0;
+    padding-block: 64px;
+  }
+  /* Na tablecie/mobile siatka 2x2 zastępuje mapę — maska pionowa zamiast
+     poziomej, żeby siec nie przechodziła przez nagłówek (który jest teraz w
+     normalnym przepływie, nad siatką), a była widoczna głównie za/między
+     kołami. */
+  .research-page .research-directions-section .research-neural-network {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.06) 0%,
+      rgba(0, 0, 0, 0.12) 14%,
+      rgba(0, 0, 0, 0.6) 26%,
+      rgba(0, 0, 0, 1) 40%,
+      rgba(0, 0, 0, 1) 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.06) 0%,
+      rgba(0, 0, 0, 0.12) 14%,
+      rgba(0, 0, 0, 0.6) 26%,
+      rgba(0, 0, 0, 1) 40%,
+      rgba(0, 0, 0, 1) 100%
+    );
   }
 }
 
@@ -1042,8 +1087,25 @@ html {
   position: absolute;
   left: 0;
   top: 48px;
-  width: 300px;
+  /* 300px -> 370px: przy najszerszych desktopach tytuł osiąga clamp()owe
+     maksimum 46px, a najdłuższa linia ("Różne perspektywy.") potrzebuje
+     wtedy ~359px, żeby zmieścić się w jednej linii — przy 300px zawijała
+     się na dodatkowe wiersze, co realnie zwiększało wysokość nagłówka i
+     powodowało kolizję z kołem 01 (zmierzone: ujemny odstęp przy 1920px).
+     370px daje bezpieczny margines i nie zderza się z kołem 02
+     (left:37% ≈ 475-540px w zależności od szerokości kontenera). */
+  width: 370px;
   z-index: 4;
+  /* Bardzo subtelny lokalny gradient WYŁĄCZNIE pod blokiem tekstowym (nie na
+     całej sekcji) — dodatkowa, druga warstwa czytelności ponad maską na
+     samej sieci (patrz .research-directions-section .research-neural-network
+     powyżej). */
+  background: radial-gradient(
+    ellipse at left center,
+    rgba(247, 243, 236, 0.96) 0%,
+    rgba(247, 243, 236, 0.82) 48%,
+    transparent 78%
+  );
 }
 .research-page .research-directions-eyebrow {
   font-size: 11px;
@@ -1100,7 +1162,13 @@ html {
    środkowa wysokość. */
 .research-page .research-hex--01 {
   left: 1%;
-  top: 380px;
+  /* 380px -> 368px. Tytuł nagłówka rośnie do 46px przy najszerszych
+     desktopach (clamp(36px,2.8vw,46px)), więc koło 01 może bezpiecznie
+     wjechać w górę tylko o ~12px — dalej naruszałoby wymóg min. 48px
+     odstępu od tekstu wprowadzającego (zweryfikowane pomiarem). Główny
+     ciężar redukcji pustej przestrzeni przenosi się na koło 03, które nie
+     sąsiaduje z nagłówkiem. */
+  top: 368px;
   width: 250px;
   height: 250px;
 }
@@ -1112,7 +1180,8 @@ html {
 }
 .research-page .research-hex--03 {
   left: 33%;
-  top: 400px;
+  /* 400px -> 355px (-45px, górna granica żądanego zakresu 35-50px). */
+  top: 355px;
   width: 235px;
   height: 235px;
 }
@@ -1124,9 +1193,13 @@ html {
 }
 
 @media (max-width: 1279px) and (min-width: 900px) {
+  /* Nagłówek renderuje się mniejszy w tym zakresie szerokości (tytuł
+     dochodzi tylko do ~36-40px), więc jest tu więcej marginesu i pełny
+     żądany zakres przesunięcia (30-45px / 35-50px) mieści się bez
+     naruszania odstępu min. 48px od tekstu. */
   .research-page .research-hex--01 {
     left: 1%;
-    top: 350px;
+    top: 316px;
     width: 235px;
     height: 235px;
   }
@@ -1138,7 +1211,7 @@ html {
   }
   .research-page .research-hex--03 {
     left: 34%;
-    top: 370px;
+    top: 325px;
     width: 220px;
     height: 220px;
   }
@@ -1276,16 +1349,34 @@ html {
 .research-page .research-hex-index {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   flex-shrink: 0;
   margin-bottom: 6px;
 }
+/* Manrope, nie Cormorant Garamond — szeryfowe "0" w tym kroju przy 15px
+   renderowało się nieodróżnialnie od wielkiej litery "O" (01 czytało się
+   jako "O1"). tabular-nums + "tnum"/"zero" wymuszają jednoznaczny, przekreślony
+   glif zera zamiast litery. */
 .research-page .research-hex-number {
   flex-shrink: 0;
-  font-family: var(--font-research-cormorant), Georgia, serif;
-  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-research-manrope), Manrope, ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings:
+    "tnum" 1,
+    "zero" 1;
+  letter-spacing: 0.12em;
   line-height: 1;
   color: #b58d2f;
+}
+.research-page .research-hex-index-line {
+  flex-shrink: 0;
+  width: 16px;
+  height: 1px;
+  background: rgba(181, 141, 47, 0.4);
 }
 .research-page .research-hex-icon {
   flex-shrink: 0;

@@ -50,6 +50,7 @@ export default function ResearchHexNode({
           <span className="research-hex-number" aria-hidden="true">
             {number}
           </span>
+          <span className="research-hex-index-line" aria-hidden="true" />
           <Icon className="research-hex-icon" aria-hidden="true" />
         </div>
         <h3 className="research-hex-title research-font-display">
