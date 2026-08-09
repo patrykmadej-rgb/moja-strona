@@ -17,15 +17,15 @@ type Props = {
 };
 
 /**
- * Węzeł sieci jako koło — soczewka badawcza, nie heksagon. Warstwy (od dołu):
- * `.research-hex-surface` (okrągła powierzchnia szkła, zwykły `border` +
- * `::after` jako drugi, wewnętrzny pierścień — koło nie ma problemu z
- * `clip-path` obcinającym `box-shadow`, więc nie potrzeba już osobnego
- * wrappera-"sandwicha" jak przy heksagonie), cztery krótkie kreski pomiarowe
- * na obwodzie, cienki niepełny łuk (SVG), i właściwa treść w wąskiej,
- * wyśrodkowanej kolumnie (`.research-hex-content`) — żeby tekst nie dotykał
- * krzywizny koła. `.research-hex-connector` to pojedynczy, drobny punkt na
- * styku z siecią neuronalną.
+ * Węzeł sieci jako koło — lekka biało-kremowa szklana soczewka, nie heksagon.
+ * Warstwy (od dołu): `.research-hex-surface` (okrągła powierzchnia szkła,
+ * zwykły `border` + `::after` jako drugi, wewnętrzny pierścień), dwie krótkie
+ * kreski pomiarowe na obwodzie (12 i 6 — celowo tylko dwie, żeby koło nie
+ * przypominało zegara ani diagramu astrologicznego), i zwięzła treść
+ * wyśrodkowana w obu osiach (`.research-hex-content`). Całe koło jest jednym
+ * linkiem (gdy `href` istnieje) prowadzącym do istniejącej podstrony
+ * kierunku — `.research-hex-connector` to pojedynczy, drobny punkt na styku
+ * z siecią neuronalną.
  */
 export default function ResearchHexNode({
   hexClass,
@@ -39,21 +39,17 @@ export default function ResearchHexNode({
   onActivate,
   onDeactivate,
 }: Props) {
+  const ariaLabel = `${titleLine1} ${titleLine2}`.trim();
+
   const surfaceInner = (
     <>
       <span className="research-hex-tick research-hex-tick--12" aria-hidden="true" />
-      <span className="research-hex-tick research-hex-tick--3" aria-hidden="true" />
       <span className="research-hex-tick research-hex-tick--6" aria-hidden="true" />
-      <span className="research-hex-tick research-hex-tick--9" aria-hidden="true" />
-      <svg className="research-hex-arc" aria-hidden="true" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="48" pathLength={100} />
-      </svg>
       <div className="research-hex-content">
         <div className="research-hex-index">
           <span className="research-hex-number" aria-hidden="true">
             {number}
           </span>
-          <span className="research-hex-index-line" aria-hidden="true" />
           <Icon className="research-hex-icon" aria-hidden="true" />
         </div>
         <h3 className="research-hex-title research-font-display">
@@ -76,11 +72,24 @@ export default function ResearchHexNode({
     <div className={`research-hex ${hexClass}`} onMouseEnter={onActivate} onMouseLeave={onDeactivate}>
       <span className="research-hex-connector" aria-hidden="true" />
       {href ? (
-        <Link href={href} className="research-hex-surface" onFocus={onActivate} onBlur={onDeactivate}>
+        <Link
+          href={href}
+          className="research-hex-surface"
+          aria-label={ariaLabel}
+          onFocus={onActivate}
+          onBlur={onDeactivate}
+        >
           {surfaceInner}
         </Link>
       ) : (
-        <div className="research-hex-surface" tabIndex={0} onFocus={onActivate} onBlur={onDeactivate}>
+        <div
+          className="research-hex-surface"
+          tabIndex={0}
+          role="group"
+          aria-label={ariaLabel}
+          onFocus={onActivate}
+          onBlur={onDeactivate}
+        >
           {surfaceInner}
         </div>
       )}

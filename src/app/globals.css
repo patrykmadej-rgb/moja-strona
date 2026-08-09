@@ -930,8 +930,39 @@ html {
   animation-play-state: paused;
 }
 
+/* Sieć w #research-directions siedzi na jasnym, kremowym tle (patrz niżej) —
+   nadpisuje bazowe kolory zaprojektowane pod ciemne tło powyżej. Reguły
+   scope'owane wyłącznie do .research-directions-section (wyższa
+   specyficzność: 3 klasy vs. 2), więc sieć reużywana w ciemnym
+   .research-closing-cta (patrz .research-closing-network) zachowuje
+   oryginalne, jasne na ciemnym kolory. */
+.research-page .research-directions-section .research-neural-path {
+  stroke: rgba(82, 35, 111, 0.28);
+}
+.research-page .research-directions-section .research-neural-path--secondary {
+  stroke: rgba(119, 82, 140, 0.14);
+}
+.research-page .research-directions-section .research-neural-node {
+  fill: rgba(82, 35, 111, 0.35);
+  opacity: 1;
+}
+.research-page .research-directions-section .research-neural-node--large {
+  fill: #572573;
+  opacity: 1;
+}
+.research-page .research-directions-section .research-neural-node[data-active="true"] {
+  fill: #c9a33f;
+  opacity: 1;
+}
+.research-page .research-directions-section .research-neural-ring {
+  stroke: rgba(201, 163, 63, 0.45);
+}
+.research-page .research-directions-section .research-neural-ring[data-active="true"] {
+  stroke: rgba(201, 163, 63, 0.75);
+}
+
 /* ------------------------------------------------------------
-   Pełnoszerokościowa ciemna sekcja #research-directions.
+   Jasna, kremowa sekcja #research-directions.
    SVG sieci i kontener treści są ułożone jako CSS Grid "stack" (oba na
    grid-area: 1/1) zamiast position:absolute + height:100% — przy
    height:auto na mobile (wymóg specyfikacji: "sekcja sieci automatycznej
@@ -949,17 +980,18 @@ html {
   grid-template-columns: 1fr;
   width: 100%;
   overflow: hidden;
-  background-color: #1d0d28;
-  background-image: radial-gradient(rgba(185, 154, 203, 0.05) 1px, transparent 1px);
-  background-size: 34px 34px;
+  /* Ten sam kremowy token co reszta strony (--research-cream), nie nowy,
+     niemal identyczny kolor — ciemna śliwkowa sekcja zastąpiona jasnym tłem,
+     żeby przejście z hero było płynne, plus bardzo słaba fioletowa
+     poświata w miejscu największego zagęszczenia sieci. */
+  background:
+    radial-gradient(circle at 65% 45%, rgba(111, 62, 139, 0.055), transparent 42%),
+    var(--research-cream);
   isolation: isolate;
-  /* 820px (nie dawne 700px) — koła (330-440px) są zauważalnie większe niż
-     poprzednie heksagony (248-350px) i przy tej samej wysokości sekcji koło
-     01 i 03 były realnie przycinane przez dolną krawędź sekcji (zmierzone:
-     dno koła 1090px vs. dno sekcji 1000px). Priorytet: brak przycinania
-     ponad zachowanie dawnej wysokości. */
-  height: 820px;
-  min-height: 820px;
+  /* 700px mieści się w zaleconym zakresie 680-760px — koła są teraz znacznie
+     mniejsze (235-285px, max 300px) niż w poprzedniej iteracji. */
+  height: 700px;
+  min-height: 700px;
 }
 .research-page .research-directions-section > * {
   grid-area: 1 / 1;
@@ -973,10 +1005,16 @@ html {
   align-self: stretch;
   justify-self: stretch;
 }
+/* Sieć najbardziej widoczna w środku kompozycji, subtelnie zanikająca przy
+   krawędziach sekcji. */
+.research-page .research-directions-section .research-neural-network {
+  -webkit-mask-image: radial-gradient(circle at 55% 46%, black 0%, black 52%, transparent 90%);
+  mask-image: radial-gradient(circle at 55% 46%, black 0%, black 52%, transparent 90%);
+}
 
 @media (max-width: 1279px) and (min-width: 900px) {
   .research-page .research-directions-section {
-    height: 740px;
+    height: 640px;
   }
 }
 @media (max-width: 899px) {
@@ -1011,7 +1049,7 @@ html {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.2em;
-  color: var(--research-gold);
+  color: #a77f25;
   text-transform: uppercase;
 }
 .research-page .research-directions-title {
@@ -1019,7 +1057,7 @@ html {
   font-size: clamp(36px, 2.8vw, 46px);
   line-height: 0.98;
   font-weight: 500;
-  color: var(--research-cream);
+  color: #281332;
   margin: 16px 0 0;
 }
 /* Krótkie, podrzędne wprowadzenie do "mapy" — nie ma konkurować z kartami. */
@@ -1029,7 +1067,7 @@ html {
   font-family: var(--font-research-manrope), ui-sans-serif, system-ui, sans-serif;
   font-size: 14px;
   line-height: 1.6;
-  color: rgba(247, 242, 234, 0.62);
+  color: rgba(60, 38, 70, 0.68);
 }
 @media (max-width: 899px) {
   .research-page .research-directions-heading {
@@ -1053,77 +1091,67 @@ html {
 }
 .research-page .research-hex:hover,
 .research-page .research-hex:focus-within {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
 }
 
-/* Koła (nie heksagony) — soczewki badawcze zawieszone nad siecią. 01: lewy
-   dół · 02: największe, dominujące, górny środek · 03: dolny środek · 04:
-   prawa strona. Wysokość sekcji (patrz .research-directions-section)
-   zwiększona z 700px do 860px na desktopie — przy rozmiarach kół z tego
-   zadania (330-440px, zauważalnie większych niż poprzednie heksagony
-   248-350px) 700px nie mieściło organicznego układu bez nachodzenia kół na
-   siebie (zweryfikowane realnym pomiarem kolizji), a zadanie explicite
-   priorytetyzuje brak kolizji nad zachowaniem dotychczasowej wysokości. */
+/* Koła jako lekkie punkty wejścia, nie planety — znacznie mniejsze niż w
+   poprzedniej iteracji (żaden nie przekracza 300px). 01: lewy dół, poniżej
+   nagłówka · 02: największe, górny środek · 03: dolny środek · 04: prawa,
+   środkowa wysokość. */
 .research-page .research-hex--01 {
-  left: 0.5%;
-  top: 400px;
-  width: 340px;
-  height: 340px;
+  left: 1%;
+  top: 380px;
+  width: 250px;
+  height: 250px;
 }
 .research-page .research-hex--02 {
-  left: 35%;
+  left: 37%;
   top: 20px;
-  width: 410px;
-  height: 410px;
+  width: 285px;
+  height: 285px;
 }
 .research-page .research-hex--03 {
-  left: 30%;
-  top: 470px;
-  width: 320px;
-  height: 320px;
+  left: 33%;
+  top: 400px;
+  width: 235px;
+  height: 235px;
 }
 .research-page .research-hex--04 {
-  right: 4%;
-  top: 280px;
-  width: 310px;
-  height: 310px;
+  right: 5%;
+  top: 220px;
+  width: 245px;
+  height: 245px;
 }
 
 @media (max-width: 1279px) and (min-width: 900px) {
-  /* Przeliczone od zera (nie proste skalowanie procentów z desktopu) — przy
-     kołach tego rozmiaru (260-330px) dawne procentowe pozycje z węższych
-     heksagonów dawały realne kolizje (zmierzone: 01/03 nachodziły się na
-     ~230px wysokości, 02/04 na ~136px) — sprawdzone ponownie na 1024px i
-     1100px, brak nakładania się prostokątów otaczających. */
   .research-page .research-hex--01 {
     left: 1%;
-    top: 340px;
-    width: 280px;
-    height: 280px;
+    top: 350px;
+    width: 235px;
+    height: 235px;
   }
   .research-page .research-hex--02 {
-    left: 37%;
-    top: 16px;
-    width: 330px;
-    height: 330px;
+    left: 38%;
+    top: 18px;
+    width: 265px;
+    height: 265px;
   }
   .research-page .research-hex--03 {
-    left: 33%;
-    top: 430px;
-    width: 260px;
-    height: 260px;
+    left: 34%;
+    top: 370px;
+    width: 220px;
+    height: 220px;
   }
   .research-page .research-hex--04 {
-    right: 2%;
-    top: 360px;
-    width: 250px;
-    height: 250px;
+    right: 3%;
+    top: 210px;
+    width: 230px;
+    height: 230px;
   }
 }
 
-/* Poniżej 900px: kontrolowana siatka 2×2 (nie absolutna "mapa"), zgodnie ze
-   specyfikacją — dwa rzędy po dwa koła, wyśrodkowane, różne rozmiary
-   zachowane. Poniżej 640px: jedna kolumna. */
+/* Poniżej 900px: kontrolowana siatka 2×2 (nie absolutna "mapa"), sieć
+   pozostaje subtelnym tłem. Poniżej 640px: jedna kolumna. */
 @media (max-width: 899px) {
   .research-page .research-hex-field {
     position: static;
@@ -1132,17 +1160,17 @@ html {
     grid-template-columns: 1fr 1fr;
     justify-items: center;
     align-items: start;
-    column-gap: 20px;
-    row-gap: 40px;
+    column-gap: 18px;
+    row-gap: 36px;
   }
   .research-page .research-hex {
     position: static;
-    width: min(42vw, 300px) !important;
+    width: min(40vw, 230px) !important;
     height: auto !important;
     aspect-ratio: 1 / 1;
   }
   .research-page .research-hex--02 {
-    width: min(48vw, 320px) !important;
+    width: min(46vw, 250px) !important;
   }
 }
 
@@ -1153,13 +1181,13 @@ html {
   }
   .research-page .research-hex,
   .research-page .research-hex--02 {
-    width: min(100%, 320px) !important;
+    width: min(100%, 250px) !important;
   }
 }
 
-/* Druga, wewnętrzna obwódka jako ::after (koło nie ma problemu z clip-path
-   obcinającym box-shadow jak heksagon, więc nie trzeba już osobnego
-   wrappera-"sandwicha" na krawędź). */
+/* Lekkie, transparentne biało-kremowe szkło — druga, wewnętrzna obwódka jako
+   ::after. Zero fioletowego/szarego wypełnienia: koło ma częściowo
+   przepuszczać fioletową sieć widoczną pod spodem. */
 .research-page .research-hex-surface {
   position: relative;
   display: flex;
@@ -1168,163 +1196,128 @@ html {
   width: 100%;
   height: 100%;
   border-radius: 9999px !important;
-  border: 1px solid rgba(226, 211, 231, 0.32);
-  background-color: transparent;
-  background-image:
-    radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.025) 26%, transparent 48%),
-    linear-gradient(145deg, rgba(92, 55, 111, 0.5) 0%, rgba(58, 33, 74, 0.62) 55%, rgba(31, 17, 43, 0.74) 100%);
+  border: 1px solid rgba(183, 147, 57, 0.44);
+  background-image: radial-gradient(
+    circle at 30% 22%,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.46) 32%,
+    rgba(255, 252, 245, 0.27) 68%,
+    rgba(255, 249, 237, 0.18) 100%
+  );
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -20px 50px rgba(12, 5, 18, 0.16),
-    0 18px 50px rgba(8, 3, 13, 0.18);
-  backdrop-filter: blur(12px) saturate(110%);
-  -webkit-backdrop-filter: blur(12px) saturate(110%);
-  color: var(--research-cream);
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 16px 40px rgba(74, 35, 92, 0.08);
+  backdrop-filter: blur(10px) saturate(105%);
+  -webkit-backdrop-filter: blur(10px) saturate(105%);
+  color: var(--research-text);
   outline: none;
   transition:
     border-color 280ms ease,
-    background-color 280ms ease;
+    background-image 280ms ease,
+    box-shadow 280ms ease;
 }
 .research-page .research-hex-surface::after {
   content: "";
   position: absolute;
-  inset: 9px;
+  inset: 7px;
   border-radius: 9999px !important;
-  border: 1px solid rgba(226, 211, 231, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.72);
   pointer-events: none;
 }
 .research-page .research-hex:hover .research-hex-surface,
 .research-page .research-hex:focus-within .research-hex-surface {
-  border-color: rgba(226, 211, 231, 0.48);
-  background-color: rgba(79, 45, 96, 0.68);
+  border-color: rgba(183, 147, 57, 0.65);
+  background-image: radial-gradient(
+    circle at 30% 22%,
+    rgba(255, 255, 255, 0.96),
+    rgba(255, 255, 255, 0.55) 38%,
+    rgba(250, 241, 255, 0.28) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 20px 50px rgba(78, 35, 98, 0.13);
 }
 .research-page .research-hex-surface:focus-visible {
   outline: 3px solid var(--research-gold);
   outline-offset: 3px;
 }
 
-/* Krótkie kreski pomiarowe na obwodzie (12/3/6/9) — delikatny, analityczny
-   akcent "soczewki", nie astrologiczny symbol. Celowo nie identyczne. */
+/* Tylko dwie kreski pomiarowe (12 i 6) — najwyżej tyle, żeby koło nie
+   przypominało zegara ani diagramu astrologicznego. */
 .research-page .research-hex-tick {
   position: absolute;
-  background: rgba(210, 171, 69, 0.5);
+  left: 50%;
+  width: 1px;
+  background: rgba(183, 147, 57, 0.45);
   pointer-events: none;
+  transform: translateX(-50%);
 }
 .research-page .research-hex-tick--12 {
-  top: 7px;
-  left: 50%;
-  width: 1px;
-  height: 10px;
-  transform: translateX(-50%);
+  top: 8px;
+  height: 8px;
 }
 .research-page .research-hex-tick--6 {
-  bottom: 7px;
-  left: 50%;
-  width: 1px;
-  height: 12px;
-  background: rgba(226, 211, 231, 0.4);
-  transform: translateX(-50%);
-}
-.research-page .research-hex-tick--3 {
-  right: 7px;
-  top: 50%;
-  width: 9px;
-  height: 1px;
-  transform: translateY(-50%);
-}
-.research-page .research-hex-tick--9 {
-  left: 7px;
-  top: 50%;
-  width: 8px;
-  height: 1px;
-  background: rgba(226, 211, 231, 0.4);
-  transform: translateY(-50%);
+  bottom: 8px;
+  height: 8px;
 }
 
-/* Jeden niepełny, cienki łuk (~22% obwodu) — jak oznaczenie skali na
-   soczewce, nigdy pełny pierścień i bez animacji obrotowej.
-   pathLength=100 na <circle> pozwala wyrazić dasharray/offset w
-   jednostkach "procentowych" niezależnie od promienia. */
-.research-page .research-hex-arc {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-.research-page .research-hex-arc circle {
-  fill: none;
-  stroke: rgba(226, 211, 231, 0.55);
-  stroke-width: 0.6;
-  stroke-dasharray: 22 78;
-  stroke-dashoffset: -12;
-  opacity: 0.25;
-}
-
-/* Treść w wąskiej, wyśrodkowanej kolumnie — nie na pełną szerokość koła, żeby
-   nie dotykała krzywizny. */
+/* Treść zwięzła, wyśrodkowana w obu osiach — koła nie prezentują pełnych
+   opisów, tylko punkt wejścia do podstrony kierunku. */
 .research-page .research-hex-content {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  width: 62%;
-  max-width: 260px;
-  margin-inline: auto;
+  align-items: center;
+  text-align: center;
+  width: 72%;
+  max-width: 210px;
 }
 .research-page .research-hex-index {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
-  margin-bottom: 8px;
-}
-.research-page .research-hex-index-line {
-  width: 16px;
-  height: 1px;
-  flex-shrink: 0;
-  background: rgba(210, 171, 69, 0.55);
+  margin-bottom: 6px;
 }
 .research-page .research-hex-number {
   flex-shrink: 0;
   font-family: var(--font-research-cormorant), Georgia, serif;
-  font-size: 18px;
+  font-size: 15px;
   line-height: 1;
-  color: #d2ab45;
+  color: #b58d2f;
 }
 .research-page .research-hex-icon {
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-  color: #d2ab45;
+  width: 21px;
+  height: 21px;
+  color: #b58d2f;
 }
 .research-page .research-hex-title {
   flex-shrink: 0;
   margin: 0;
-  font-size: clamp(24px, 1.8vw, 30px);
+  font-size: clamp(25px, 1.6vw, 29px);
   font-weight: 400;
-  line-height: 1.05;
-  color: var(--research-cream);
+  line-height: 1.02;
+  color: #2b1635;
 }
 .research-page .research-hex-desc {
   flex-shrink: 0;
-  margin-top: 8px;
-  font-size: 13px;
+  margin-top: 6px;
+  font-size: 12px;
   line-height: 1.45;
-  color: rgba(247, 242, 234, 0.72);
+  color: rgba(55, 34, 65, 0.68);
 }
 .research-page .research-hex-link {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  margin-top: 12px;
+  margin-top: 10px;
   font-family: var(--font-research-manrope), ui-sans-serif, system-ui, sans-serif;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: #d2ab45;
+  color: #6d318d;
 }
 .research-page .research-hex-arrow {
   display: inline-block;
@@ -1336,16 +1329,15 @@ html {
 }
 
 /* Punkt połączenia — jeden na koło, po stronie zwróconej w stronę środka
-   sieci, 5px, bez dużej poświaty. Reużywa istniejącej animacji pulsowania
-   węzłów sieci (research-node-pulse), bardzo subtelnie. */
+   sieci, fioletowy, delikatnie się rozjaśniający na hover. */
 .research-page .research-hex-connector {
   position: absolute;
   z-index: 3;
   width: 5px;
   height: 5px;
   border-radius: 9999px !important;
-  background: var(--research-gold);
-  box-shadow: 0 0 4px 1px rgba(199, 163, 70, 0.3);
+  background: #572573;
+  box-shadow: 0 0 4px 1px rgba(87, 37, 115, 0.25);
   transform-box: fill-box;
   transform-origin: center;
   animation: research-node-pulse 4s ease-in-out infinite;
@@ -1354,7 +1346,7 @@ html {
 }
 .research-page .research-hex:hover .research-hex-connector,
 .research-page .research-hex:focus-within .research-hex-connector {
-  box-shadow: 0 0 8px 2px rgba(199, 163, 70, 0.5);
+  box-shadow: 0 0 8px 2px rgba(87, 37, 115, 0.4);
 }
 /* 01: lewy dół → punkt po prawej (w stronę środka). 02: górny środek → punkt
    u dołu. 03: dolny środek → punkt u góry. 04: prawa strona → punkt po lewej.

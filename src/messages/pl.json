@@ -175,27 +175,27 @@
     "directionsHeadingLine2": "Wspólne pytanie",
     "directionsHeadingLine3": "o bezpieczeństwo.",
     "directionsSubtitle": "Cztery perspektywy połączone wspólnym pytaniem o mechanizmy zagrożeń i możliwości ich zapobiegania.",
-    "directionsLinkLabel": "Poznaj kierunek",
+    "directionsLinkLabel": "Zobacz więcej",
     "directions": {
       "separatism": {
         "titleLine1": "Separatyzmy",
         "titleLine2": "i bezpieczeństwo",
-        "description": "Przyczyny, narzędzia i wpływ ruchów separatystycznych na bezpieczeństwo państw i społeczeństw."
+        "description": "Mechanizmy separatyzmu i ich wpływ na bezpieczeństwo."
       },
       "profiling": {
         "titleLine1": "Profilowanie kryminalne",
         "titleLine2": "i wiktymologiczne",
-        "description": "Nowoczesne metody rozpoznawania sprawców, ofiar i mechanizmów wiktymizacji."
+        "description": "Nowoczesne metody rozpoznawania sprawców i ofiar."
       },
       "threats": {
         "titleLine1": "Psychologia",
         "titleLine2": "zagrożeń",
-        "description": "Powiązania profili psychologicznych, zachowań i procesów decyzyjnych z powstawaniem zagrożeń."
+        "description": "Psychologiczne źródła zachowań i procesów ryzyka."
       },
       "prevention": {
         "titleLine1": "Psychologia",
         "titleLine2": "prewencji",
-        "description": "Psychologiczne aspekty zapobiegania zagrożeniom jako integralna część bezpieczeństwa."
+        "description": "Psychologiczne mechanizmy skutecznego zapobiegania."
       }
     },
     "processHeadingLine1": "Od zrozumienia",
