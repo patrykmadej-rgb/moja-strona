@@ -1,40 +1,44 @@
 import { RESEARCH_CONTAINER_CLASS } from "./constants";
 
 type Props = {
-  headingLine1: string;
-  headingLine2: string;
-  intro: string;
+  labelLine1: string;
+  labelLine2: string;
   questions: [string, string, string];
 };
 
-/** Pełnoszerokościowa sekcja w kolorze ciemnej śliwki — jedna ciągła kompozycja
- * typograficzna, bez kart. Wyłamanie na szerokość viewportu tą samą techniką co
- * sekcje "PIĘĆ FILARÓW" / "CYTAT" na stronie głównej (src/app/(site)/[locale]/page.tsx). */
-export default function ResearchQuestions({ headingLine1, headingLine2, intro, questions }: Props) {
+/** Mały, czysto dekoracyjny fragment "neuralny" przy separatorze wiersza. */
+function QuestionMotif() {
   return (
-    <section className="relative mt-20 lg:mt-28">
-      <div className="relative left-[calc(-50vw+50%)] w-screen bg-[var(--research-plum-900)] py-16 lg:py-24">
-        <div
-          className={`${RESEARCH_CONTAINER_CLASS} grid grid-cols-1 gap-10 lg:grid-cols-[0.9fr_1.3fr] lg:gap-20`}
-        >
-          <div>
-            <h2 className="research-font-display text-3xl leading-[1.05] font-medium text-[var(--research-ivory)] uppercase lg:text-[40px]">
-              {headingLine1}
-              <br />
-              {headingLine2}
-            </h2>
-            <p className="mt-5 max-w-[380px] leading-relaxed text-[var(--research-ivory)]/70">{intro}</p>
-          </div>
+    <svg aria-hidden="true" width="30" height="10" viewBox="0 0 30 10" className="research-question-motif">
+      <path d="M0,5 Q8,1 15,5 T30,5" stroke="var(--research-gold)" strokeWidth="1" fill="none" opacity="0.55" />
+      <circle cx="30" cy="5" r="1.4" fill="var(--research-gold)" opacity="0.7" />
+    </svg>
+  );
+}
+
+export default function ResearchQuestions({ labelLine1, labelLine2, questions }: Props) {
+  return (
+    <section className="research-questions">
+      <div className={RESEARCH_CONTAINER_CLASS}>
+        <div className="research-questions-grid">
+          <h2 className="research-questions-label">
+            {labelLine1}
+            <br />
+            {labelLine2}
+          </h2>
+
           <div>
             {questions.map((q, i) => (
-              <p
-                key={q}
-                className={`research-font-display text-2xl leading-snug font-medium text-[var(--research-ivory)] sm:text-[28px] lg:text-3xl ${
-                  i > 0 ? "border-t border-[var(--research-gold)]/30 pt-8" : ""
-                } ${i < questions.length - 1 ? "pb-8" : ""}`}
-              >
-                {q}
-              </p>
+              <div key={q} className="research-question-row">
+                <span className="research-question-number" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <p className="research-question-text">{q}</p>
+                <span className="research-question-arrow" aria-hidden="true">
+                  →
+                </span>
+                <QuestionMotif />
+              </div>
             ))}
           </div>
         </div>

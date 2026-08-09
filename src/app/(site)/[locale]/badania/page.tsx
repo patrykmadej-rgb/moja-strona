@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 import { getTranslations } from "next-intl/server";
 import { siteConfig } from "@/lib/site-config";
-import { researchAxes, type ResearchAxisId } from "@/lib/research";
+import { researchDirections, type ResearchDirectionId } from "@/lib/research-directions";
 import { publications, getFeaturedPublications } from "@/lib/publications";
 import { getAllTags, tagToSlug } from "@/lib/tags";
 import ResearchHero from "@/components/research/ResearchHero";
-import ResearchAreas, { type AreaItem } from "@/components/research/ResearchAreas";
+import ResearchDirectionNetwork, { type DirectionContent } from "@/components/research/ResearchDirectionNetwork";
+import ResearchProcess from "@/components/research/ResearchProcess";
 import ResearchQuestions from "@/components/research/ResearchQuestions";
 import ResearchPublications from "@/components/research/ResearchPublications";
 import ResearchClosingCta from "@/components/research/ResearchClosingCta";
@@ -37,26 +38,31 @@ export default async function BadaniaPage() {
   const t = await getTranslations("ResearchPage");
   const tStatus = await getTranslations("PublicationStatus");
 
-  // Moduł obszaru dostaje prawdziwy link tylko wtedy, gdy istnieje faktyczna
-  // publikacja oznaczona odpowiadającym tagiem (routing /tagi/[tag] generuje
-  // statyczne strony wyłącznie dla tagów realnie występujących w publikacjach).
-  // Obecnie dotyczy to tylko "Bałkany Zachodnie" — pozostałe obszary renderują
-  // się jako wizualny (nieklikalny) odpowiednik, żeby nie tworzyć fikcyjnego routingu.
+  // Kierunek dostaje prawdziwy link tylko wtedy, gdy istnieje faktyczna publikacja
+  // oznaczona odpowiadającym tagiem (routing /tagi/[tag] generuje statyczne strony
+  // wyłącznie dla tagów realnie występujących w publikacjach). Obecnie dotyczy to
+  // tylko "separatism" (tag "Separatyzm"). Pozostałe trzy renderują się jako
+  // wizualny (nieklikalny) odpowiednik "Poznaj kierunek →", żeby nie tworzyć
+  // fikcyjnego routingu do nieistniejących podstron kierunków.
   const allTags = getAllTags(publications);
-  const axisTagHref = new Map<ResearchAxisId, string>();
-  for (const axis of researchAxes) {
-    const matchingTag = axis.tagsPl.find((tag) => allTags.includes(tag));
-    if (matchingTag) axisTagHref.set(axis.id, `/tagi/${tagToSlug(matchingTag)}`);
+  const directionHref = new Map<ResearchDirectionId, string>();
+  for (const dir of researchDirections) {
+    const matchingTag = dir.candidateTags.find((tag) => allTags.includes(tag));
+    if (matchingTag) directionHref.set(dir.id, `/tagi/${tagToSlug(matchingTag)}`);
   }
 
-  const areaCopy = t.raw("areas") as Record<ResearchAxisId, { title: string; description: string }>;
-  const areas = researchAxes.map((axis) => ({
-    id: axis.id,
-    number: axis.number,
-    title: areaCopy[axis.id].title,
-    description: areaCopy[axis.id].description,
-    href: axisTagHref.get(axis.id),
-  })) as [AreaItem, AreaItem, AreaItem, AreaItem, AreaItem];
+  const directionCopy = t.raw("directions") as Record<
+    ResearchDirectionId,
+    { titleLine1: string; titleLine2: string; description: string }
+  >;
+  const directions: DirectionContent[] = researchDirections.map((dir) => ({
+    id: dir.id,
+    number: dir.number,
+    titleLine1: directionCopy[dir.id].titleLine1,
+    titleLine2: directionCopy[dir.id].titleLine2,
+    description: directionCopy[dir.id].description,
+    href: directionHref.get(dir.id),
+  }));
 
   const featuredPublications = getFeaturedPublications();
   const yearLabels: Record<string, string> = {};
@@ -65,8 +71,14 @@ export default async function BadaniaPage() {
       pub.year !== undefined ? String(pub.year) : pub.status === "w-trakcie" ? tStatus("inPreparation") : "";
   }
 
-  const heroWords = t.raw("heroWords") as [string, string, string];
-  const questions = t.raw("questionsSection.items") as [string, string, string];
+  const heroIndex = t.raw("heroIndex") as [string, string, string, string];
+  const processSteps = t.raw("processSteps") as [
+    { number: string; label: string; description: string },
+    { number: string; label: string; description: string },
+    { number: string; label: string; description: string },
+    { number: string; label: string; description: string },
+  ];
+  const questions = t.raw("questions3") as [string, string, string];
 
   return (
     <div className={`research-page ${cormorant.variable} ${manrope.variable}`}>
@@ -74,28 +86,35 @@ export default async function BadaniaPage() {
         eyebrow={t("eyebrow")}
         h1Line1={t("h1Line1")}
         h1Line2={t("h1Line2")}
-        intro={t("intro")}
-        ctaExploreLabel={t("ctaExplore")}
-        ctaPublicationsLabel={t("ctaPublications")}
-        heroWords={heroWords}
+        description={t("heroDescription")}
+        ctaPrimaryLabel={t("ctaExplore")}
+        ctaSecondaryLabel={t("ctaPublications")}
+        badgeLine1={t("heroBadgeLine1")}
+        badgeLine2={t("heroBadgeLine2")}
+        indexItems={heroIndex}
       />
 
-      <ResearchAreas
-        eyebrow={t("axesEyebrow")}
-        intro={t("areasIntro")}
-        seeAreaLabel={t("areasSeeArea")}
-        areas={areas}
+      <ResearchDirectionNetwork
+        eyebrow={t("directionsEyebrow")}
+        headingLines={[t("directionsHeadingLine1"), t("directionsHeadingLine2"), t("directionsHeadingLine3")]}
+        linkLabel={t("directionsLinkLabel")}
+        directions={directions}
+      />
+
+      <ResearchProcess
+        heading={[t("processHeadingLine1"), t("processHeadingLine2"), t("processHeadingLine3")]}
+        steps={processSteps}
       />
 
       <ResearchQuestions
-        headingLine1={t("questionsSection.headingLine1")}
-        headingLine2={t("questionsSection.headingLine2")}
-        intro={t("questionsSection.intro")}
+        labelLine1={t("questionsLabelLine1")}
+        labelLine2={t("questionsLabelLine2")}
         questions={questions}
       />
 
       <ResearchPublications
-        heading={t("publicationsHeading")}
+        labelLine1={t("publicationsLabelLine1")}
+        labelLine2={t("publicationsLabelLine2")}
         ctaLabel={t("publicationsCta")}
         emptyLabel={t("noPublications")}
         publications={featuredPublications}
@@ -105,7 +124,10 @@ export default async function BadaniaPage() {
       <ResearchClosingCta
         headingLine1={t("closingHeadingLine1")}
         headingLine2={t("closingHeadingLine2")}
-        ctaLabel={t("closingCta")}
+        headingLine3={t("closingHeadingLine3")}
+        bodyText={t("closingBody")}
+        ctaPublicationsLabel={t("closingCtaPublications")}
+        ctaContactLabel={t("closingCtaContact")}
       />
     </div>
   );

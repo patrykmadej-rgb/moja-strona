@@ -1,42 +1,49 @@
-import Image from "next/image";
 import { Link } from "@/i18n/navigation";
-import { RESEARCH_CONTAINER_CLASS } from "./constants";
+import ResearchNeuralNetwork from "./ResearchNeuralNetwork";
 
 type Props = {
   headingLine1: string;
   headingLine2: string;
-  ctaLabel: string;
+  headingLine3: string;
+  bodyText: string;
+  ctaPublicationsLabel: string;
+  ctaContactLabel: string;
 };
 
-export default function ResearchClosingCta({ headingLine1, headingLine2, ctaLabel }: Props) {
+export default function ResearchClosingCta({
+  headingLine1,
+  headingLine2,
+  headingLine3,
+  bodyText,
+  ctaPublicationsLabel,
+  ctaContactLabel,
+}: Props) {
   return (
-    <section className={`${RESEARCH_CONTAINER_CLASS} py-20 lg:py-28`}>
-      <div className="rounded-research-md relative overflow-hidden border border-[var(--research-gold)]/40 bg-[var(--research-paper)]">
-        <div aria-hidden="true" className="absolute inset-0">
-          <Image
-            src="/images/research/research-cta-accent.png"
-            alt=""
-            fill
-            loading="lazy"
-            sizes="(min-width: 1024px) 1320px, 100vw"
-            className="object-cover"
-            style={{ objectPosition: "right center" }}
-          />
-          {/* Gwarantuje czytelność tekstu niezależnie od dokładnych tonów obrazu przy
-              lewej krawędzi — kremowy gradient zanikający w prawo. */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[var(--research-paper)] from-10% via-[var(--research-paper)]/80 via-45% to-transparent to-75%" />
+    <section className="research-closing-cta">
+      <div className="research-closing-dark">
+        <div className="research-closing-network" aria-hidden="true">
+          <ResearchNeuralNetwork activeDirection={null} />
         </div>
-        <div className="relative z-10 px-8 py-14 sm:px-12 lg:px-16 lg:py-20">
-          <h2 className="research-font-display max-w-[420px] text-3xl leading-[1.08] font-medium text-[var(--research-plum-900)] sm:text-4xl lg:text-[44px]">
-            {headingLine1}
-            <br />
-            {headingLine2}
-          </h2>
-          <Link
-            href="/publikacje"
-            className="rounded-research-sm mt-8 inline-flex h-12 items-center justify-center gap-2 bg-[#4A1D6E] px-7 text-sm font-semibold text-white transition-colors hover:bg-[#4A2073]"
-          >
-            {ctaLabel}
+        <h2 className="research-closing-heading research-font-display">
+          {headingLine1}
+          <br />
+          {headingLine2}
+          <br />
+          {headingLine3}
+        </h2>
+      </div>
+
+      <div className="research-closing-light">
+        <p className="research-closing-text">{bodyText}</p>
+        <div className="research-closing-actions">
+          <Link href="/publikacje" className="research-btn research-btn--primary">
+            {ctaPublicationsLabel}
+            <span aria-hidden="true" className="research-btn-arrow">
+              →
+            </span>
+          </Link>
+          <Link href="/kontakt" className="research-btn research-btn--secondary">
+            {ctaContactLabel}
           </Link>
         </div>
       </div>
