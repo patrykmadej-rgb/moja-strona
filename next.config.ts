@@ -24,9 +24,15 @@ const nextConfig: NextConfig = {
   // pliki do odczytu przez fs w kodzie serwera), więc trzeba je jawnie
   // dołączyć, inaczej fs.readFile w produkcji dostanie ENOENT mimo że pliki
   // realnie leżą w repo.
+  // /api/lab/biblioteka/recognize (rozpoznawanie okładki książki ze
+  // zdjęcia) używa TEJ SAMEJ warstwy OCR co import dokumentów szkoły —
+  // brak wpisu dla tej trasy tutaj był rzeczywistą przyczyną, dla której
+  // rozpoznawanie nie działało na produkcji: dane językowe tesseract nie
+  // trafiały do bundla tej konkretnej funkcji serverless.
   outputFileTracingIncludes: {
     "/lab/szkola/import": ["./public/ocr-lang/**/*"],
     "/lab/szkola/import/[id]": ["./public/ocr-lang/**/*"],
+    "/api/lab/biblioteka/recognize": ["./public/ocr-lang/**/*"],
   },
 };
 

@@ -1,6 +1,6 @@
 import "server-only";
 import { createLocalOcrProvider } from "@/lib/szkola/import/ocr/localOcrProvider";
-import { lookupBookByIsbn } from "@/lib/lab/library-isbn-lookup";
+import { lookupBookByIsbn, lookupBookByTitleAuthor } from "@/lib/lab/library-isbn-lookup";
 
 /**
  * Rozpoznawanie okładki książki ze zdjęcia (sekcja 6 briefu). Reużywa
@@ -41,7 +41,8 @@ export type BookRecognitionResult = {
   /** 0-100 z silnika OCR, jeśli dostępne — pomaga UI pokazać "słabe rozpoznanie, sprawdź uważnie". */
   confidence: number | null;
   rawTextPreview: string;
-  source: "ocr" | "ocr+isbn_lookup";
+  /** ocr = tylko heurystyka z tekstu; *_lookup = wzbogacone/nadpisane danymi z katalogu Google Books. */
+  source: "ocr" | "ocr+isbn_lookup" | "ocr+title_lookup";
 };
 
 const ISBN_CANDIDATE_REGEX = /(?:97[89][-\s]?)?(?:\d[-\s]?){9}[\dXx]/g;
@@ -108,17 +109,36 @@ export async function recognizeBookFromImage(buffer: Buffer, mimeType: string): 
     source: "ocr",
   };
 
-  if (!isbn) return base;
+  if (isbn) {
+    const lookup = await lookupBookByIsbn(isbn);
+    if (lookup) {
+      return {
+        ...base,
+        title: lookup.title ?? base.title,
+        author: lookup.author ?? base.author,
+        publisher: lookup.publisher ?? base.publisher,
+        year: lookup.year,
+        source: "ocr+isbn_lookup",
+      };
+    }
+    return base;
+  }
 
-  const lookup = await lookupBookByIsbn(isbn);
+  // Brak ISBN-u w tekście (typowe dla zdjęcia PRZEDNIEJ okładki — ISBN
+  // zwykle jest na tylnej albo stronie redakcyjnej) — sekcja 4 briefu:
+  // spróbuj dopasować po tytule/autorze zamiast poddawać się od razu.
+  if (!title) return base;
+
+  const lookup = await lookupBookByTitleAuthor(title, author);
   if (!lookup) return base;
 
   return {
     ...base,
     title: lookup.title ?? base.title,
     author: lookup.author ?? base.author,
+    isbn: lookup.isbn ?? base.isbn,
     publisher: lookup.publisher ?? base.publisher,
     year: lookup.year,
-    source: "ocr+isbn_lookup",
+    source: "ocr+title_lookup",
   };
 }

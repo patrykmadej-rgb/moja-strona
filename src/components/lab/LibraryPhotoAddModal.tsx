@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Camera, Check, Loader2, Trash2, X } from "lucide-react";
+import { AlertTriangle, Camera, Check, Info, Loader2, Trash2, X } from "lucide-react";
 import { createLibraryBook, type LibraryActionError } from "@/app/lab/biblioteka/actions";
 import { OWNERSHIP_STATUS_LABELS, OWNERSHIP_STATUSES, type OwnershipStatus } from "@/lib/lab/library-types";
 
@@ -20,7 +20,10 @@ type PhotoProposal = {
   publisher: string;
   year: string;
   ownershipStatus: OwnershipStatus;
+  /** Błąd (rozpoznawania albo zapisu) — czerwony tekst. */
   message: string | null;
+  /** Neutralna informacja (np. "nie rozpoznano tytułu, uzupełnij ręcznie") — nie jest błędem, formularz i tak działa. */
+  infoMessage: string | null;
   duplicates: NonNullable<LibraryActionError["duplicates"]> | null;
   rawTextPreview: string;
   textOpen: boolean;
@@ -40,8 +43,84 @@ function bookCountLabel(count: number): string {
   return "książek";
 }
 
-const smallInputClass =
-  "w-full rounded-[8px] border border-[#e6deec] bg-white px-2.5 py-1.5 text-xs text-[#201a2b] outline-none focus:border-[#5b2a86] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#5b2a86]/40";
+const fieldLabelClass = "flex flex-col gap-1 text-xs font-medium text-[#4f4758]";
+// text-[16px] jest celowe — poniżej 16px Safari na iOS automatycznie
+// przybliża widok po dotknięciu pola, co na telefonie jest bardzo mylące.
+const fieldInputClass =
+  "w-full rounded-[10px] border border-[#e6deec] bg-white px-3 py-2.5 text-[16px] text-[#201a2b] outline-none focus:border-[#5b2a86] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#5b2a86]/40";
+
+const MAX_IMAGE_DIMENSION = 1600;
+const TARGET_UPLOAD_BYTES = 3.5 * 1024 * 1024;
+const INITIAL_JPEG_QUALITY = 0.85;
+
+/**
+ * Przygotowanie zdjęcia przed wysyłką (sekcja 2 briefu) — jest to
+ * BEZPOŚREDNIA przyczyna, dla której rozpoznawanie nie działało na
+ * prawdziwym iPhonie: oryginalne zdjęcia z aparatu (często 3-8 MB) trafiały
+ * na serwer, którego platforma hostingowa odrzuca zbyt duże żądania,
+ * zanim dotrą do naszego kodu — klient dostawał odpowiedź, która nie była
+ * poprawnym JSON, i lądował w ogólnym "Błąd połączenia z serwerem".
+ *
+ * Standardowy <img> + <canvas> (NIE createImageBitmap — gorzej wspierane
+ * opcje orientacji w Safari): nowoczesne przeglądarki, łącznie z Safari na
+ * iOS, renderują <img> z uwzględnieniem orientacji EXIF, więc obraz
+ * narysowany z takiego <img> na canvasie jest już poprawnie obrócony bez
+ * ręcznego parsowania EXIF. Safari dekoduje też HEIC/HEIF natywnie w
+ * <img> — canvas.toBlob() zawsze zwraca JPEG niezależnie od formatu
+ * wejściowego, więc to jednocześnie naturalnie "konwertuje" HEIC. W
+ * przeglądarkach bez natywnego dekodera HEIC (np. desktopowy Chrome)
+ * wczytanie się nie uda — wtedy zwracamy jawny komunikat zamiast udawać
+ * obsługę.
+ */
+async function prepareImageForUpload(file: File): Promise<{ blob: Blob } | { error: string }> {
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("decode-failed"));
+      el.src = objectUrl;
+    });
+
+    if (!img.naturalWidth || !img.naturalHeight) {
+      return { error: "Nie udało się odczytać tego zdjęcia. Spróbuj zdjęcia w formacie JPG lub PNG." };
+    }
+
+    const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(img.naturalWidth, img.naturalHeight));
+    const width = Math.max(1, Math.round(img.naturalWidth * scale));
+    const height = Math.max(1, Math.round(img.naturalHeight * scale));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return { error: "Ta przeglądarka nie obsługuje przetwarzania zdjęć." };
+    ctx.drawImage(img, 0, 0, width, height);
+
+    let quality = INITIAL_JPEG_QUALITY;
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
+      if (!blob) return { error: "Nie udało się przygotować zdjęcia do wysyłki." };
+      if (blob.size <= TARGET_UPLOAD_BYTES || quality <= 0.4) return { blob };
+      quality -= 0.15;
+    }
+    return { error: "Nie udało się wystarczająco zmniejszyć zdjęcia." };
+  } catch {
+    return { error: "Nie udało się odczytać tego formatu zdjęcia w tej przeglądarce. Spróbuj zdjęcia w formacie JPG lub PNG." };
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
+/** Sekcja 5 briefu: rozróżnienie przyczyn zamiast jednego ogólnego komunikatu. */
+function messageForStatus(status: number, serverMessage?: string): string {
+  if (serverMessage) return serverMessage;
+  if (status === 401 || status === 403) return "Sesja wygasła — zaloguj się ponownie.";
+  if (status === 413) return "Zdjęcie jest za duże. Spróbuj innego zdjęcia.";
+  if (status === 504 || status === 408) return "Analiza trwała zbyt długo. Spróbuj ponownie albo wpisz dane ręcznie.";
+  if (status >= 500) return "Wystąpił problem po stronie serwera. Spróbuj ponownie za chwilę.";
+  return "Nie udało się rozpoznać zdjęcia. Spróbuj ponownie albo wpisz dane ręcznie.";
+}
 
 /**
  * "Dodaj ze zdjęcia" (sekcja 6 briefu). Priorytet: solidne działanie dla
@@ -72,10 +151,6 @@ export default function LibraryPhotoAddModal({
   const photosRef = useRef<PhotoProposal[]>([]);
   const headingId = useId();
 
-  // Refy aktualizowane w efekcie (nie podczas renderu — mutacja ref.current
-  // w trakcie renderu jest zabroniona przez React), żeby efekt czyszczący
-  // poniżej mógł przy odmontowaniu odczytać NAJŚWIEŻSZĄ listę zdjęć mimo
-  // pustej tablicy zależności (który uruchamia się tylko raz).
   useEffect(() => {
     photosRef.current = photos;
   }, [photos]);
@@ -94,32 +169,57 @@ export default function LibraryPhotoAddModal({
   };
 
   const recognizeOne = async (proposal: PhotoProposal) => {
-    const formData = new FormData();
-    formData.set("image", proposal.file);
-    try {
-      const res = await fetch("/api/lab/biblioteka/recognize", { method: "POST", body: formData });
-      const json = (await res.json()) as {
-        result?: { title: string | null; author: string | null; isbn: string | null; publisher: string | null; year: number | null; rawTextPreview: string };
-        error?: string;
-      };
-      if (!res.ok || !json.result) {
-        updateProposal(proposal.localId, { status: "recognize_error", message: json.error ?? "Nie udało się rozpoznać zdjęcia." });
-        return;
-      }
-      const { result } = json;
-      updateProposal(proposal.localId, {
-        status: "ready",
-        title: result.title ?? "",
-        author: result.author ?? "",
-        isbn: result.isbn ?? "",
-        publisher: result.publisher ?? "",
-        year: result.year ? String(result.year) : "",
-        rawTextPreview: result.rawTextPreview,
-        selected: Boolean(result.title && result.author),
-      });
-    } catch {
-      updateProposal(proposal.localId, { status: "recognize_error", message: "Błąd połączenia z serwerem." });
+    const prepared = await prepareImageForUpload(proposal.file);
+    if ("error" in prepared) {
+      updateProposal(proposal.localId, { status: "recognize_error", message: prepared.error });
+      return;
     }
+
+    const formData = new FormData();
+    formData.set("image", prepared.blob, "cover.jpg");
+
+    let res: Response;
+    try {
+      res = await fetch("/api/lab/biblioteka/recognize", { method: "POST", body: formData });
+    } catch {
+      updateProposal(proposal.localId, {
+        status: "recognize_error",
+        message: "Nie udało się połączyć z serwerem. Sprawdź internet i spróbuj ponownie.",
+      });
+      return;
+    }
+
+    let json: {
+      result?: { title: string | null; author: string | null; isbn: string | null; publisher: string | null; year: number | null; rawTextPreview: string };
+      error?: string;
+    } | null = null;
+    try {
+      json = await res.json();
+    } catch {
+      // Odpowiedź nie była poprawnym JSON — najczęściej strona błędu samego
+      // hostingu (limit rozmiaru/czasu), nie coś zwrócone przez nasz kod.
+      updateProposal(proposal.localId, { status: "recognize_error", message: messageForStatus(res.status) });
+      return;
+    }
+
+    if (!json || !res.ok || !json.result) {
+      updateProposal(proposal.localId, { status: "recognize_error", message: messageForStatus(res.status, json?.error) });
+      return;
+    }
+
+    const { result } = json;
+    const foundNothing = !result.title && !result.author;
+    updateProposal(proposal.localId, {
+      status: "ready",
+      title: result.title ?? "",
+      author: result.author ?? "",
+      isbn: result.isbn ?? "",
+      publisher: result.publisher ?? "",
+      year: result.year ? String(result.year) : "",
+      rawTextPreview: result.rawTextPreview,
+      selected: Boolean(result.title && result.author),
+      infoMessage: foundNothing ? "Nie udało się rozpoznać tytułu i autora na tym zdjęciu — uzupełnij pola ręcznie." : null,
+    });
   };
 
   const handleFilesSelected = (files: FileList | null) => {
@@ -137,6 +237,7 @@ export default function LibraryPhotoAddModal({
       year: "",
       ownershipStatus: initialOwnershipStatus,
       message: null,
+      infoMessage: null,
       duplicates: null,
       rawTextPreview: "",
       textOpen: false,
@@ -179,7 +280,7 @@ export default function LibraryPhotoAddModal({
       }
       return false;
     }
-    updateProposal(proposal.localId, { status: "saved", message: null, selected: false, duplicates: null });
+    updateProposal(proposal.localId, { status: "saved", message: null, infoMessage: null, selected: false, duplicates: null });
     return true;
   };
 
@@ -203,11 +304,11 @@ export default function LibraryPhotoAddModal({
   const stillRecognizing = photos.some((p) => p.status === "recognizing");
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby={headingId}>
-      <div className="flex max-h-[90vh] w-full max-w-[640px] flex-col overflow-y-auto rounded-[16px] bg-white p-6 shadow-[0_20px_60px_rgba(30,15,45,0.25)]">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 id={headingId} className="font-[family-name:var(--font-cormorant)] text-[22px] font-semibold text-[#201a2b]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 min-[420px]:p-4" role="dialog" aria-modal="true" aria-labelledby={headingId}>
+      <div className="flex max-h-[90dvh] w-full max-w-[640px] flex-col overflow-hidden rounded-[16px] bg-white shadow-[0_20px_60px_rgba(30,15,45,0.25)]">
+        <div className="flex items-start justify-between gap-4 border-b border-[#f0ebf5] p-4 min-[420px]:p-6 min-[420px]:pb-4">
+          <div className="min-w-0">
+            <h2 id={headingId} className="font-[family-name:var(--font-cormorant)] text-[20px] font-semibold text-[#201a2b] min-[420px]:text-[22px]">
               Dodaj ze zdjęcia
             </h2>
             <p className="mt-1 text-xs text-[#706878]">
@@ -218,150 +319,206 @@ export default function LibraryPhotoAddModal({
             type="button"
             onClick={onClose}
             aria-label="Zamknij"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] text-[#9a919f] transition-colors hover:bg-[#f7f4ef] hover:text-[#5b2a86]"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] text-[#9a919f] transition-colors hover:bg-[#f7f4ef] hover:text-[#5b2a86]"
           >
             <X className="h-4 w-4" strokeWidth={1.75} />
           </button>
         </div>
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          multiple
-          className="hidden"
-          onChange={(e) => {
-            handleFilesSelected(e.target.files);
-            e.target.value = "";
-          }}
-        />
+        {/* overscroll-contain: przewijanie treści modalu nie "przecieka" do
+            przewijania strony pod spodem podczas gestów na iOS. */}
+        <div className="flex-1 overflow-y-auto overscroll-contain p-4 min-[420px]:p-6">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              handleFilesSelected(e.target.files);
+              e.target.value = "";
+            }}
+          />
 
-        {photos.length === 0 ? (
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="mt-5 flex flex-col items-center justify-center gap-2 rounded-[14px] border-2 border-dashed border-[#d9cde5] bg-[#faf8fc] px-6 py-10 text-center transition-colors hover:border-[#5b2a86] hover:bg-[#f1eafd]"
-          >
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#5b2a86] shadow-[0_4px_12px_rgba(91,42,134,0.15)]">
-              <Camera className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
-            </span>
-            <span className="text-sm font-medium text-[#201a2b]">Zrób zdjęcie okładki lub wybierz z galerii</span>
-            <span className="text-xs text-[#9a919f]">Możesz dodać kilka zdjęć — każde to osobna książka do przeglądu</span>
-          </button>
-        ) : (
-          <>
+          {photos.length === 0 ? (
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="mt-4 flex h-9 items-center gap-1.5 self-start rounded-[10px] border border-[#e6deec] px-3.5 text-xs font-medium text-[#5b2a86] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd]"
+              className="flex w-full flex-col items-center justify-center gap-2 rounded-[14px] border-2 border-dashed border-[#d9cde5] bg-[#faf8fc] px-6 py-10 text-center transition-colors hover:border-[#5b2a86] hover:bg-[#f1eafd]"
             >
-              <Camera className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
-              Dodaj kolejne zdjęcie
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#5b2a86] shadow-[0_4px_12px_rgba(91,42,134,0.15)]">
+                <Camera className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
+              </span>
+              <span className="text-sm font-medium text-[#201a2b]">Zrób zdjęcie okładki lub wybierz z galerii</span>
+              <span className="text-xs text-[#9a919f]">Możesz dodać kilka zdjęć — każde to osobna książka do przeglądu</span>
             </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex h-10 items-center gap-1.5 self-start rounded-[10px] border border-[#e6deec] px-3.5 text-xs font-medium text-[#5b2a86] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd]"
+              >
+                <Camera className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
+                Dodaj kolejne zdjęcie
+              </button>
 
-            <div className="mt-3 flex flex-col gap-2.5">
-              {photos.map((p) => (
-                <div key={p.localId} className="flex gap-3 rounded-[14px] border border-[#e8e2ec] bg-white p-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- podgląd lokalnego pliku przez object URL, nie zasób do optymalizacji przez next/image */}
-                  <img src={p.previewUrl} alt="" className="h-24 w-16 shrink-0 rounded-[8px] object-cover" />
+              <div className="mt-3 flex flex-col gap-3">
+                {photos.map((p) => {
+                  const missingRequired = !p.title.trim() || !p.author.trim();
+                  return (
+                    <div key={p.localId} className="rounded-[14px] border border-[#e8e2ec] bg-white p-3">
+                      {/* Górny rząd: miniatura + status/checkbox + usuń — zawsze krótki, mieści się poziomo nawet na telefonie. */}
+                      <div className="flex items-center gap-3">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- podgląd lokalnego pliku przez object URL, nie zasób do optymalizacji przez next/image */}
+                        <img src={p.previewUrl} alt="" className="h-20 w-14 shrink-0 rounded-[8px] object-cover" />
 
-                  <div className="min-w-0 flex-1">
-                    {p.status === "recognizing" && (
-                      <p className="flex items-center gap-1.5 text-xs text-[#706878]">
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.75} aria-hidden="true" />
-                        Rozpoznaję zdjęcie…
-                      </p>
-                    )}
+                        <div className="min-w-0 flex-1">
+                          {p.status === "recognizing" && (
+                            <p className="flex items-center gap-1.5 text-xs text-[#706878]">
+                              <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" strokeWidth={1.75} aria-hidden="true" />
+                              Rozpoznaję zdjęcie…
+                            </p>
+                          )}
+                          {p.status === "saved" && (
+                            <p className="flex items-center gap-1.5 text-xs font-medium text-[#2f7a4c]">
+                              <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                              <span className="truncate">Dodano: „{p.title}”</span>
+                            </p>
+                          )}
+                          {p.status !== "recognizing" && p.status !== "saved" && (
+                            <label className="flex items-center gap-2 text-xs font-medium text-[#4f4758]">
+                              <input
+                                type="checkbox"
+                                checked={p.selected}
+                                onChange={(e) => updateProposal(p.localId, { selected: e.target.checked })}
+                                className="h-[18px] w-[18px] shrink-0 accent-[#5b2a86]"
+                              />
+                              Zaznacz do zapisu
+                            </label>
+                          )}
+                        </div>
 
-                    {p.status === "saved" && (
-                      <p className="flex items-center gap-1.5 text-xs font-medium text-[#2f7a4c]">
-                        <Check className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
-                        Dodano: „{p.title}”
-                      </p>
-                    )}
+                        {p.status !== "saved" && p.status !== "saving" && (
+                          <button
+                            type="button"
+                            onClick={() => removeProposal(p.localId)}
+                            aria-label="Usuń zdjęcie z listy"
+                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] text-[#9a919f] transition-colors hover:bg-red-50 hover:text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+                          </button>
+                        )}
+                      </div>
 
-                    {p.status !== "recognizing" && p.status !== "saved" && (
-                      <div className="flex items-start gap-2">
-                        <input
-                          type="checkbox"
-                          checked={p.selected}
-                          onChange={(e) => updateProposal(p.localId, { selected: e.target.checked })}
-                          aria-label="Zaznacz do zapisu"
-                          className="mt-1.5 h-4 w-4 shrink-0 accent-[#5b2a86]"
-                        />
-                        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                          <input
-                            value={p.title}
-                            onChange={(e) => updateProposal(p.localId, { title: e.target.value })}
-                            placeholder="Tytuł *"
-                            className={smallInputClass}
-                          />
-                          <input
-                            value={p.author}
-                            onChange={(e) => updateProposal(p.localId, { author: e.target.value })}
-                            placeholder="Autor *"
-                            className={smallInputClass}
-                          />
-                          <div className="flex gap-1.5">
+                      {/* Pola formularza — zawsze pełna szerokość, pod górnym rzędem (sekcja 6 briefu: pionowy układ na telefonie). */}
+                      {p.status !== "recognizing" && p.status !== "saved" && (
+                        <div className="mt-3 flex flex-col gap-2.5">
+                          <label className={fieldLabelClass}>
+                            <span>Tytuł *</span>
                             <input
-                              value={p.isbn}
-                              onChange={(e) => updateProposal(p.localId, { isbn: e.target.value })}
-                              placeholder="ISBN"
-                              className={`${smallInputClass} flex-1`}
+                              value={p.title}
+                              onChange={(e) => updateProposal(p.localId, { title: e.target.value })}
+                              placeholder="np. Leżąc na kozetce"
+                              className={fieldInputClass}
                             />
+                          </label>
+                          <label className={fieldLabelClass}>
+                            <span>Autor *</span>
                             <input
-                              value={p.year}
-                              onChange={(e) => updateProposal(p.localId, { year: e.target.value })}
-                              placeholder="Rok"
-                              inputMode="numeric"
-                              className={`${smallInputClass} w-16 shrink-0`}
+                              value={p.author}
+                              onChange={(e) => updateProposal(p.localId, { author: e.target.value })}
+                              placeholder="np. Irvin D. Yalom"
+                              className={fieldInputClass}
                             />
-                          </div>
-                          <input
-                            value={p.publisher}
-                            onChange={(e) => updateProposal(p.localId, { publisher: e.target.value })}
-                            placeholder="Wydawnictwo"
-                            className={smallInputClass}
-                          />
+                          </label>
 
-                          <div className="flex gap-1.5">
-                            {OWNERSHIP_STATUSES.map((s) => (
-                              <button
-                                key={s}
-                                type="button"
-                                onClick={() => updateProposal(p.localId, { ownershipStatus: s })}
-                                aria-pressed={p.ownershipStatus === s}
-                                className={
-                                  p.ownershipStatus === s
-                                    ? "rounded-[7px] bg-[#5b2a86] px-2.5 py-1 text-[11px] font-medium text-white"
-                                    : "rounded-[7px] border border-[#e6deec] px-2.5 py-1 text-[11px] text-[#706878]"
-                                }
-                              >
-                                {OWNERSHIP_STATUS_LABELS[s]}
-                              </button>
-                            ))}
+                          <div className="grid grid-cols-1 gap-2.5 min-[380px]:grid-cols-2">
+                            <label className={fieldLabelClass}>
+                              <span>ISBN</span>
+                              <input
+                                value={p.isbn}
+                                onChange={(e) => updateProposal(p.localId, { isbn: e.target.value })}
+                                placeholder="opcjonalnie"
+                                className={fieldInputClass}
+                              />
+                            </label>
+                            <label className={fieldLabelClass}>
+                              <span>Rok wydania</span>
+                              <input
+                                value={p.year}
+                                onChange={(e) => updateProposal(p.localId, { year: e.target.value })}
+                                placeholder="opcjonalnie"
+                                inputMode="numeric"
+                                className={fieldInputClass}
+                              />
+                            </label>
                           </div>
+
+                          <label className={fieldLabelClass}>
+                            <span>Wydawnictwo</span>
+                            <input
+                              value={p.publisher}
+                              onChange={(e) => updateProposal(p.localId, { publisher: e.target.value })}
+                              placeholder="opcjonalnie"
+                              className={fieldInputClass}
+                            />
+                          </label>
+
+                          <div className={fieldLabelClass}>
+                            <span>Status własności</span>
+                            <div className="flex gap-2">
+                              {OWNERSHIP_STATUSES.map((s) => (
+                                <button
+                                  key={s}
+                                  type="button"
+                                  onClick={() => updateProposal(p.localId, { ownershipStatus: s })}
+                                  aria-pressed={p.ownershipStatus === s}
+                                  className={
+                                    p.ownershipStatus === s
+                                      ? "flex h-9 flex-1 items-center justify-center rounded-[9px] bg-[#5b2a86] text-[13px] font-medium text-white"
+                                      : "flex h-9 flex-1 items-center justify-center rounded-[9px] border border-[#e6deec] text-[13px] text-[#706878]"
+                                  }
+                                >
+                                  {OWNERSHIP_STATUS_LABELS[s]}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {p.infoMessage && (
+                            <p className="flex items-start gap-1.5 text-xs text-[#706878]">
+                              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                              {p.infoMessage}
+                            </p>
+                          )}
+                          {!p.infoMessage && missingRequired && p.status === "ready" && (
+                            <p className="flex items-start gap-1.5 text-xs text-[#a76616]">
+                              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                              Uzupełnij tytuł i autora, aby zatwierdzić tę pozycję.
+                            </p>
+                          )}
 
                           {p.rawTextPreview && (
                             <button
                               type="button"
                               onClick={() => updateProposal(p.localId, { textOpen: !p.textOpen })}
-                              className="self-start text-[11px] text-[#9a919f] underline decoration-dotted"
+                              className="self-start text-xs text-[#9a919f] underline decoration-dotted"
                             >
                               {p.textOpen ? "Ukryj rozpoznany tekst" : "Pokaż rozpoznany tekst (OCR)"}
                             </button>
                           )}
                           {p.textOpen && (
-                            <p className="whitespace-pre-wrap rounded-[8px] bg-[#f7f4ef] p-2 text-[10px] leading-relaxed text-[#706878]">
+                            <p className="whitespace-pre-wrap rounded-[8px] bg-[#f7f4ef] p-2 text-[11px] leading-relaxed text-[#706878]">
                               {p.rawTextPreview}
                             </p>
                           )}
 
                           {p.status === "duplicate" && p.duplicates && (
-                            <div className="rounded-[8px] border border-[#f0d9a8] bg-[#fff8e8] p-2 text-[11px] text-[#8a5a10]">
+                            <div className="rounded-[8px] border border-[#f0d9a8] bg-[#fff8e8] p-2.5 text-xs text-[#8a5a10]">
                               <p className="flex items-center gap-1.5 font-medium">
-                                <AlertTriangle className="h-3 w-3 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                                <AlertTriangle className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
                                 Podobna pozycja już jest w bibliotece
                               </p>
                               <ul className="mt-1 flex flex-col gap-0.5 pl-4">
@@ -374,7 +531,7 @@ export default function LibraryPhotoAddModal({
                               <button
                                 type="button"
                                 onClick={() => void saveOne(p, true)}
-                                className="mt-1.5 rounded-[7px] border border-[#e6c98a] bg-white px-2 py-1 text-[11px] font-medium text-[#8a5a10] hover:bg-[#fff2d9]"
+                                className="mt-2 flex h-8 items-center rounded-[8px] border border-[#e6c98a] bg-white px-3 text-xs font-medium text-[#8a5a10] hover:bg-[#fff2d9]"
                               >
                                 Dodaj mimo to
                               </button>
@@ -382,43 +539,35 @@ export default function LibraryPhotoAddModal({
                           )}
 
                           {(p.status === "recognize_error" || p.status === "save_error") && p.message && (
-                            <p className="text-[11px] text-red-600">{p.message}</p>
+                            <p className="flex items-start gap-1.5 text-xs text-red-600">
+                              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                              {p.message}
+                            </p>
                           )}
 
                           {p.status === "saving" && (
-                            <p className="flex items-center gap-1 text-[11px] text-[#706878]">
-                              <Loader2 className="h-3 w-3 animate-spin" strokeWidth={1.75} aria-hidden="true" />
+                            <p className="flex items-center gap-1.5 text-xs text-[#706878]">
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.75} aria-hidden="true" />
                               Zapisywanie…
                             </p>
                           )}
                         </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {p.status !== "saved" && p.status !== "saving" && (
-                    <button
-                      type="button"
-                      onClick={() => removeProposal(p.localId)}
-                      aria-label="Usuń zdjęcie z listy"
-                      className="flex h-7 w-7 shrink-0 items-center justify-center self-start rounded-[8px] text-[#9a919f] transition-colors hover:bg-red-50 hover:text-red-600"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
 
         {photos.length > 0 && (
-          <div className="mt-5 flex gap-3">
+          <div className="flex flex-col gap-2 border-t border-[#f0ebf5] p-4 min-[420px]:flex-row min-[420px]:p-6 min-[420px]:pt-4">
             <button
               type="button"
               disabled={selectedCount === 0 || savingAll || stillRecognizing}
               onClick={handleSaveSelected}
-              className="flex h-10 items-center gap-1.5 rounded-[10px] bg-[#5b2a86] px-5 text-sm font-medium text-white transition-colors hover:bg-[#32134f] disabled:opacity-50"
+              className="flex h-11 items-center justify-center gap-1.5 rounded-[10px] bg-[#5b2a86] px-5 text-sm font-medium text-white transition-colors hover:bg-[#32134f] disabled:opacity-50 min-[420px]:h-10"
             >
               {savingAll && <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.75} aria-hidden="true" />}
               Zatwierdź zaznaczone ({selectedCount})
@@ -426,7 +575,7 @@ export default function LibraryPhotoAddModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex h-10 items-center rounded-[10px] border border-[#e6deec] px-5 text-sm font-medium text-[#706878] transition-colors hover:border-[#d9cde5]"
+              className="flex h-11 items-center justify-center rounded-[10px] border border-[#e6deec] px-5 text-sm font-medium text-[#706878] transition-colors hover:border-[#d9cde5] min-[420px]:h-10"
             >
               Zamknij
             </button>
