@@ -2101,6 +2101,19 @@ html {
   --lab-bottom-nav-height: 60px;
 }
 
+/* Zabezpieczenie uzupełniające (nie jedyna poprawka — patrz `.lab-main-content *`
+   niżej, to usuwa RZECZYWISTE przyczyny), na wszystkich szerokościach: /lab ma
+   własny <html>/<body> (src/app/lab/layout.tsx), więc to bezpiecznie NIE
+   dotyka publicznej strony. Gdyby mimo strukturalnych poprawek jakiś
+   nieprzewidziany element gdzieś nadal wystawał poza viewport, użytkownik
+   dostaje twardą blokadę przypadkowego przeciągania całej strony w bok
+   zamiast biernie akceptować scroll dokumentu. */
+.lab-root,
+.lab-body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 .lab-mobile-header,
 .lab-bottom-nav {
   display: none;
@@ -2113,12 +2126,36 @@ html {
 
   .lab-main-content {
     margin-left: 0;
+    width: 100%;
+    max-width: 100%;
     padding-top: calc(var(--lab-mobile-header-height) + env(safe-area-inset-top));
     /* env(safe-area-inset-bottom) wymaga viewport-fit=cover — ustawione
        w src/app/lab/layout.tsx (export const viewport). +16px oddechu
        nad paskiem, żeby ostatnia karta/przycisk na stronie nie stykały
        się wizualnie z nawigacją. */
     padding-bottom: calc(var(--lab-bottom-nav-height) + env(safe-area-inset-bottom) + 16px);
+  }
+
+  /* PRAWDZIWA przyczyna poziomego przewijania całego dokumentu na telefonie
+     (zgłoszenie: pulpit, nagłówki, karty, zakładki szkoły — wszystko naraz)
+     to domyślne `min-width: auto` na elementach flex/grid: element-dziecko z
+     nieprzełamywalną treścią (np. `truncate`/`white-space: nowrap` w
+     `<span>`/`<p>` wewnątrz `flex`/`grid`) odmawia skurczenia się poniżej
+     szerokości WŁASNEJ treści, mimo że jego kontener ma już poprawną
+     szerokość 100%. To wypycha rodzica — a w konsekwencji cały dokument —
+     szerzej niż viewport. Dotyczy to dziesiątek miejsc w /lab (karty
+     dashboardu, zakładki modułu szkoły, karty Biblioteki/Schowka), nie
+     tylko nowych komponentów mobilnych. `min-width: 0` na KAŻDYM potomku
+     .lab-main-content usuwa tę automatyczną blokadę kurczenia się:
+     - jest to no-op dla elementów, które nie są dzieckiem flex/grid;
+     - nie nadpisuje jawnie ustawionych szerokości/`flex-shrink: 0` (np.
+       ikony pozostają swojego rozmiaru, bo min-width nigdy nie WYMUSZA
+       rozmiaru — tylko podnosi/obniża dolny limit automatycznego kurczenia);
+     - dzięki temu `truncate`/`line-clamp`/zawijanie tekstu zaczyna
+       faktycznie działać zamiast być przełamywane przez tę blokadę.
+     Desktop (min-width: 768px) NIE dostaje tej reguły — zachowuje dotychczasowy układ bez zmian. */
+  .lab-main-content * {
+    min-width: 0;
   }
 
   .lab-mobile-header {

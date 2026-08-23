@@ -69,9 +69,9 @@ export default async function LabLayout({
   return (
     <html
       lang="pl"
-      className={`${cormorant.variable} ${manrope.variable} h-full`}
+      className={`${cormorant.variable} ${manrope.variable} lab-root h-full`}
     >
-      <body className="h-full font-[family-name:var(--font-manrope)] antialiased">
+      <body className="lab-body h-full font-[family-name:var(--font-manrope)] antialiased">
         {user ? (
           <>
             {/* Sidebar/header/bottom-nav muszą wszystkie poprzedzać <main> w DOM —

@@ -160,7 +160,7 @@ export default async function SzkolaPulpitPage() {
               Kontroluj zjazdy, podróże, opłaty, materiały i godziny szkoleniowe.
             </p>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/lab/szkola/kalendarz"
               className="flex h-10 items-center gap-1.5 rounded-[10px] border border-[#e8e2ec] px-4 text-[13px] font-medium text-[#201a2b] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd]"

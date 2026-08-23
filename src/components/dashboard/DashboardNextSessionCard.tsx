@@ -81,10 +81,10 @@ export default function DashboardNextSessionCard({ data, error }: { data: NextSe
               brak, elegancki link do dodania zamiast pustego miejsca. */}
           <div className="mt-3 grid grid-cols-1 gap-2.5 border-t border-[#eee9f2] pt-3 text-xs min-[560px]:grid-cols-2">
             {data.nextSegment ? (
-              <div>
+              <div className="min-w-0">
                 <p className="flex items-center gap-1.5 font-medium text-[#201a2b]">
                   <Plane className="h-3.5 w-3.5 shrink-0 text-[#5b2a86]" strokeWidth={1.75} aria-hidden="true" />
-                  <span className="truncate">
+                  <span className="min-w-0 truncate">
                     {data.nextSegment.departure_place || "?"} → {data.nextSegment.arrival_place || "?"}
                   </span>
                 </p>
@@ -110,10 +110,10 @@ export default function DashboardNextSessionCard({ data, error }: { data: NextSe
             )}
 
             {data.nextAccommodation ? (
-              <div>
+              <div className="min-w-0">
                 <p className="flex items-center gap-1.5 font-medium text-[#201a2b]">
                   <Bed className="h-3.5 w-3.5 shrink-0 text-[#5b2a86]" strokeWidth={1.75} aria-hidden="true" />
-                  <span className="truncate">{data.nextAccommodation.name}</span>
+                  <span className="min-w-0 truncate">{data.nextAccommodation.name}</span>
                 </p>
                 <p className="mt-0.5 truncate text-[#706878]">
                   {[
