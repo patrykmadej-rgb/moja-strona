@@ -9,6 +9,7 @@ import {
   FileText,
   GraduationCap,
   Clipboard,
+  Library,
   PanelsTopLeft,
   SquareCheckBig,
   ChartNoAxesCombined,
@@ -43,6 +44,7 @@ const PRIMARY_ITEMS: NavItem[] = [
   { key: "artykuly", href: "/lab/artykuly", label: "Artykuły", icon: FileText, enabled: true },
   { key: "szkola", href: "/lab/szkola", label: "Szkoła psychoterapii", icon: GraduationCap, enabled: true },
   { key: "schowek", href: "/lab/schowek", label: "Schowek", icon: Clipboard, enabled: true },
+  { key: "biblioteka", href: "/lab/biblioteka", label: "Biblioteka", icon: Library, enabled: true },
 ];
 
 const SECONDARY_ITEMS: NavItem[] = [
