@@ -21,13 +21,18 @@ import {
 } from "lucide-react";
 import { signOutLab } from "@/app/lab/actions";
 
-type NavItem = {
+export type NavItem = {
   key: string;
   href: string;
   label: string;
   icon: LucideIcon;
   enabled: boolean;
 };
+
+/** Reużywane też przez LabBottomNav/LabMoreSheet — ta sama definicja "aktywnej" pozycji na desktopie i mobile. */
+export function isLabNavItemActive(pathname: string, href: string): boolean {
+  return href === "/lab" ? pathname === "/lab" : pathname.startsWith(href);
+}
 
 /**
  * Powrót na publiczną stronę główną — celowo POZA PRIMARY_ITEMS: to jedyna
@@ -37,9 +42,9 @@ type NavItem = {
  * isItemActive(). Link do "/" (nie pełny URL) — działa tak samo lokalnie
  * i na produkcji.
  */
-const HOME_ITEM: NavItem = { key: "strona-glowna", href: "/", label: "Strona główna", icon: Home, enabled: true };
+export const HOME_ITEM: NavItem = { key: "strona-glowna", href: "/", label: "Strona główna", icon: Home, enabled: true };
 
-const PRIMARY_ITEMS: NavItem[] = [
+export const PRIMARY_ITEMS: NavItem[] = [
   { key: "pulpit", href: "/lab", label: "Pulpit", icon: LayoutDashboard, enabled: true },
   { key: "artykuly", href: "/lab/artykuly", label: "Artykuły", icon: FileText, enabled: true },
   { key: "szkola", href: "/lab/szkola", label: "Szkoła psychoterapii", icon: GraduationCap, enabled: true },
@@ -47,7 +52,7 @@ const PRIMARY_ITEMS: NavItem[] = [
   { key: "biblioteka", href: "/lab/biblioteka", label: "Biblioteka", icon: Library, enabled: true },
 ];
 
-const SECONDARY_ITEMS: NavItem[] = [
+export const SECONDARY_ITEMS: NavItem[] = [
   { key: "projekty", href: "/lab/projekty", label: "Projekty", icon: PanelsTopLeft, enabled: false },
   { key: "zadania", href: "/lab/zadania", label: "Zadania", icon: SquareCheckBig, enabled: false },
   {
@@ -171,8 +176,7 @@ function LogoutButton() {
 export default function Sidebar({ email }: { email?: string | null }) {
   const pathname = usePathname();
 
-  const isItemActive = (href: string) =>
-    href === "/lab" ? pathname === "/lab" : pathname.startsWith(href);
+  const isItemActive = (href: string) => isLabNavItemActive(pathname, href);
 
   const initial = email?.trim().charAt(0).toUpperCase() || "?";
 

@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, Library, Plus, Search } from "lucide-react";
+import { Camera, ChevronDown, Library, Plus, Search } from "lucide-react";
 import LibraryTabs, { type LibraryTabKey } from "@/components/lab/LibraryTabs";
 import LibraryBookCard from "@/components/lab/LibraryBookCard";
 import LibraryBookFormModal from "@/components/lab/LibraryBookFormModal";
 import LibraryDeleteModal from "@/components/lab/LibraryDeleteModal";
 import LibraryLoanModal from "@/components/lab/LibraryLoanModal";
+import LibraryPhotoAddModal from "@/components/lab/LibraryPhotoAddModal";
 import EmptyState from "@/components/lab/EmptyState";
 import { NO_CATEGORY_LABEL, NO_LANGUAGE_LABEL, READING_STATUSES, READING_STATUS_LABELS, type LibraryBook, type LibraryLoan, type OwnershipStatus, type ReadingStatus } from "@/lib/lab/library-types";
 
@@ -15,6 +16,7 @@ type ModalState =
   | { type: "edit"; book: LibraryBook }
   | { type: "delete"; book: LibraryBook }
   | { type: "loan"; book: LibraryBook }
+  | { type: "photo" }
   | null;
 
 type SortKey = "newest" | "title" | "author" | "loanedAt";
@@ -250,14 +252,24 @@ export default function LibraryExplorer({ books, loans }: { books: LibraryBook[]
           <h1 className="mt-1 font-[family-name:var(--font-cormorant)] text-[32px] font-semibold leading-[1.1] text-[#201a2b]">Biblioteka</h1>
           <p className="mt-1.5 text-[13px] text-[#706878]">Książki psychologiczne i psychoterapeutyczne — posiadane i planowane do zakupu.</p>
         </div>
-        <button
-          type="button"
-          onClick={() => setModal({ type: "add" })}
-          className="flex h-10 shrink-0 items-center gap-1.5 rounded-[10px] bg-[#5b2a86] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#32134f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5b2a86]"
-        >
-          <Plus className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-          Dodaj książkę
-        </button>
+        <div className="flex w-full flex-wrap gap-2 min-[720px]:w-auto min-[720px]:shrink-0">
+          <button
+            type="button"
+            onClick={() => setModal({ type: "photo" })}
+            className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-[10px] border border-[#e6deec] bg-white px-4 text-[13px] font-medium text-[#5b2a86] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5b2a86]/40 min-[720px]:flex-none"
+          >
+            <Camera className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+            Dodaj ze zdjęcia
+          </button>
+          <button
+            type="button"
+            onClick={() => setModal({ type: "add" })}
+            className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-[10px] bg-[#5b2a86] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#32134f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5b2a86] min-[720px]:flex-none"
+          >
+            <Plus className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+            Dodaj książkę
+          </button>
+        </div>
       </div>
 
       {hasAnyBooks && (
@@ -437,6 +449,16 @@ export default function LibraryExplorer({ books, loans }: { books: LibraryBook[]
           book={modal.book}
           onClose={() => setModal(null)}
           onSaved={(message) => {
+            setModal(null);
+            setToast(message);
+          }}
+        />
+      )}
+      {modal?.type === "photo" && (
+        <LibraryPhotoAddModal
+          initialOwnershipStatus={defaultOwnershipForAdd}
+          onClose={() => setModal(null)}
+          onDone={(message) => {
             setModal(null);
             setToast(message);
           }}

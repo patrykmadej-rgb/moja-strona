@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { AlertTriangle, Loader2, X } from "lucide-react";
+import { AlertTriangle, Loader2, Search, X } from "lucide-react";
 import { createLibraryBook, updateLibraryBook, type LibraryActionError } from "@/app/lab/biblioteka/actions";
 import {
   LIBRARY_CATEGORIES,
@@ -65,7 +65,14 @@ export default function LibraryBookFormModal({
   const [duplicates, setDuplicates] = useState<LibraryActionError["duplicates"]>(undefined);
   const [ownershipStatus, setOwnershipStatus] = useState<OwnershipStatus>(item?.ownership_status ?? initialOwnershipStatus);
   const [confirmPending, setConfirmPending] = useState(false);
+  const [isbnLookupPending, setIsbnLookupPending] = useState(false);
+  const [isbnLookupMessage, setIsbnLookupMessage] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
+  const authorInputRef = useRef<HTMLInputElement>(null);
+  const publisherInputRef = useRef<HTMLInputElement>(null);
+  const yearInputRef = useRef<HTMLInputElement>(null);
+  const isbnInputRef = useRef<HTMLInputElement>(null);
 
   const titleId = useId();
   const authorId = useId();
@@ -104,6 +111,56 @@ export default function LibraryBookFormModal({
     const result = await createLibraryBook(formData);
     setConfirmPending(false);
     applyResult(result, "Dodano książkę do biblioteki.");
+  };
+
+  /**
+   * Zakres 6 briefu: "wpisz ISBN i pobierz dane bibliograficzne" — bez
+   * biblioteki formularzy (pola są niekontrolowane, defaultValue), więc
+   * uzupełnienie idzie przez refy i tylko do PUSTYCH pól — nie nadpisuje
+   * tego, co użytkownik już wpisał/poprawił ręcznie.
+   */
+  const handleIsbnLookup = async () => {
+    const isbn = isbnInputRef.current?.value.trim();
+    if (!isbn || isbnLookupPending) return;
+
+    setIsbnLookupPending(true);
+    setIsbnLookupMessage(null);
+    try {
+      const res = await fetch(`/api/lab/biblioteka/isbn-lookup?isbn=${encodeURIComponent(isbn)}`);
+      if (!res.ok) throw new Error("lookup-failed");
+      const { result } = (await res.json()) as {
+        result: { title: string | null; author: string | null; publisher: string | null; year: number | null } | null;
+      };
+
+      if (!result) {
+        setIsbnLookupMessage("Nie znaleziono danych dla tego ISBN — uzupełnij ręcznie.");
+        return;
+      }
+
+      let filled = 0;
+      if (result.title && titleInputRef.current && !titleInputRef.current.value.trim()) {
+        titleInputRef.current.value = result.title;
+        filled += 1;
+      }
+      if (result.author && authorInputRef.current && !authorInputRef.current.value.trim()) {
+        authorInputRef.current.value = result.author;
+        filled += 1;
+      }
+      if (result.publisher && publisherInputRef.current && !publisherInputRef.current.value.trim()) {
+        publisherInputRef.current.value = result.publisher;
+        filled += 1;
+      }
+      if (result.year && yearInputRef.current && !yearInputRef.current.value.trim()) {
+        yearInputRef.current.value = String(result.year);
+        filled += 1;
+      }
+
+      setIsbnLookupMessage(filled > 0 ? "Uzupełniono dane z Google Books — sprawdź przed zapisem." : "Znaleziono, ale pola były już wypełnione.");
+    } catch {
+      setIsbnLookupMessage("Nie udało się połączyć z wyszukiwarką ISBN.");
+    } finally {
+      setIsbnLookupPending(false);
+    }
   };
 
   return (
@@ -162,6 +219,7 @@ export default function LibraryBookFormModal({
               Tytuł *
             </label>
             <input
+              ref={titleInputRef}
               id={titleId}
               name="title"
               required
@@ -178,6 +236,7 @@ export default function LibraryBookFormModal({
               Autor / autorzy *
             </label>
             <input
+              ref={authorInputRef}
               id={authorId}
               name="author"
               required
@@ -249,6 +308,7 @@ export default function LibraryBookFormModal({
                 Rok wydania
               </label>
               <input
+                ref={yearInputRef}
                 id={yearId}
                 name="year"
                 type="number"
@@ -264,7 +324,31 @@ export default function LibraryBookFormModal({
               <label htmlFor={isbnId} className={labelClass}>
                 ISBN
               </label>
-              <input id={isbnId} name="isbn" defaultValue={item?.isbn ?? ""} placeholder="np. 978-83-235-3456-6" className={inputClass} />
+              <div className="flex gap-2">
+                <input
+                  ref={isbnInputRef}
+                  id={isbnId}
+                  name="isbn"
+                  defaultValue={item?.isbn ?? ""}
+                  placeholder="np. 978-83-235-3456-6"
+                  className={`${inputClass} flex-1`}
+                />
+                <button
+                  type="button"
+                  disabled={isbnLookupPending}
+                  onClick={handleIsbnLookup}
+                  title="Sprawdź ISBN i pobierz dane z Google Books"
+                  className="flex h-[38px] shrink-0 items-center gap-1.5 rounded-[10px] border border-[#e6deec] px-3 text-xs font-medium text-[#5b2a86] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] disabled:opacity-60"
+                >
+                  {isbnLookupPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.75} />
+                  ) : (
+                    <Search className="h-3.5 w-3.5" strokeWidth={1.75} />
+                  )}
+                  Sprawdź
+                </button>
+              </div>
+              {isbnLookupMessage && <p className="text-xs text-[#706878]">{isbnLookupMessage}</p>}
             </div>
           </div>
 
@@ -272,7 +356,14 @@ export default function LibraryBookFormModal({
             <label htmlFor={publisherId} className={labelClass}>
               Wydawnictwo
             </label>
-            <input id={publisherId} name="publisher" defaultValue={item?.publisher ?? ""} placeholder="np. Wydawnictwo UJ" className={inputClass} />
+            <input
+              ref={publisherInputRef}
+              id={publisherId}
+              name="publisher"
+              defaultValue={item?.publisher ?? ""}
+              placeholder="np. Wydawnictwo UJ"
+              className={inputClass}
+            />
           </div>
 
           <div className="flex flex-col gap-1.5">

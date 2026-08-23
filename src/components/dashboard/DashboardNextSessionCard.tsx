@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { CalendarRange, CheckCircle2, AlertTriangle, MinusCircle, CircleHelp, MapPin } from "lucide-react";
+import { CalendarRange, CheckCircle2, AlertTriangle, MinusCircle, CircleHelp, MapPin, Plane, Bed } from "lucide-react";
 import EmptyState from "@/components/lab/EmptyState";
 import { formatSessionDateRange } from "@/lib/szkola/format";
+import { formatShortDate } from "@/lib/lab/format";
+import { ACCOMMODATION_STATUS_LABELS, SEGMENT_STATUS_LABELS } from "@/lib/szkola/types";
 import type { PrepStatusKind } from "@/lib/szkola/preparation";
 import type { NextSessionData } from "@/lib/dashboard/types";
 
@@ -73,6 +75,67 @@ export default function DashboardNextSessionCard({ data, error }: { data: NextSe
               Koszty: {data.costCount} {formatEntryCountLabel(data.costCount)}
             </li>
           </ul>
+
+          {/* Sekcja 3 briefu (mobilny ekran startowy): konkretne dane lotu/
+              noclegu, nie tylko zagregowany status jak wyżej — jeśli ich
+              brak, elegancki link do dodania zamiast pustego miejsca. */}
+          <div className="mt-3 grid grid-cols-1 gap-2.5 border-t border-[#eee9f2] pt-3 text-xs min-[560px]:grid-cols-2">
+            {data.nextSegment ? (
+              <div>
+                <p className="flex items-center gap-1.5 font-medium text-[#201a2b]">
+                  <Plane className="h-3.5 w-3.5 shrink-0 text-[#5b2a86]" strokeWidth={1.75} aria-hidden="true" />
+                  <span className="truncate">
+                    {data.nextSegment.departure_place || "?"} → {data.nextSegment.arrival_place || "?"}
+                  </span>
+                </p>
+                <p className="mt-0.5 truncate text-[#706878]">
+                  {[
+                    data.nextSegment.departure_date ? formatShortDate(data.nextSegment.departure_date) : null,
+                    data.nextSegment.departure_time?.slice(0, 5),
+                    data.nextSegment.carrier,
+                    SEGMENT_STATUS_LABELS[data.nextSegment.status],
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              </div>
+            ) : (
+              <Link
+                href={`/lab/szkola/zjazdy/${data.session.id}`}
+                className="flex items-center gap-1.5 text-[#706878] transition-colors hover:text-[#5b2a86]"
+              >
+                <Plane className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                Brak dodanego lotu — dodaj w zjeździe
+              </Link>
+            )}
+
+            {data.nextAccommodation ? (
+              <div>
+                <p className="flex items-center gap-1.5 font-medium text-[#201a2b]">
+                  <Bed className="h-3.5 w-3.5 shrink-0 text-[#5b2a86]" strokeWidth={1.75} aria-hidden="true" />
+                  <span className="truncate">{data.nextAccommodation.name}</span>
+                </p>
+                <p className="mt-0.5 truncate text-[#706878]">
+                  {[
+                    data.nextAccommodation.check_in && data.nextAccommodation.check_out
+                      ? `${formatShortDate(data.nextAccommodation.check_in)} – ${formatShortDate(data.nextAccommodation.check_out)}`
+                      : null,
+                    ACCOMMODATION_STATUS_LABELS[data.nextAccommodation.payment_status],
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              </div>
+            ) : (
+              <Link
+                href={`/lab/szkola/zjazdy/${data.session.id}`}
+                className="flex items-center gap-1.5 text-[#706878] transition-colors hover:text-[#5b2a86]"
+              >
+                <Bed className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                Brak dodanego noclegu — dodaj w zjeździe
+              </Link>
+            )}
+          </div>
 
           {data.schedulePreview.length > 0 && (
             <ul className="mt-3 border-t border-[#eee9f2] pt-3 text-xs text-[#706878]">

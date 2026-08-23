@@ -1,6 +1,6 @@
 import type { ArticlePriority, ArticleStatus } from "@/lib/lab/types";
 import type { PrepItem } from "@/lib/szkola/preparation";
-import type { SchoolSession } from "@/lib/szkola/types";
+import type { Accommodation, SchoolSession, TravelSegment } from "@/lib/szkola/types";
 
 export type DashboardFilterKey = "wszystko" | "szkola" | "artykuly";
 export type DashboardSource = "school" | "article";
@@ -54,6 +54,9 @@ export type NextSessionData = {
   paymentStatus: PrepItem;
   costCount: number;
   schedulePreview: { label: string; time: string }[];
+  /** Najbliższy chronologicznie odcinek podróży/nocleg tego zjazdu (może być null — patrz DashboardNextSessionCard, pusty stan z linkiem dodania). Mobilny ekran startowy (sekcja 3 briefu) pokazuje te same dane co desktop, bez osobnego zapytania. */
+  nextSegment: TravelSegment | null;
+  nextAccommodation: Accommodation | null;
 };
 
 export type DashboardArticleRow = {

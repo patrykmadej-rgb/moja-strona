@@ -2074,3 +2074,212 @@ html {
     opacity: 1;
   }
 }
+
+/* ============================================================
+   Nawigacja mobilna /lab: sticky nagłówek + dolny pasek + arkusz
+   "Więcej" (LabMobileHeader.tsx, LabBottomNav.tsx, LabMoreSheet.tsx).
+
+   Poniżej 768px .lab-sidebar znika CAŁKOWICIE (do tej pory tylko się
+   zwężał do 72px, patrz --lab-sidebar-width wyżej) — panel przechodzi
+   w tryb "aplikacji mobilnej" z dolnym paskiem zamiast pionowego
+   paska ikon. Od 768px w górę wszystko działa jak dotychczas, bez
+   zmian (próg inny niż --lab-sidebar-width 899px celowo — 768px to
+   already przyjęta w tym pliku granica mobile/tablet, patrz reszta
+   media queries).
+
+   Kolejność w DOM (src/app/lab/layout.tsx): Sidebar, LabMobileHeader,
+   LabBottomNav, potem <main>. Wszystkie trzy mają z-index 50, TAK SAMO
+   jak istniejące modale w treści strony — ponieważ <main> jest OSTATNIE
+   w dokumencie, modale (zagnieżdżone w <main>) zawsze malują się NAD
+   tą trójką przy remisie z-index (CSS: przy równym z-index późniejszy
+   element w dokumencie wygrywa) — dokładnie tak jak dziś modale
+   przykrywają Sidebar. Nie podnosić z-index nawigacji mobilnej bez
+   zachowania tej kolejności w layout.tsx.
+   ============================================================ */
+:root {
+  --lab-mobile-header-height: 52px;
+  --lab-bottom-nav-height: 60px;
+}
+
+.lab-mobile-header,
+.lab-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .lab-sidebar {
+    display: none;
+  }
+
+  .lab-main-content {
+    margin-left: 0;
+    padding-top: calc(var(--lab-mobile-header-height) + env(safe-area-inset-top));
+    /* env(safe-area-inset-bottom) wymaga viewport-fit=cover — ustawione
+       w src/app/lab/layout.tsx (export const viewport). +16px oddechu
+       nad paskiem, żeby ostatnia karta/przycisk na stronie nie stykały
+       się wizualnie z nawigacją. */
+    padding-bottom: calc(var(--lab-bottom-nav-height) + env(safe-area-inset-bottom) + 16px);
+  }
+
+  .lab-mobile-header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: calc(var(--lab-mobile-header-height) + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 16px 0;
+
+    background: rgba(245, 241, 236, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid #e8e2ec;
+  }
+
+  .lab-bottom-nav {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 50;
+    display: flex;
+    align-items: stretch;
+    height: calc(var(--lab-bottom-nav-height) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid #e8e2ec;
+    box-shadow: 0 -6px 20px rgba(49, 30, 64, 0.06);
+  }
+}
+
+.lab-mobile-header-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px !important;
+  background: #251332;
+  color: #d8b77b;
+  flex-shrink: 0;
+}
+
+.lab-mobile-header-title {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-cormorant);
+  font-size: 17px;
+  font-weight: 600;
+  color: #201a2b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lab-mobile-header-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px !important;
+  background: #f1eafd;
+  color: #5b2a86;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.lab-bottom-nav-item {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border: none;
+  background: none;
+  color: #9a919f;
+  font-size: 10px;
+  font-weight: 500;
+  transition: color 150ms ease;
+}
+
+.lab-bottom-nav-item[data-active="true"] {
+  color: #5b2a86;
+}
+
+.lab-bottom-nav-item[data-active="true"]::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 3px;
+  border-radius: 999px !important;
+  background: #d8b77b;
+}
+
+/* Arkusz "Więcej" — LabMoreSheet.tsx, wysuwany od dołu, w tej samej
+   trójce warstw DOM co reszta nawigacji mobilnej (patrz komentarz
+   wyżej), więc modale treści strony i tak go przykryją, gdyby oba
+   stany kiedyś się nałożyły. */
+.lab-more-sheet {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 480px;
+  max-height: 80dvh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 20px 20px 0 0 !important;
+  padding: 10px 20px calc(20px + env(safe-area-inset-bottom));
+  box-shadow: 0 -12px 40px rgba(30, 15, 45, 0.22);
+}
+
+.lab-more-sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px !important;
+  background: #e6deec;
+  margin: 4px auto 14px;
+}
+
+.lab-more-sheet-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 10px;
+  border-radius: 10px !important;
+  color: #201a2b;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+a.lab-more-sheet-item:hover,
+button.lab-more-sheet-item:hover {
+  background: #f7f4ef;
+  color: #5b2a86;
+}
+
+.lab-more-sheet-item[data-active="true"] {
+  color: #5b2a86;
+  background: #f1eafd;
+}
+
+.lab-more-sheet-item[data-disabled="true"] {
+  color: #b8b0c0;
+  cursor: not-allowed;
+}

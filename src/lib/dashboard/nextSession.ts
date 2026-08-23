@@ -61,6 +61,21 @@ export function buildNextSessionData(input: {
     semester: input.semester,
   });
 
+  // Chronologicznie najbliższy odcinek/nocleg tego zjazdu (sekcja 3 briefu:
+  // "data i godzina lotu", "daty pobytu" na mobilnym ekranie startowym) —
+  // segments/accommodations to już tylko dane TEGO zjazdu (przefiltrowane
+  // przez wywołującego), więc bierzemy po prostu najwcześniejszy wpis, nie
+  // filtrujemy dodatkowo po "przyszłości" (zjazd sam w sobie jest przyszły).
+  const nextSegment =
+    [...input.segments].sort((a, b) =>
+      `${a.departure_date ?? "9999-99-99"} ${a.departure_time ?? "99:99"}`.localeCompare(
+        `${b.departure_date ?? "9999-99-99"} ${b.departure_time ?? "99:99"}`,
+      ),
+    )[0] ?? null;
+
+  const nextAccommodation =
+    [...input.accommodations].sort((a, b) => (a.check_in ?? "9999-99-99").localeCompare(b.check_in ?? "9999-99-99"))[0] ?? null;
+
   return {
     session: input.session,
     daysUntil: getDaysUntil(input.session.start_date),
@@ -69,5 +84,7 @@ export function buildNextSessionData(input: {
     paymentStatus,
     costCount: input.costCount,
     schedulePreview: buildSchedulePreview(input.scheduleItems),
+    nextSegment,
+    nextAccommodation,
   };
 }
