@@ -1917,6 +1917,13 @@ html {
 
 .lab-main-content {
   min-height: 100vh;
+  /* 100dvh (dynamic viewport height) jako progresywne ulepszenie — tak samo
+     jak .lab-sidebar wyżej. Na iOS Safari samo 100vh bywa liczone względem
+     "największego możliwego" viewportu (z ukrytym paskiem adresu), czyli
+     WIĘCEJ niż realnie widoczny obszar — to była jedna z podejrzewanych
+     przyczyn dużej pustej przestrzeni nad/pod dolną nawigacją mobilną.
+     100dvh śledzi RZECZYWISTY widoczny obszar. */
+  min-height: 100dvh;
   margin-left: var(--lab-sidebar-width);
 }
 
@@ -2158,6 +2165,17 @@ html {
     min-width: 0;
   }
 
+  /* Naprawa "ogromnej białej przestrzeni pod dolną nawigacją": poprzednia
+     wersja liczyła `height: calc(baza + env(safe-area))` I RÓWNOCZEŚNIE
+     `padding: env(safe-area) ...` na tym samym elemencie — matematycznie
+     przy box-sizing:border-box to się nie dubluje (padding jest już
+     wliczony w height), ale jest to krucha, myląca konstrukcja dokładnie
+     tego typu, o który prosił brief do wyeliminowania. Nowa wersja NIE
+     ustawia jawnego `height` w ogóle — wysokość wynika WYŁĄCZNIE z
+     zawartości (ikony/etykiety + min-height) plus JEDNEGO źródła
+     safe-area (padding), więc nie ma żadnej możliwości podwójnego
+     naliczenia ani rozjazdu w przeglądarkach, które inaczej obsługują
+     `env()` wewnątrz `calc()` w `height`. */
   .lab-mobile-header {
     position: fixed;
     inset: 0 0 auto 0;
@@ -2165,8 +2183,8 @@ html {
     display: flex;
     align-items: center;
     gap: 10px;
-    height: calc(var(--lab-mobile-header-height) + env(safe-area-inset-top));
-    padding: env(safe-area-inset-top) 16px 0;
+    min-height: var(--lab-mobile-header-height);
+    padding: env(safe-area-inset-top) 16px 8px;
 
     background: rgba(245, 241, 236, 0.92);
     backdrop-filter: blur(10px);
@@ -2180,7 +2198,9 @@ html {
     z-index: 50;
     display: flex;
     align-items: stretch;
-    height: calc(var(--lab-bottom-nav-height) + env(safe-area-inset-bottom));
+    /* Brak jawnego height — wysokość = .lab-bottom-nav-item (min-height:
+       var(--lab-bottom-nav-height), rozciągnięte przez align-items:stretch)
+       + ten JEDEN padding-bottom na safe-area. */
     padding-bottom: env(safe-area-inset-bottom);
 
     background: rgba(255, 255, 255, 0.97);
@@ -2233,7 +2253,11 @@ html {
   position: relative;
   flex: 1;
   min-width: 0;
-  min-height: 44px;
+  /* Ta sama zmienna, co .lab-main-content używa do wyliczenia
+     padding-bottom (rezerwacja miejsca na treści) — jedno źródło prawdy,
+     żeby wysokość paska i zarezerwowany margines treści nigdy się nie
+     rozjechały. */
+  min-height: var(--lab-bottom-nav-height);
   display: flex;
   flex-direction: column;
   align-items: center;
