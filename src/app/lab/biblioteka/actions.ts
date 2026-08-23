@@ -7,6 +7,7 @@ import {
   createLoan,
   deleteBook,
   returnLoan as returnLoanService,
+  setCoverUrl,
   setOwnershipStatus,
   setReadingStatus,
   updateBook,
@@ -50,6 +51,7 @@ function parseBookInput(formData: FormData): { input: LibraryBookInput } | { err
   const isbn = String(formData.get("isbn") ?? "").trim() || null;
   const publisher = String(formData.get("publisher") ?? "").trim() || null;
   const notes = String(formData.get("notes") ?? "").trim() || null;
+  const coverUrl = String(formData.get("coverUrl") ?? "").trim() || null;
 
   const yearRaw = String(formData.get("year") ?? "").trim();
   let year: number | null = null;
@@ -59,7 +61,7 @@ function parseBookInput(formData: FormData): { input: LibraryBookInput } | { err
     year = parsed;
   }
 
-  return { input: { title, author, ownershipStatus, readingStatus, category, language, year, isbn, publisher, notes } };
+  return { input: { title, author, ownershipStatus, readingStatus, category, language, year, isbn, publisher, notes, coverUrl } };
 }
 
 export async function createLibraryBook(formData: FormData): Promise<LibraryActionError | undefined> {
@@ -169,6 +171,24 @@ export async function updateReadingStatus(bookId: string, readingStatus: Reading
     return { success: true };
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Nie udało się zmienić statusu czytania." };
+  }
+}
+
+export async function updateLibraryBookCover(bookId: string, coverUrl: string | null): Promise<{ error: string } | { success: true }> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { error: "Brak autoryzacji." };
+
+    const result = await setCoverUrl(supabase, user.id, bookId, coverUrl);
+    if (!result.ok) return { error: result.error };
+
+    revalidatePath(LAB_LIBRARY_PATH);
+    return { success: true };
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Nie udało się zapisać okładki." };
   }
 }
 

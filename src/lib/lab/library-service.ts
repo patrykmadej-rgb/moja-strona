@@ -34,6 +34,7 @@ export type LibraryBookInput = {
   isbn: string | null;
   publisher: string | null;
   notes: string | null;
+  coverUrl: string | null;
 };
 
 export type LoanInput = {
@@ -124,6 +125,7 @@ export async function createBook(
       isbn: input.isbn,
       publisher: input.publisher,
       notes: input.notes,
+      cover_url: input.coverUrl,
     })
     .select("*")
     .single();
@@ -163,6 +165,7 @@ export async function updateBook(
       isbn: input.isbn,
       publisher: input.publisher,
       notes: input.notes,
+      cover_url: input.coverUrl,
       updated_at: new Date().toISOString(),
     })
     .eq("id", bookId)
@@ -281,6 +284,26 @@ export async function createLoan(
     return { ok: false, error: error.message };
   }
   return { ok: true, data: data as LibraryLoan };
+}
+
+/** "Znajdź okładkę" z menu istniejącej książki (sekcja 4/7 briefu) — zmienia WYŁĄCZNIE cover_url, bez dotykania tytułu/autora/statusów. */
+export async function setCoverUrl(
+  supabase: SupabaseServerClient,
+  userId: string,
+  bookId: string,
+  coverUrl: string | null,
+): Promise<LibraryServiceResult<LibraryBook>> {
+  const { data, error } = await supabase
+    .from("library_books")
+    .update({ cover_url: coverUrl, updated_at: new Date().toISOString() })
+    .eq("id", bookId)
+    .eq("user_id", userId)
+    .select("*")
+    .maybeSingle();
+
+  if (error) return { ok: false, error: error.message };
+  if (!data) return { ok: false, error: "Nie znaleziono książki." };
+  return { ok: true, data: data as LibraryBook };
 }
 
 export async function returnLoan(

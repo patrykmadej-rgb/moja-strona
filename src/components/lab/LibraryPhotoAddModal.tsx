@@ -4,7 +4,8 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, Camera, Check, Info, Loader2, Trash2, X } from "lucide-react";
 import { createLibraryBook, type LibraryActionError } from "@/app/lab/biblioteka/actions";
-import { OWNERSHIP_STATUS_LABELS, OWNERSHIP_STATUSES, type OwnershipStatus } from "@/lib/lab/library-types";
+import LibraryCoverPicker, { type CoverCandidate } from "@/components/lab/LibraryCoverPicker";
+import type { OwnershipStatus } from "@/lib/lab/library-types";
 
 type ProposalStatus = "recognizing" | "ready" | "recognize_error" | "saving" | "saved" | "duplicate" | "save_error";
 
@@ -16,10 +17,13 @@ type PhotoProposal = {
   selected: boolean;
   title: string;
   author: string;
+  /** ISBN/wydawnictwo/rok z OCR — nie pokazywane w UI (sekcja 10 briefu), tylko do identyfikacji/zapisu; nadpisywane danymi z wybranej okładki, jeśli jest. */
   isbn: string;
   publisher: string;
   year: string;
+  /** Zawsze z aktywnej zakładki, bez UI do zmiany — sekcja 10 briefu. */
   ownershipStatus: OwnershipStatus;
+  selectedCover: CoverCandidate | null;
   /** Błąd (rozpoznawania albo zapisu) — czerwony tekst. */
   message: string | null;
   /** Neutralna informacja (np. "nie rozpoznano tytułu, uzupełnij ręcznie") — nie jest błędem, formularz i tak działa. */
@@ -236,6 +240,7 @@ export default function LibraryPhotoAddModal({
       publisher: "",
       year: "",
       ownershipStatus: initialOwnershipStatus,
+      selectedCover: null,
       message: null,
       infoMessage: null,
       duplicates: null,
@@ -266,9 +271,16 @@ export default function LibraryPhotoAddModal({
     formData.set("author", proposal.author.trim());
     formData.set("ownershipStatus", proposal.ownershipStatus);
     formData.set("readingStatus", "unread");
-    if (proposal.isbn.trim()) formData.set("isbn", proposal.isbn.trim());
-    if (proposal.publisher.trim()) formData.set("publisher", proposal.publisher.trim());
-    if (proposal.year.trim()) formData.set("year", proposal.year.trim());
+    // Wydawnictwo/rok/ISBN/okładka z wybranego kandydata mają pierwszeństwo
+    // przed surowym odczytem OCR — katalog jest wiarygodniejszy; OCR
+    // zostaje jako fallback, gdy wyszukiwanie okładki nic nie znalazło.
+    const isbn = proposal.selectedCover?.isbn ?? (proposal.isbn.trim() || null);
+    const publisher = proposal.selectedCover?.publisher ?? (proposal.publisher.trim() || null);
+    const year = proposal.selectedCover?.year ?? (proposal.year.trim() ? Number.parseInt(proposal.year, 10) : null);
+    if (isbn) formData.set("isbn", isbn);
+    if (publisher) formData.set("publisher", publisher);
+    if (year) formData.set("year", String(year));
+    if (proposal.selectedCover?.thumbnailUrl) formData.set("coverUrl", proposal.selectedCover.thumbnailUrl);
     if (confirmDuplicate) formData.set("confirmDuplicate", "true");
 
     const result = await createLibraryBook(formData);
@@ -434,57 +446,14 @@ export default function LibraryPhotoAddModal({
                             />
                           </label>
 
-                          <div className="grid grid-cols-1 gap-2.5 min-[380px]:grid-cols-2">
-                            <label className={fieldLabelClass}>
-                              <span>ISBN</span>
-                              <input
-                                value={p.isbn}
-                                onChange={(e) => updateProposal(p.localId, { isbn: e.target.value })}
-                                placeholder="opcjonalnie"
-                                className={fieldInputClass}
-                              />
-                            </label>
-                            <label className={fieldLabelClass}>
-                              <span>Rok wydania</span>
-                              <input
-                                value={p.year}
-                                onChange={(e) => updateProposal(p.localId, { year: e.target.value })}
-                                placeholder="opcjonalnie"
-                                inputMode="numeric"
-                                className={fieldInputClass}
-                              />
-                            </label>
-                          </div>
-
-                          <label className={fieldLabelClass}>
-                            <span>Wydawnictwo</span>
-                            <input
-                              value={p.publisher}
-                              onChange={(e) => updateProposal(p.localId, { publisher: e.target.value })}
-                              placeholder="opcjonalnie"
-                              className={fieldInputClass}
-                            />
-                          </label>
-
                           <div className={fieldLabelClass}>
-                            <span>Status własności</span>
-                            <div className="flex gap-2">
-                              {OWNERSHIP_STATUSES.map((s) => (
-                                <button
-                                  key={s}
-                                  type="button"
-                                  onClick={() => updateProposal(p.localId, { ownershipStatus: s })}
-                                  aria-pressed={p.ownershipStatus === s}
-                                  className={
-                                    p.ownershipStatus === s
-                                      ? "flex h-9 flex-1 items-center justify-center rounded-[9px] bg-[#5b2a86] text-[13px] font-medium text-white"
-                                      : "flex h-9 flex-1 items-center justify-center rounded-[9px] border border-[#e6deec] text-[13px] text-[#706878]"
-                                  }
-                                >
-                                  {OWNERSHIP_STATUS_LABELS[s]}
-                                </button>
-                              ))}
-                            </div>
+                            <span>Okładka</span>
+                            <LibraryCoverPicker
+                              title={p.title}
+                              author={p.author}
+                              selected={p.selectedCover}
+                              onSelect={(candidate) => updateProposal(p.localId, { selectedCover: candidate })}
+                            />
                           </div>
 
                           {p.infoMessage && (

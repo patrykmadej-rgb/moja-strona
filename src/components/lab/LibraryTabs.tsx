@@ -1,9 +1,8 @@
-export type LibraryTabKey = "owned" | "wishlist" | "all";
+export type LibraryTabKey = "owned" | "wishlist";
 
 export const LIBRARY_TABS: { key: LibraryTabKey; label: string }[] = [
   { key: "owned", label: "Moje książki" },
   { key: "wishlist", label: "Chcę kupić" },
-  { key: "all", label: "Wszystkie" },
 ];
 
 export default function LibraryTabs({ tab, onChange }: { tab: LibraryTabKey; onChange: (tab: LibraryTabKey) => void }) {

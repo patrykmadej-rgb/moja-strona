@@ -14,10 +14,14 @@ export const READING_STATUSES = ["unread", "reading", "read"] as const;
 export type ReadingStatus = (typeof READING_STATUSES)[number];
 
 export const READING_STATUS_LABELS: Record<ReadingStatus, string> = {
-  unread: "Nieprzeczytana",
+  unread: "Do przeczytania",
   reading: "W trakcie czytania",
   read: "Przeczytana",
 };
+
+/** Status pokazywany zamiast statusu czytania, gdy książka ma aktywne wypożyczenie — wyłącznie prezentacyjne, nie zapisywane w bazie (patrz LibraryBookCard.tsx). */
+export const LOANED_STATUS_LABEL = "Wypożyczona";
+export const LOANED_STATUS_COLORS = { bg: "#fdf1de", text: "#8a5a12" };
 
 // Kolory w stylu STATUS_COLORS z components/lab/StatusTag.tsx (ta sama
 // paleta: fiolety/złoto/zielenie panelu /lab).
@@ -68,6 +72,8 @@ export type LibraryBook = {
   isbn: string | null;
   publisher: string | null;
   notes: string | null;
+  /** Migracja 023 — miniatura z Google Books (wymuszone HTTPS) albo ręczny wybór. */
+  cover_url: string | null;
   created_at: string;
   updated_at: string;
 };
