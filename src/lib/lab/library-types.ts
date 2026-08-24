@@ -59,6 +59,9 @@ export const LIBRARY_LANGUAGES = ["PL", "EN", "DE", "Inny"] as const;
 
 export const NO_LANGUAGE_LABEL = "Bez oznaczenia";
 
+/** Nazwa prywatnego bucketu Storage dla ręcznie wgranych okładek (migracja 024) — stała trzymana tutaj (nie w libraryCoverStorage.ts, który importuje klienta przeglądarki), żeby server-only library-service.ts mógł ją reużyć bez importowania niczego związanego z przeglądarką. */
+export const LIBRARY_COVERS_BUCKET = "library-covers";
+
 export type LibraryBook = {
   id: string;
   user_id: string;
@@ -72,8 +75,10 @@ export type LibraryBook = {
   isbn: string | null;
   publisher: string | null;
   notes: string | null;
-  /** Migracja 023 — miniatura z Google Books (wymuszone HTTPS) albo ręczny wybór. */
+  /** Migracja 023 — miniatura z Google Books/Open Library (wymuszone HTTPS) albo ręczny wybór spośród wyników wyszukiwania. Ignorowane, gdy cover_storage_path jest ustawione. */
   cover_url: string | null;
+  /** Migracja 024 — własne zdjęcie okładki w prywatnym Storage (bucket library-covers); ma pierwszeństwo przed cover_url. Surowa ścieżka, NIE URL — do wyświetlenia trzeba wygenerować podpisany URL (patrz src/app/lab/biblioteka/page.tsx). */
+  cover_storage_path: string | null;
   created_at: string;
   updated_at: string;
 };

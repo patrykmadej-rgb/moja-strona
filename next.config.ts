@@ -34,19 +34,20 @@ const nextConfig: NextConfig = {
     "/lab/szkola/import/[id]": ["./public/ocr-lang/**/*"],
     "/api/lab/biblioteka/recognize": ["./public/ocr-lang/**/*"],
   },
-  // Miniatury okładek z Google Books (LibraryCoverPicker/LibraryCoverImage,
+  // Miniatury okładek z Google Books i Open Library (fallback — sekcja 5
+  // briefu, LibraryCoverPicker/LibraryCoverImage,
   // src/lib/lab/library-isbn-lookup.ts) — next/image wymaga jawnej listy
-  // dozwolonych domen zewnętrznych obrazów. Tylko HTTPS i tylko te dwie
-  // domeny, z których Google Books realnie serwuje miniatury (aplikacja
-  // wymusza https:// na URL-u przed zapisem — toHttpsUrl w
+  // dozwolonych domen zewnętrznych obrazów. Tylko HTTPS i tylko domeny, z
+  // których te dwa źródła realnie serwują obrazy (aplikacja dodatkowo
+  // wymusza https:// na URL-u Google Books przed zapisem — toHttpsUrl w
   // library-isbn-lookup.ts — ale ta lista i tak dopuszcza wyłącznie
-  // protocol: "https", więc nawet nadpisany URL http:// zostałby odrzucony
-  // przez next/image). Celowo NIE dopuszczamy całej domeny "*.google.com"
+  // protocol: "https"). Celowo NIE dopuszczamy całej domeny "*.google.com"
   // ani innych hostów.
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "books.google.com" },
       { protocol: "https", hostname: "books.googleusercontent.com" },
+      { protocol: "https", hostname: "covers.openlibrary.org" },
     ],
   },
 };

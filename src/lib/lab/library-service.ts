@@ -1,6 +1,6 @@
 import "server-only";
 import type { createClient } from "@/lib/supabase/server";
-import type { LibraryBook, LibraryLoan, OwnershipStatus, ReadingStatus } from "@/lib/lab/library-types";
+import { LIBRARY_COVERS_BUCKET, type LibraryBook, type LibraryLoan, type OwnershipStatus, type ReadingStatus } from "@/lib/lab/library-types";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -179,6 +179,11 @@ export async function updateBook(
 }
 
 export async function deleteBook(supabase: SupabaseServerClient, userId: string, bookId: string): Promise<LibraryServiceResult<null>> {
+  // Ścieżka ewentualnej ręcznie wgranej okładki (migracja 024) — do
+  // posprzątania w Storage PO udanym usunięciu wiersza, żeby nie zostawiać
+  // osieroconego pliku w prywatnym buckecie.
+  const { data: existing } = await supabase.from("library_books").select("cover_storage_path").eq("id", bookId).eq("user_id", userId).maybeSingle();
+
   // Kasowanie kaskadowe: usunięcie książki usuwa też jej historię
   // wypożyczeń (library_loans.book_id ... on delete cascade, migracja 022)
   // — rozsądne domyślne zachowanie, bo historia bez książki nie ma sensu.
@@ -186,6 +191,13 @@ export async function deleteBook(supabase: SupabaseServerClient, userId: string,
 
   if (error) return { ok: false, error: error.message };
   if (!count) return { ok: false, error: "Nie znaleziono książki." };
+
+  const coverPath = existing?.cover_storage_path as string | null | undefined;
+  if (coverPath) {
+    // Best-effort — nieudane sprzątanie pliku nigdy nie cofa już wykonanego usunięcia książki.
+    await supabase.storage.from(LIBRARY_COVERS_BUCKET).remove([coverPath]);
+  }
+
   return { ok: true, data: null };
 }
 
@@ -287,22 +299,44 @@ export async function createLoan(
 }
 
 /** "Znajdź okładkę" z menu istniejącej książki (sekcja 4/7 briefu) — zmienia WYŁĄCZNIE cover_url, bez dotykania tytułu/autora/statusów. */
-export async function setCoverUrl(
+/**
+ * Zakres 6 briefu (ręczna okładka): źródło okładki jest albo zewnętrznym
+ * URL-em (Google Books/Open Library/ręcznie wpisany), albo ścieżką we
+ * własnym, prywatnym Storage (upload z telefonu/komputera) — nigdy oba
+ * naraz, żeby uniknąć niejednoznaczności przy renderze (patrz komentarz w
+ * LibraryBook.cover_storage_path, library-types.ts). "null" usuwa okładkę
+ * całkowicie.
+ */
+export type CoverUpdate = { source: "url"; url: string | null } | { source: "storage"; path: string };
+
+export async function setCover(
   supabase: SupabaseServerClient,
   userId: string,
   bookId: string,
-  coverUrl: string | null,
+  update: CoverUpdate,
 ): Promise<LibraryServiceResult<LibraryBook>> {
-  const { data, error } = await supabase
-    .from("library_books")
-    .update({ cover_url: coverUrl, updated_at: new Date().toISOString() })
-    .eq("id", bookId)
-    .eq("user_id", userId)
-    .select("*")
-    .maybeSingle();
+  // Poprzednia ścieżka w Storage (jeśli inna niż nowa) — do posprzątania po
+  // udanej zmianie, żeby nie zostawiać osieroconych plików przy każdej
+  // podmianie/usunięciu ręcznie wgranej okładki.
+  const { data: existing } = await supabase.from("library_books").select("cover_storage_path").eq("id", bookId).eq("user_id", userId).maybeSingle();
+
+  const patch =
+    update.source === "url"
+      ? { cover_url: update.url, cover_storage_path: null, updated_at: new Date().toISOString() }
+      : { cover_url: null, cover_storage_path: update.path, updated_at: new Date().toISOString() };
+
+  const { data, error } = await supabase.from("library_books").update(patch).eq("id", bookId).eq("user_id", userId).select("*").maybeSingle();
 
   if (error) return { ok: false, error: error.message };
   if (!data) return { ok: false, error: "Nie znaleziono książki." };
+
+  const oldPath = existing?.cover_storage_path as string | null | undefined;
+  const newPath = update.source === "storage" ? update.path : null;
+  if (oldPath && oldPath !== newPath) {
+    // Best-effort — nieudane sprzątanie nigdy nie cofa już zapisanej zmiany okładki.
+    await supabase.storage.from(LIBRARY_COVERS_BUCKET).remove([oldPath]);
+  }
+
   return { ok: true, data: data as LibraryBook };
 }
 

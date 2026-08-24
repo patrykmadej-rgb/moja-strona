@@ -96,7 +96,14 @@ async function fetchRawData(supabase: SupabaseServerClient, userId: string) {
         .limit(10),
       [],
     ),
-    safeFetch<SchoolSemester[]>(supabase.from("school_semesters").select("*"), []),
+    // Sekcja 7 briefu (wydajność): brak .limit() tutaj było bezpieczne przy
+    // małej liczbie semestrów, ale niepotrzebnie nieograniczone — semestry
+    // rosną wolno (kilka rocznie), 50 to ~kilkanaście lat historii, z
+    // zapasem dla dowolnego realnego użytkownika tego panelu.
+    safeFetch<SchoolSemester[]>(
+      supabase.from("school_semesters").select("*").order("start_date", { ascending: false }).limit(50),
+      [],
+    ),
     safeFetch<{ id: string; departure_place: string | null; arrival_place: string | null; segment_type: string; created_at: string }[]>(
       supabase.from("travel_segments").select("id, departure_place, arrival_place, segment_type, created_at").order("created_at", { ascending: false }).limit(5),
       [],
@@ -117,7 +124,14 @@ async function fetchRawData(supabase: SupabaseServerClient, userId: string) {
       supabase.from("session_tasks").select("id, session_id, title, due_date, is_done").not("due_date", "is", null).eq("is_done", false).order("due_date", { ascending: true }).limit(10),
       [],
     ),
-    safeFetch<Article[]>(supabase.from("articles").select("*").order("updated_at", { ascending: false }), []),
+    // Sekcja 7 briefu (wydajność): jedyne zapytanie w tym pliku bez .limit()
+    // mimo select("*") — dashboard potrzebuje tylko skrótu (activeArticles,
+    // liczniki wersji, mapowanie tytułów), nie CAŁEJ historii artykułów.
+    // 100 najnowszych (po updated_at) z zapasem pokrywa wszystko, co
+    // selectActiveArticles/buildRecentActivity realnie pokazują — pełna,
+    // niepaginowana lista zostaje na /lab/artykuly (osobne, nietknięte tu
+    // zapytanie w src/app/lab/artykuly/page.tsx).
+    safeFetch<Article[]>(supabase.from("articles").select("*").order("updated_at", { ascending: false }).limit(100), []),
     safeFetch<{ id: string; article_id: string; version_number: number; uploaded_at: string }[]>(
       supabase.from("article_versions").select("id, article_id, version_number, uploaded_at"),
       [],

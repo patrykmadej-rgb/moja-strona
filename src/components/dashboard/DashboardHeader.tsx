@@ -5,14 +5,23 @@ export default function DashboardHeader() {
   return (
     <div className="flex flex-wrap items-start justify-between gap-6">
       <div>
-        <h1 className="font-[family-name:var(--font-cormorant)] text-[32px] font-semibold leading-[1.1] text-[#201a2b]">Pulpit</h1>
-        <p className="mt-1.5 text-[13px] text-[#706878]">Centrum dowodzenia dla szkoły psychoterapii i artykułów naukowych.</p>
+        <h1 className="font-[family-name:var(--font-cormorant)] text-[22px] font-semibold leading-[1.1] text-[#201a2b] min-[768px]:text-[32px]">
+          Pulpit
+        </h1>
+        <p className="mt-1.5 hidden text-[13px] text-[#706878] min-[768px]:block">
+          Centrum dowodzenia dla szkoły psychoterapii i artykułów naukowych.
+        </p>
       </div>
-      {/* Poniżej 500px przyciski stoją jeden pod drugim na pełną szerokość
-          (żaden nie może "prawie dotykać krawędzi ekranu" — pełna szerokość
-          z marginesem z samego kontenera strony). Od 500px wraca do
-          poziomego rzędu z zawijaniem, bez zmiany wyglądu na desktopie. */}
-      <div className="flex w-full flex-col gap-2 min-[500px]:w-auto min-[500px]:flex-row min-[500px]:flex-wrap min-[500px]:items-center">
+      {/* Poniżej 768px cały rząd przycisków znika (sekcja 2 briefu: "zastąp
+          wielkie przyciski mniejszymi, praktycznymi podglądami"). "Dodaj
+          artykuł" nadal jest dostępny na mobile przez bottom nav → Więcej →
+          Artykuły (ArticlesPageHeader ma własny przycisk). "Dodaj odcinek
+          podróży"/"Importuj dokument" są świadomie mniej eksponowane na
+          telefonie — mobilny moduł Szkoły (sekcja 3 briefu) pokazuje
+          uproszczoną listę zjazdów zamiast pełnej nawigacji podstron, więc
+          te dwie akcje pozostają w pełni dostępne na desktopie bez zmian.
+          Od 768px rząd wraca dokładnie w dotychczasowej postaci. */}
+      <div className="hidden w-full flex-col gap-2 min-[500px]:flex-row min-[500px]:flex-wrap min-[500px]:items-center min-[768px]:flex min-[768px]:w-auto">
         <Link
           href="/lab/artykuly/nowy"
           className="flex h-10 items-center justify-center gap-1.5 rounded-[10px] bg-[#5b2a86] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#32134f]"

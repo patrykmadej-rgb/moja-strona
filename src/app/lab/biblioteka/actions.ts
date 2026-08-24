@@ -7,10 +7,11 @@ import {
   createLoan,
   deleteBook,
   returnLoan as returnLoanService,
-  setCoverUrl,
+  setCover,
   setOwnershipStatus,
   setReadingStatus,
   updateBook,
+  type CoverUpdate,
   type LibraryBookInput,
 } from "@/lib/lab/library-service";
 import { OWNERSHIP_STATUSES, READING_STATUSES, type LibraryBook, type OwnershipStatus, type ReadingStatus } from "@/lib/lab/library-types";
@@ -174,7 +175,17 @@ export async function updateReadingStatus(bookId: string, readingStatus: Reading
   }
 }
 
+/** Zewnętrzny URL (Google Books/Open Library) — "Znajdź okładkę" / wybór spośród wyników wyszukiwania. `null` = usuń okładkę. */
 export async function updateLibraryBookCover(bookId: string, coverUrl: string | null): Promise<{ error: string } | { success: true }> {
+  return applyCoverUpdate(bookId, { source: "url", url: coverUrl });
+}
+
+/** Zakres 6 briefu: ścieżka we WŁASNYM Storage (bucket library-covers) po udanym uploadzie — patrz src/lib/lab/libraryCoverStorage.ts. */
+export async function updateLibraryBookCoverStorage(bookId: string, storagePath: string): Promise<{ error: string } | { success: true }> {
+  return applyCoverUpdate(bookId, { source: "storage", path: storagePath });
+}
+
+async function applyCoverUpdate(bookId: string, update: CoverUpdate): Promise<{ error: string } | { success: true }> {
   try {
     const supabase = await createClient();
     const {
@@ -182,7 +193,7 @@ export async function updateLibraryBookCover(bookId: string, coverUrl: string | 
     } = await supabase.auth.getUser();
     if (!user) return { error: "Brak autoryzacji." };
 
-    const result = await setCoverUrl(supabase, user.id, bookId, coverUrl);
+    const result = await setCover(supabase, user.id, bookId, update);
     if (!result.ok) return { error: result.error };
 
     revalidatePath(LAB_LIBRARY_PATH);

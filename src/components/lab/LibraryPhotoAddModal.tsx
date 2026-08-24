@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AlertTriangle, Camera, Check, Info, Loader2, Trash2, X } from "lucide-react";
 import { createLibraryBook, type LibraryActionError } from "@/app/lab/biblioteka/actions";
 import LibraryCoverPicker, { type CoverCandidate } from "@/components/lab/LibraryCoverPicker";
+import { prepareImageForUpload } from "@/lib/imagePrep";
 import type { OwnershipStatus } from "@/lib/lab/library-types";
 
 type ProposalStatus = "recognizing" | "ready" | "recognize_error" | "saving" | "saved" | "duplicate" | "save_error";
@@ -53,68 +54,10 @@ const fieldLabelClass = "flex flex-col gap-1 text-xs font-medium text-[#4f4758]"
 const fieldInputClass =
   "w-full rounded-[10px] border border-[#e6deec] bg-white px-3 py-2.5 text-[16px] text-[#201a2b] outline-none focus:border-[#5b2a86] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#5b2a86]/40";
 
-const MAX_IMAGE_DIMENSION = 1600;
-const TARGET_UPLOAD_BYTES = 3.5 * 1024 * 1024;
-const INITIAL_JPEG_QUALITY = 0.85;
-
-/**
- * Przygotowanie zdjęcia przed wysyłką (sekcja 2 briefu) — jest to
- * BEZPOŚREDNIA przyczyna, dla której rozpoznawanie nie działało na
- * prawdziwym iPhonie: oryginalne zdjęcia z aparatu (często 3-8 MB) trafiały
- * na serwer, którego platforma hostingowa odrzuca zbyt duże żądania,
- * zanim dotrą do naszego kodu — klient dostawał odpowiedź, która nie była
- * poprawnym JSON, i lądował w ogólnym "Błąd połączenia z serwerem".
- *
- * Standardowy <img> + <canvas> (NIE createImageBitmap — gorzej wspierane
- * opcje orientacji w Safari): nowoczesne przeglądarki, łącznie z Safari na
- * iOS, renderują <img> z uwzględnieniem orientacji EXIF, więc obraz
- * narysowany z takiego <img> na canvasie jest już poprawnie obrócony bez
- * ręcznego parsowania EXIF. Safari dekoduje też HEIC/HEIF natywnie w
- * <img> — canvas.toBlob() zawsze zwraca JPEG niezależnie od formatu
- * wejściowego, więc to jednocześnie naturalnie "konwertuje" HEIC. W
- * przeglądarkach bez natywnego dekodera HEIC (np. desktopowy Chrome)
- * wczytanie się nie uda — wtedy zwracamy jawny komunikat zamiast udawać
- * obsługę.
- */
-async function prepareImageForUpload(file: File): Promise<{ blob: Blob } | { error: string }> {
-  const objectUrl = URL.createObjectURL(file);
-  try {
-    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const el = new Image();
-      el.onload = () => resolve(el);
-      el.onerror = () => reject(new Error("decode-failed"));
-      el.src = objectUrl;
-    });
-
-    if (!img.naturalWidth || !img.naturalHeight) {
-      return { error: "Nie udało się odczytać tego zdjęcia. Spróbuj zdjęcia w formacie JPG lub PNG." };
-    }
-
-    const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(img.naturalWidth, img.naturalHeight));
-    const width = Math.max(1, Math.round(img.naturalWidth * scale));
-    const height = Math.max(1, Math.round(img.naturalHeight * scale));
-
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return { error: "Ta przeglądarka nie obsługuje przetwarzania zdjęć." };
-    ctx.drawImage(img, 0, 0, width, height);
-
-    let quality = INITIAL_JPEG_QUALITY;
-    for (let attempt = 0; attempt < 4; attempt += 1) {
-      const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
-      if (!blob) return { error: "Nie udało się przygotować zdjęcia do wysyłki." };
-      if (blob.size <= TARGET_UPLOAD_BYTES || quality <= 0.4) return { blob };
-      quality -= 0.15;
-    }
-    return { error: "Nie udało się wystarczająco zmniejszyć zdjęcia." };
-  } catch {
-    return { error: "Nie udało się odczytać tego formatu zdjęcia w tej przeglądarce. Spróbuj zdjęcia w formacie JPG lub PNG." };
-  } finally {
-    URL.revokeObjectURL(objectUrl);
-  }
-}
+// prepareImageForUpload (kompresja/orientacja/konwersja HEIC→JPEG — sekcja 2
+// briefu poprzedniego zadania) przeniesione do src/lib/imagePrep.ts, żeby
+// ręczny upload własnej okładki (LibraryCoverPickerModal.tsx, zakres 6
+// briefu tego zadania) używał dokładnie tej samej, sprawdzonej logiki.
 
 /** Sekcja 5 briefu: rozróżnienie przyczyn zamiast jednego ogólnego komunikatu. */
 function messageForStatus(status: number, serverMessage?: string): string {

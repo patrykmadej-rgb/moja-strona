@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import SessionHeader from "@/components/szkola/SessionHeader";
-import SessionTabs, { type SessionTabKey } from "@/components/szkola/SessionTabs";
+import SessionTabs, { SESSION_TABS, type SessionTabKey } from "@/components/szkola/SessionTabs";
 import SessionOverview from "@/components/szkola/SessionOverview";
 import SessionForm from "@/components/szkola/SessionForm";
 import TravelTab from "@/components/szkola/TravelTab";
@@ -58,7 +59,15 @@ export default function SessionWorkspace({
   importableGoogleEvents: SchoolCalendarEvent[];
   semesters: SchoolSemester[];
 }) {
-  const [tab, setTab] = useState<SessionTabKey>("przeglad");
+  // Odczyt startowej zakładki z ?tab= (wzorem ArticleWorkspace.tsx) — pozwala
+  // linkować bezpośrednio do "Podróż"/"Zakwaterowanie"/"Plan zajęć" z
+  // mobilnej, uproszczonej listy zjazdów (sekcja 3 briefu, /lab/szkola)
+  // bez duplikowania logiki zakładek w osobnym, konkurencyjnym widoku.
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const isValidTab = (value: string | null): value is SessionTabKey => SESSION_TABS.some((t) => t.key === value && t.enabled);
+
+  const [tab, setTab] = useState<SessionTabKey>(isValidTab(tabParam) ? tabParam : "przeglad");
   const [editing, setEditing] = useState(false);
 
   return (

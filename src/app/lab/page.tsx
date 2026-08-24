@@ -63,31 +63,35 @@ export default async function LabDashboardPage({
 
           <div className="grid grid-cols-1 items-stretch gap-5 min-[900px]:grid-cols-[minmax(0,0.32fr)_minmax(0,0.68fr)]">
             <DashboardNextSessionCard data={data.nextSession.data} error={data.nextSession.error} />
-            <DashboardArticlesCard articles={filter === "szkola" ? [] : data.activeArticles.data} error={data.activeArticles.error} />
+            {/* Ukryte na telefonie (sekcja 2 briefu: "ogranicz liczbę elementów
+                widocznych jednocześnie") — artykuły mają własną, pełną stronę
+                pod bottom nav → Więcej → Artykuły. Próg 768px (nie 900px jak
+                grid-cols wyżej), żeby dokładnie pokrywał się z granicą, na
+                której panel w ogóle przełącza się w tryb mobilny (sidebar/
+                bottom-nav), zamiast z osobnym, węższym progiem tego grida. */}
+            <div className="hidden min-[768px]:block">
+              <DashboardArticlesCard articles={filter === "szkola" ? [] : data.activeArticles.data} error={data.activeArticles.error} />
+            </div>
           </div>
 
           {/*
-            Sekcja 14 briefu: na mobile kolejność ma być Terminy, POTEM
-            Priorytety, POTEM Szybkie akcje/Ostatnia aktywność — inna niż na
-            desktopie (gdzie Priorytety to osobny, ostatni pełnoszerokościowy
-            rząd). CSS order działa tylko między rodzeństwem w TYM SAMYM
-            kontenerze flex/grid, więc wszystkie cztery karty (Terminy/Akcje/
-            Aktywność/Priorytety) muszą być bezpośrednimi dziećmi jednego
-            grida — na desktopie Priorytety dostaje pełny col-span i domyślny
-            (czyli: ostatni w DOM) porządek, więc i tak ląduje w nowym rzędzie
-            pod resztą.
+            Sekcja 14 (poprzedni brief) + sekcja 2 (ten brief): na mobile
+            widoczne jest WYŁĄCZNIE Terminy — Szybkie akcje/Ostatnia
+            aktywność/Priorytety tygodnia znikają całkowicie poniżej 768px
+            (compact pulpit), bez zmiany ich pozycji/kolejności na desktopie
+            (>=768px), gdzie ten grid działa dokładnie jak dotychczas.
           */}
           <div className="grid grid-cols-1 items-stretch gap-5 min-[700px]:grid-cols-2 min-[1100px]:grid-cols-3">
             <div className="order-1 min-[700px]:order-none">
               <DashboardDeadlinesCard deadlines={upcomingDeadlines} error={data.upcomingDeadlines.error} />
             </div>
-            <div className="order-3 min-[700px]:order-none">
+            <div className="order-3 hidden min-[700px]:order-none min-[768px]:block">
               <DashboardQuickActionsCard />
             </div>
-            <div className="order-4 min-[700px]:order-none">
+            <div className="order-4 hidden min-[700px]:order-none min-[768px]:block">
               <DashboardActivityCard items={recentActivity} error={data.recentActivity.error} />
             </div>
-            <div className="order-2 min-[700px]:order-none min-[700px]:col-span-2 min-[1100px]:col-span-3">
+            <div className="order-2 hidden min-[700px]:order-none min-[768px]:block min-[700px]:col-span-2 min-[1100px]:col-span-3">
               <DashboardWeeklyPrioritiesCard priorities={weeklyPriorities} error={data.weeklyPriorities.error} />
             </div>
           </div>

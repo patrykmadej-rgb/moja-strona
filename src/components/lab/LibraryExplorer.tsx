@@ -1,16 +1,34 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Camera, Library, Plus, Search } from "lucide-react";
+import dynamic from "next/dynamic";
+import { Camera, Library, Loader2, Plus, Search } from "lucide-react";
 import LibraryTabs, { type LibraryTabKey } from "@/components/lab/LibraryTabs";
 import LibraryBookCard from "@/components/lab/LibraryBookCard";
 import LibraryBookFormModal from "@/components/lab/LibraryBookFormModal";
 import LibraryDeleteModal from "@/components/lab/LibraryDeleteModal";
 import LibraryLoanModal from "@/components/lab/LibraryLoanModal";
-import LibraryPhotoAddModal from "@/components/lab/LibraryPhotoAddModal";
 import LibraryCoverPickerModal from "@/components/lab/LibraryCoverPickerModal";
+import LibraryBookDetailsModal from "@/components/lab/LibraryBookDetailsModal";
 import EmptyState from "@/components/lab/EmptyState";
 import type { LibraryBook, LibraryLoan, OwnershipStatus } from "@/lib/lab/library-types";
+
+// Sekcja 7 briefu: LibraryPhotoAddModal był importowany statycznie mimo że
+// renderuje się wyłącznie po kliknięciu "Dodaj ze zdjęcia" — jego kod
+// (obsługa kamery, kompresja obrazu przez canvas, LibraryCoverPicker)
+// trafiał więc do TEGO SAMEGO chunka JS co reszta Biblioteki i był
+// pobierany/parsowany przy KAŻDYM wejściu na /lab/biblioteka, nawet gdy
+// nikt nigdy nie otwiera tego modala. next/dynamic ładuje go dopiero przy
+// pierwszym renderze (czyli po kliknięciu), bez SSR (i tak jest to zawsze
+// interakcja po stronie klienta — modal wymaga dostępu do kamery/plików).
+const LibraryPhotoAddModal = dynamic(() => import("@/components/lab/LibraryPhotoAddModal"), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <Loader2 className="h-6 w-6 animate-spin text-white" strokeWidth={1.75} aria-hidden="true" />
+    </div>
+  ),
+});
 
 type ModalState =
   | { type: "add" }
@@ -18,6 +36,7 @@ type ModalState =
   | { type: "delete"; book: LibraryBook }
   | { type: "loan"; book: LibraryBook }
   | { type: "findCover"; book: LibraryBook }
+  | { type: "details"; book: LibraryBook; activeLoan: LibraryLoan | null; loanHistory: LibraryLoan[] }
   | { type: "photo" }
   | null;
 
@@ -161,11 +180,7 @@ export default function LibraryExplorer({ books, loans }: { books: LibraryBook[]
               key={book.id}
               book={book}
               activeLoan={activeLoan}
-              loanHistory={loanHistory}
-              onEdit={() => setModal({ type: "edit", book })}
-              onDeleteRequest={() => setModal({ type: "delete", book })}
-              onLoanRequest={() => setModal({ type: "loan", book })}
-              onFindCoverRequest={() => setModal({ type: "findCover", book })}
+              onOpenDetails={() => setModal({ type: "details", book, activeLoan, loanHistory })}
               onToast={(message) => setToast(message)}
             />
           ))}
@@ -222,6 +237,19 @@ export default function LibraryExplorer({ books, loans }: { books: LibraryBook[]
             setModal(null);
             setToast(message);
           }}
+        />
+      )}
+      {modal?.type === "details" && (
+        <LibraryBookDetailsModal
+          book={modal.book}
+          activeLoan={modal.activeLoan}
+          loanHistory={modal.loanHistory}
+          onClose={() => setModal(null)}
+          onEdit={() => setModal({ type: "edit", book: modal.book })}
+          onFindCover={() => setModal({ type: "findCover", book: modal.book })}
+          onDeleteRequest={() => setModal({ type: "delete", book: modal.book })}
+          onLoanRequest={() => setModal({ type: "loan", book: modal.book })}
+          onToast={(message) => setToast(message)}
         />
       )}
       {modal?.type === "photo" && (

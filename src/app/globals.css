@@ -2094,14 +2094,29 @@ html {
    already przyjęta w tym pliku granica mobile/tablet, patrz reszta
    media queries).
 
-   Kolejność w DOM (src/app/lab/layout.tsx): Sidebar, LabMobileHeader,
-   LabBottomNav, potem <main>. Wszystkie trzy mają z-index 50, TAK SAMO
-   jak istniejące modale w treści strony — ponieważ <main> jest OSTATNIE
-   w dokumencie, modale (zagnieżdżone w <main>) zawsze malują się NAD
-   tą trójką przy remisie z-index (CSS: przy równym z-index późniejszy
-   element w dokumencie wygrywa) — dokładnie tak jak dziś modale
-   przykrywają Sidebar. Nie podnosić z-index nawigacji mobilnej bez
-   zachowania tej kolejności w layout.tsx.
+   ARCHITEKTURA (druga wersja — pierwsza wersja, `position: fixed` header/
+   nav + padding na .lab-main-content kompensujący ich wysokość, nadal
+   zostawiała na iOS dużą pustą przestrzeń pod paskiem). Przyczyna: `position:
+   fixed` na iOS Safari bywa liczony względem LAYOUT viewportu (który może
+   być WYŻSZY niż realnie widoczny visual viewport, np. gdy pasek adresu
+   jest schowany w PWA standalone albo podczas przewijania) — to udokumentowana
+   niespójność w silniku WebKit, nie błąd w konkretnych wartościach `calc()`.
+   Dolny pasek "przyklejony" do dołu LAYOUT viewportu mógł więc realnie
+   wisieć WYŻEJ niż dół ekranu, zostawiając pod sobą pusty pas tła strony.
+
+   Naprawa: CAŁKOWICIE rezygnujemy z `position: fixed` dla header/nav na
+   mobile i przechodzimy na klasyczny "app shell" — `.lab-body` staje się
+   kolumną flex o wysokości DOKŁADNIE `100dvh` (realny widoczny viewport),
+   header i nav są zwykłymi dziećmi flex (`flex-shrink: 0`), a `.lab-main-
+   content` jest jedynym przewijanym elementem (`flex: 1; overflow-y: auto`)
+   między nimi. To strukturalnie eliminuje całą klasę błędów fixed-vs-layout-
+   viewport, bo nic już nie jest pozycjonowane względem viewportu — wszystko
+   to zwykły, policzalny flexbox. Kolejność w DOM (src/app/lab/layout.tsx:
+   Sidebar, LabMobileHeader, LabBottomNav, <main>) zostaje BEZ ZMIAN (Sidebar
+   nadal position:fixed na desktopie, modale w <main> nadal muszą być
+   ostatnie w DOM, żeby przykrywać Sidebar) — na mobile header/nav są teraz
+   wizualnie przestawiane na właściwe miejsce wyłącznie przez `order`
+   (Header=1, Main=2, BottomNav=3), bez zmiany realnego DOM.
    ============================================================ */
 :root {
   --lab-mobile-header-height: 52px;
@@ -2131,16 +2146,35 @@ html {
     display: none;
   }
 
+  /* Body = app shell o wysokości dokładnie jednego ekranu. `100vh` jako
+     fallback dla przeglądarek bez wsparcia `dvh` (rzadkie w 2026, ale
+     bezpieczny, tani fallback — kolejność deklaracji ma znaczenie: druga
+     wygrywa tam, gdzie jest wspierana). */
+  .lab-body {
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
   .lab-main-content {
+    order: 2;
+    flex: 1 1 auto;
+    /* Bez min-height:0 flex-item domyślnie nie chce się skurczyć poniżej
+       wysokości własnej treści — element nie mógłby stać się scrollowalny,
+       tylko rozpychałby rodzica (dokładnie ta sama pułapka co min-width:0
+       przy poziomym overflow, opisana niżej). */
+    min-height: 0;
     margin-left: 0;
     width: 100%;
     max-width: 100%;
-    padding-top: calc(var(--lab-mobile-header-height) + env(safe-area-inset-top));
-    /* env(safe-area-inset-bottom) wymaga viewport-fit=cover — ustawione
-       w src/app/lab/layout.tsx (export const viewport). +16px oddechu
-       nad paskiem, żeby ostatnia karta/przycisk na stronie nie stykały
-       się wizualnie z nawigacją. */
-    padding-bottom: calc(var(--lab-bottom-nav-height) + env(safe-area-inset-bottom) + 16px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Tylko estetyczny oddech nad paskiem — nav ma już swoją realną
+       wysokość w layoucie (flex-shrink:0), więc TU nie trzeba już
+       rezerwować miejsca kalkulacją bezpiecznego obszaru. */
+    padding-bottom: 16px;
   }
 
   /* PRAWDZIWA przyczyna poziomego przewijania całego dokumentu na telefonie
@@ -2165,37 +2199,28 @@ html {
     min-width: 0;
   }
 
-  /* Naprawa "ogromnej białej przestrzeni pod dolną nawigacją": poprzednia
-     wersja liczyła `height: calc(baza + env(safe-area))` I RÓWNOCZEŚNIE
-     `padding: env(safe-area) ...` na tym samym elemencie — matematycznie
-     przy box-sizing:border-box to się nie dubluje (padding jest już
-     wliczony w height), ale jest to krucha, myląca konstrukcja dokładnie
-     tego typu, o który prosił brief do wyeliminowania. Nowa wersja NIE
-     ustawia jawnego `height` w ogóle — wysokość wynika WYŁĄCZNIE z
-     zawartości (ikony/etykiety + min-height) plus JEDNEGO źródła
-     safe-area (padding), więc nie ma żadnej możliwości podwójnego
-     naliczenia ani rozjazdu w przeglądarkach, które inaczej obsługują
-     `env()` wewnątrz `calc()` w `height`. */
+  /* Header i nav są teraz ZWYKŁYMI dziećmi flex kolumny .lab-body (patrz
+     komentarz architektury wyżej) — żadnego `position: fixed`, żadnego
+     `z-index`, żadnego jawnego `height`. Wysokość każdego wynika wyłącznie
+     z zawartości + `min-height`; `flex-shrink: 0` gwarantuje, że .lab-main-
+     content (jedyny element z `flex: 1`) nigdy ich nie ściśnie. safe-area
+     jest doliczana DOKŁADNIE RAZ na element, przez `padding`. */
   .lab-mobile-header {
-    position: fixed;
-    inset: 0 0 auto 0;
-    z-index: 50;
+    order: 1;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     gap: 10px;
     min-height: var(--lab-mobile-header-height);
     padding: env(safe-area-inset-top) 16px 8px;
 
-    background: rgba(245, 241, 236, 0.92);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: #f5f1ec;
     border-bottom: 1px solid #e8e2ec;
   }
 
   .lab-bottom-nav {
-    position: fixed;
-    inset: auto 0 0 0;
-    z-index: 50;
+    order: 3;
+    flex-shrink: 0;
     display: flex;
     align-items: stretch;
     /* Brak jawnego height — wysokość = .lab-bottom-nav-item (min-height:
@@ -2203,9 +2228,7 @@ html {
        + ten JEDEN padding-bottom na safe-area. */
     padding-bottom: env(safe-area-inset-bottom);
 
-    background: rgba(255, 255, 255, 0.97);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: #ffffff;
     border-top: 1px solid #e8e2ec;
     box-shadow: 0 -6px 20px rgba(49, 30, 64, 0.06);
   }

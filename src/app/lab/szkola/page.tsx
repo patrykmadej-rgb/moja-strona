@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCalendarConnectionSummary, isCalendarConnectionActive } from "@/lib/szkola/calendarConnectionStatus";
-import { Plus, CalendarDays } from "lucide-react";
+import { Plus, CalendarDays, CalendarRange } from "lucide-react";
 import SzkolaNav from "@/components/szkola/SzkolaNav";
 import NextSessionCard from "@/components/szkola/NextSessionCard";
 import SchoolSummaryCards from "@/components/szkola/SchoolSummaryCards";
@@ -10,7 +10,9 @@ import CalendarChangesSummaryCard, { type DashboardCalendarChange } from "@/comp
 import NextSessionLogisticsCard from "@/components/szkola/NextSessionLogisticsCard";
 import ImportSummaryCard from "@/components/szkola/ImportSummaryCard";
 import AlertsSummaryCard from "@/components/szkola/AlertsSummaryCard";
+import EmptyState from "@/components/lab/EmptyState";
 import { todayDateString } from "@/lib/lab/format";
+import { formatSessionDateRange } from "@/lib/szkola/format";
 import { sumByCurrency } from "@/lib/szkola/money";
 import type { Accommodation, Currency, SchoolAlert, SchoolSemester, SchoolSession, TravelSegment } from "@/lib/szkola/types";
 
@@ -151,79 +153,116 @@ export default async function SzkolaPulpitPage() {
   return (
     <div className="lab-szkola-page min-h-full bg-[#f7f4ef]">
       <div className="mx-auto max-w-[1180px] px-8 pt-9 pb-16">
-        <div className="flex flex-wrap items-start justify-between gap-6">
-          <div>
-            <h1 className="font-[family-name:var(--font-cormorant)] text-[32px] font-semibold leading-[1.1] text-[#201a2b]">
-              Szkoła psychoterapii
-            </h1>
-            <p className="mt-1.5 text-[13px] text-[#706878]">
-              Kontroluj zjazdy, podróże, opłaty, materiały i godziny szkoleniowe.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Link
-              href="/lab/szkola/kalendarz"
-              className="flex h-10 items-center gap-1.5 rounded-[10px] border border-[#e8e2ec] px-4 text-[13px] font-medium text-[#201a2b] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd]"
-            >
-              <CalendarDays className="h-4 w-4" strokeWidth={1.75} />
-              Sprawdź kalendarz
-            </Link>
-            <Link
-              href="/lab/szkola/zjazdy/nowy"
-              className="flex h-10 shrink-0 items-center gap-1.5 rounded-[10px] bg-[#5b2a86] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#32134f]"
-            >
-              <Plus className="h-4 w-4" strokeWidth={2} />
-              Dodaj zjazd
-            </Link>
-          </div>
-        </div>
+        {/* Mobile (sekcja 3 briefu): prosta lista zjazdów zamiast rozbudowanego
+            pulpitu — nazwa/numer, data, linki do trzech konkretnych zakładek
+            zjazdu (istniejące SessionWorkspace/SessionTabs, przez ?tab=,
+            patrz SessionWorkspace.tsx). Reużywa `sessions` (te same,
+            nadchodzące zjazdy już pobrane wyżej dla desktopowego pulpitu) —
+            zero dodatkowych zapytań, zero konkurencyjnego modelu danych. */}
+        <div className="min-[768px]:hidden">
+          <h1 className="font-[family-name:var(--font-cormorant)] text-[22px] font-semibold leading-[1.1] text-[#201a2b]">
+            Szkoła psychoterapii
+          </h1>
 
-        <div className="mt-6">
-          <SzkolaNav />
-        </div>
-
-        <div className="mt-6 flex flex-col gap-5">
-          <NextSessionCard
-            session={
-              nextSession
-                ? {
-                    ...nextSession,
-                    segments: nextSessionSegments,
-                    accommodations: nextSessionAccommodations,
-                    semester: nextSessionSemester,
-                  }
-                : null
-            }
-          />
-
-          {nextSession && (
-            <NextSessionLogisticsCard
-              sessionId={nextSession.id}
-              segments={nextSessionSegments}
-              accommodations={nextSessionAccommodations}
-            />
+          {sessions.length === 0 ? (
+            <div className="mt-5 rounded-[16px] border border-[#e8e2ec] bg-white px-6 py-10 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+              <EmptyState icon={CalendarRange} title="Brak zaplanowanych zjazdów" compact />
+            </div>
+          ) : (
+            <ul className="mt-4 flex flex-col gap-2.5">
+              {sessions.map((session) => (
+                <li key={session.id} className="rounded-[12px] border border-[#e8e2ec] bg-white p-3.5">
+                  <Link href={`/lab/szkola/zjazdy/${session.id}`} className="block text-sm font-semibold text-[#201a2b]">
+                    {session.session_number ? `Zjazd ${session.session_number}` : session.title}
+                  </Link>
+                  <p className="mt-0.5 text-xs text-[#706878]">{formatSessionDateRange(session.start_date, session.end_date)}</p>
+                  <div className="mt-2.5 flex flex-wrap gap-x-3 gap-y-1 text-xs font-medium text-[#5b2a86]">
+                    <Link href={`/lab/szkola/zjazdy/${session.id}?tab=podroz`}>Podróż</Link>
+                    <Link href={`/lab/szkola/zjazdy/${session.id}?tab=zakwaterowanie`}>Zakwaterowanie</Link>
+                    <Link href={`/lab/szkola/zjazdy/${session.id}?tab=plan`}>Plan zajęć</Link>
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
+        </div>
 
-          <SchoolSummaryCards
-            nextSessionLabel={
-              nextSession ? (nextSession.session_number ? `Zjazd ${nextSession.session_number}` : nextSession.title) : "Brak"
-            }
-            preparedTripsCount={preparedTripsCount}
-            totalSessionsForTravel={sessions.length}
-            expensesThisYearSums={expensesThisYearSums}
-            calendarChangesCount={calendarChangesCount}
-            calendarConnected={calendarConnected}
-          />
+        {/* Desktop: dotychczasowy pulpit szkoły, bez zmian. */}
+        <div className="hidden min-[768px]:block">
+          <div className="flex flex-wrap items-start justify-between gap-6">
+            <div>
+              <h1 className="font-[family-name:var(--font-cormorant)] text-[32px] font-semibold leading-[1.1] text-[#201a2b]">
+                Szkoła psychoterapii
+              </h1>
+              <p className="mt-1.5 text-[13px] text-[#706878]">
+                Kontroluj zjazdy, podróże, opłaty, materiały i godziny szkoleniowe.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href="/lab/szkola/kalendarz"
+                className="flex h-10 items-center gap-1.5 rounded-[10px] border border-[#e8e2ec] px-4 text-[13px] font-medium text-[#201a2b] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd]"
+              >
+                <CalendarDays className="h-4 w-4" strokeWidth={1.75} />
+                Sprawdź kalendarz
+              </Link>
+              <Link
+                href="/lab/szkola/zjazdy/nowy"
+                className="flex h-10 shrink-0 items-center gap-1.5 rounded-[10px] bg-[#5b2a86] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#32134f]"
+              >
+                <Plus className="h-4 w-4" strokeWidth={2} />
+                Dodaj zjazd
+              </Link>
+            </div>
+          </div>
 
-          <CalendarChangesSummaryCard
-            calendarConnected={calendarConnected}
-            changes={dashboardChanges}
-            totalCount={calendarChangesCount}
-          />
+          <div className="mt-6">
+            <SzkolaNav />
+          </div>
 
-          <div className="grid grid-cols-1 gap-5 min-[700px]:grid-cols-2">
-            <ImportSummaryCard newCount={importNewCount} needsReviewCount={importNeedsReviewCount} readyCount={importReadyCount} />
-            <AlertsSummaryCard alerts={alerts} />
+          <div className="mt-6 flex flex-col gap-5">
+            <NextSessionCard
+              session={
+                nextSession
+                  ? {
+                      ...nextSession,
+                      segments: nextSessionSegments,
+                      accommodations: nextSessionAccommodations,
+                      semester: nextSessionSemester,
+                    }
+                  : null
+              }
+            />
+
+            {nextSession && (
+              <NextSessionLogisticsCard
+                sessionId={nextSession.id}
+                segments={nextSessionSegments}
+                accommodations={nextSessionAccommodations}
+              />
+            )}
+
+            <SchoolSummaryCards
+              nextSessionLabel={
+                nextSession ? (nextSession.session_number ? `Zjazd ${nextSession.session_number}` : nextSession.title) : "Brak"
+              }
+              preparedTripsCount={preparedTripsCount}
+              totalSessionsForTravel={sessions.length}
+              expensesThisYearSums={expensesThisYearSums}
+              calendarChangesCount={calendarChangesCount}
+              calendarConnected={calendarConnected}
+            />
+
+            <CalendarChangesSummaryCard
+              calendarConnected={calendarConnected}
+              changes={dashboardChanges}
+              totalCount={calendarChangesCount}
+            />
+
+            <div className="grid grid-cols-1 gap-5 min-[700px]:grid-cols-2">
+              <ImportSummaryCard newCount={importNewCount} needsReviewCount={importNeedsReviewCount} readyCount={importReadyCount} />
+              <AlertsSummaryCard alerts={alerts} />
+            </div>
           </div>
         </div>
       </div>

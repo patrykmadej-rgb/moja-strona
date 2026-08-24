@@ -32,7 +32,7 @@ function formatEntryCountLabel(count: number): string {
 
 export default function DashboardNextSessionCard({ data, error }: { data: NextSessionData | null; error: string | null }) {
   return (
-    <section aria-labelledby="dashboard-next-session-heading" className="flex h-full flex-col rounded-[16px] border border-[#e8e2ec] bg-white p-6 shadow-[0_4px_18px_rgba(49,30,64,0.035)]">
+    <section aria-labelledby="dashboard-next-session-heading" className="flex h-full flex-col rounded-[16px] border border-[#e8e2ec] bg-white p-4 shadow-[0_4px_18px_rgba(49,30,64,0.035)] min-[768px]:p-6">
       <h2 id="dashboard-next-session-heading" className="text-sm font-semibold text-[#201a2b]">
         Najbliższy zjazd
       </h2>
@@ -61,7 +61,10 @@ export default function DashboardNextSessionCard({ data, error }: { data: NextSe
             </p>
           </div>
 
-          <ul className="mt-4 flex flex-col gap-1.5 border-t border-[#eee9f2] pt-3 text-xs">
+          {/* Skrót statusów przygotowania — dublowałby konkretne dane lotu/
+              noclegu poniżej na małym ekranie ("nie duplikuj informacji",
+              sekcja 2 briefu), więc na mobile jest ukryty; desktop bez zmian. */}
+          <ul className="mt-4 hidden flex-col gap-1.5 border-t border-[#eee9f2] pt-3 text-xs min-[768px]:flex">
             {[data.transportStatus, data.accommodationStatus, data.paymentStatus].map((status) => {
               const Icon = STATUS_ICON[status.kind];
               return (
@@ -137,8 +140,9 @@ export default function DashboardNextSessionCard({ data, error }: { data: NextSe
             )}
           </div>
 
+          {/* Plan dnia po dniach — za dużo szczegółu na kompaktowy pulpit mobilny, dostępny w pełni w widoku zjazdu (link "Otwórz zjazd" niżej). Desktop bez zmian. */}
           {data.schedulePreview.length > 0 && (
-            <ul className="mt-3 border-t border-[#eee9f2] pt-3 text-xs text-[#706878]">
+            <ul className="mt-3 hidden border-t border-[#eee9f2] pt-3 text-xs text-[#706878] min-[768px]:block">
               {data.schedulePreview.map((day) => (
                 <li key={day.label} className="flex items-center justify-between gap-2 py-0.5">
                   <span>{day.label}</span>
@@ -155,9 +159,10 @@ export default function DashboardNextSessionCard({ data, error }: { data: NextSe
             >
               Otwórz zjazd
             </Link>
+            {/* "Zobacz podróż" jest zbędny obok konkretnego odcinka pokazanego wyżej — zostaje wyłącznie na desktopie. */}
             <Link
               href="/lab/szkola/podroze"
-              className="rounded-[10px] border border-[#e8e2ec] px-4 py-2 text-xs font-medium text-[#201a2b] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd]"
+              className="hidden rounded-[10px] border border-[#e8e2ec] px-4 py-2 text-xs font-medium text-[#201a2b] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] min-[768px]:block"
             >
               Zobacz podróż
             </Link>

@@ -1,13 +1,22 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, X } from "lucide-react";
-import { updateLibraryBookCover } from "@/app/lab/biblioteka/actions";
+import { Camera, Loader2, Trash2, X } from "lucide-react";
+import { updateLibraryBookCover, updateLibraryBookCoverStorage } from "@/app/lab/biblioteka/actions";
 import LibraryCoverPicker, { type CoverCandidate } from "@/components/lab/LibraryCoverPicker";
+import { prepareImageForUpload } from "@/lib/imagePrep";
+import { uploadLibraryCover } from "@/lib/lab/libraryCoverStorage";
 import type { LibraryBook } from "@/lib/lab/library-types";
 
-/** "Znajdź okładkę" z menu istniejącej książki (sekcja 4 briefu) — zmienia wyłącznie cover_url, reużywa ten sam picker co formularz dodawania/edycji. */
+/**
+ * "Zmień okładkę" z menu/panelu szczegółów istniejącej książki (sekcje 4 i
+ * 6 briefu). Trzy sposoby ustawienia okładki w jednym miejscu: (1) wyszukane
+ * automatycznie/wybrane spośród wyników (LibraryCoverPicker, Google Books +
+ * Open Library fallback), (2) własne zdjęcie z galerii albo aparatu
+ * (uploadLibraryCover → prywatny Storage, ta sama kompresja co przy
+ * rozpoznawaniu ze zdjęcia — prepareImageForUpload), (3) usunięcie okładki.
+ */
 export default function LibraryCoverPickerModal({
   book,
   onClose,
@@ -22,7 +31,9 @@ export default function LibraryCoverPickerModal({
     book.cover_url ? { id: "current", title: book.title, author: book.author, publisher: null, year: null, isbn: null, thumbnailUrl: book.cover_url } : null,
   );
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const headingId = useId();
 
   const handleSave = async () => {
@@ -35,8 +46,38 @@ export default function LibraryCoverPickerModal({
       return;
     }
     router.refresh();
-    onSaved("Zaktualizowano okładkę.");
+    onSaved(selected ? "Zaktualizowano okładkę." : "Usunięto okładkę.");
   };
+
+  const handleFileSelected = async (file: File | undefined) => {
+    if (!file) return;
+    setError(null);
+    setUploading(true);
+
+    const prepared = await prepareImageForUpload(file);
+    if ("error" in prepared) {
+      setUploading(false);
+      setError(prepared.error);
+      return;
+    }
+
+    try {
+      const storagePath = await uploadLibraryCover(book.id, prepared.blob);
+      const result = await updateLibraryBookCoverStorage(book.id, storagePath);
+      setUploading(false);
+      if ("error" in result) {
+        setError(result.error);
+        return;
+      }
+      router.refresh();
+      onSaved("Zapisano własną okładkę.");
+    } catch (err) {
+      setUploading(false);
+      setError(err instanceof Error ? err.message : "Nie udało się przesłać zdjęcia.");
+    }
+  };
+
+  const busy = saving || uploading;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby={headingId}>
@@ -44,7 +85,7 @@ export default function LibraryCoverPickerModal({
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <h2 id={headingId} className="font-[family-name:var(--font-cormorant)] text-[20px] font-semibold text-[#201a2b]">
-              Znajdź okładkę
+              Zmień okładkę
             </h2>
             <p className="mt-1 truncate text-sm text-[#706878]">
               „{book.title}” — {book.author}
@@ -64,12 +105,46 @@ export default function LibraryCoverPickerModal({
           <LibraryCoverPicker title={book.title} author={book.author} selected={selected} onSelect={setSelected} />
         </div>
 
+        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[#f0ebf5] pt-4">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="hidden"
+            onChange={(e) => {
+              void handleFileSelected(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => fileInputRef.current?.click()}
+            className="flex h-9 items-center gap-1.5 rounded-[9px] border border-[#e6deec] px-3 text-xs font-medium text-[#5b2a86] transition-colors hover:border-[#d9cde5] hover:bg-[#f1eafd] disabled:opacity-60"
+          >
+            {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.75} /> : <Camera className="h-3.5 w-3.5" strokeWidth={1.75} />}
+            {uploading ? "Przesyłanie…" : "Prześlij własne zdjęcie"}
+          </button>
+          {selected && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => setSelected(null)}
+              className="flex h-9 items-center gap-1.5 rounded-[9px] px-3 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-60"
+            >
+              <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
+              Usuń okładkę
+            </button>
+          )}
+        </div>
+
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 
         <div className="mt-5 flex gap-3">
           <button
             type="button"
-            disabled={saving}
+            disabled={busy}
             onClick={handleSave}
             className="flex h-10 items-center gap-1.5 rounded-[10px] bg-[#5b2a86] px-5 text-sm font-medium text-white transition-colors hover:bg-[#32134f] disabled:opacity-50"
           >
@@ -78,7 +153,7 @@ export default function LibraryCoverPickerModal({
           </button>
           <button
             type="button"
-            disabled={saving}
+            disabled={busy}
             onClick={onClose}
             className="flex h-10 items-center rounded-[10px] border border-[#e6deec] px-5 text-sm font-medium text-[#706878] transition-colors hover:border-[#d9cde5] disabled:opacity-50"
           >
